@@ -84,19 +84,19 @@ const Dashboard: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="bg-white p-4 rounded-lg shadow-md">
               <h3 className="text-sm text-gray-500">Total Invested Value</h3>
-              <p className="text-2xl font-bold" style={{color: '#08AFF1'}}>₹225,000</p>
+              <p className="text-2xl font-bold text-black">₹225,000</p>
             </div>
             <div className="bg-white p-4 rounded-lg shadow-md">
               <h3 className="text-sm text-gray-500">Total Current Value</h3>
-              <p className="text-2xl font-bold" style={{color: '#AACF45'}}>₹239,750</p>
+              <p className="text-2xl font-bold text-black">₹239,750</p>
             </div>
             <div className="bg-white p-4 rounded-lg shadow-md">
               <h3 className="text-sm text-gray-500">Profit & Loss</h3>
-              <p className="text-2xl font-bold text-green-500">+₹14,750</p>
+              <p className={`text-2xl font-bold ${investmentData.reduce((acc, curr) => acc + curr.current, 0) - investmentData.reduce((acc, curr) => acc + curr.invested, 0) > 0 ? 'text-green-500' : 'text-red-500'}`}>₹{investmentData.reduce((acc, curr) => acc + curr.current, 0) - investmentData.reduce((acc, curr) => acc + curr.invested, 0)}</p>
             </div>
             <div className="bg-white p-4 rounded-lg shadow-md">
               <h3 className="text-sm text-gray-500">No. of Investments</h3>
-              <p className="text-2xl font-bold">3</p>
+              <p className="text-2xl font-bold text-black">3</p>
             </div>
           </div>
 
@@ -148,8 +148,8 @@ const Dashboard: React.FC = () => {
                   <td className="py-2 px-3">{item.date}</td>
                   <td className="py-2 px-3">{item.mode}</td>
                   <td className="py-2 px-3">{item.period}</td>
-                  <td className="py-2 px-3" style={{color: '#08AFF1'}}>{item.roi}%</td>
-                  <td className="py-2 px-3" style={{color: '#AACF45'}}>₹{item.pnl.toLocaleString()}</td>
+                  <td className="py-2 px-3 text-black">{item.roi}%</td>
+                  <td className={`py-2 px-3 ${item.pnl > 0 ? 'text-green-500' : 'text-red-500'}`}>₹{item.pnl.toLocaleString()}</td>
                   <td className="py-2 px-3">{item.withdrawal}</td>
                   <td className="py-2 px-3">{item.maturity}</td>
                 </tr>
