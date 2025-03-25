@@ -123,61 +123,91 @@ const Funds: React.FC = () => {
       )}
 
       {/* Add Funds Tab */}
-      {activeTab === 'add' && (
-        <div className="bg-white p-4 rounded-lg shadow-md">
-          <h3 className="text-lg font-semibold mb-4" style={{color: '#AACF45'}}>Add Funds</h3>
-          <div className="space-y-4">
-            <div>
-              <label className="block mb-2">Payment Method</label>
-              <select 
-                className="w-full p-2 border rounded"
-                value={paymentMethod}
-                onChange={(e) => setPaymentMethod(e.target.value)}
-              >
-                <option value="UPI">UPI</option>
-                <option value="NEFT">NEFT (Account Details will be shared)</option>
-              </select>
-            </div>
-            <div>
-              <label className="block mb-2">Amount</label>
-              <input 
-                type="number" 
-                placeholder="Enter amount" 
-                className="w-full p-2 border rounded"
-                value={addAmount}
-                onChange={(e) => setAddAmount(e.target.value)}
-              />
-            </div>
-            <div>
-              <label className="block mb-2">Ref. No. (Last 4 Digits of UPI/UTR/IMPS Ref. No.)</label>
-              <input 
-                type="text" 
-                placeholder="Enter reference number" 
-                className="w-full p-2 border rounded"
-                value={referenceNumber}
-                onChange={(e) => setReferenceNumber(e.target.value)}
-              />
-            </div>
-            <div>
-              <label className="block mb-2">Comments (Optional)</label>
-              <textarea 
-                placeholder="Enter any comments" 
-                className="w-full p-2 border rounded"
-                value={comments}
-                onChange={(e) => setComments(e.target.value)}
-              />
-            </div>
-            <button 
-              className="w-full py-2 rounded text-white"
-              style={{backgroundColor: '#AACF45'}}
-              disabled={!addAmount || !referenceNumber}
-            >
-              Add Funds
-            </button>
-          </div>
+{activeTab === 'add' && (
+  <div className="bg-white p-4 rounded-lg shadow-md">
+    <h3 className="text-lg font-semibold mb-4" style={{color: '#AACF45'}}>Add Funds</h3>
+    
+    <div className="flex flex-col md:flex-row gap-6">
+      {/* Left Column - Form */}
+      <div className="flex-1 space-y-4">
+        <div>
+          <label className="block mb-2">Payment Method</label>
+          <select 
+            className="w-full p-2 border rounded"
+            value={paymentMethod}
+            onChange={(e) => setPaymentMethod(e.target.value)}
+          >
+            <option value="UPI">UPI</option>
+            <option value="NEFT">NEFT (Account Details will be shared)</option>
+          </select>
         </div>
-      )}
-
+        
+        <div>
+          <label className="block mb-2">Amount</label>
+          <input 
+            type="number" 
+            placeholder="Enter amount" 
+            className="w-full p-2 border rounded"
+            value={addAmount}
+            onChange={(e) => setAddAmount(e.target.value)}
+          />
+        </div>
+        
+        <div>
+          <label className="block mb-2">Ref. No. (Last 4 Digits of UPI/UTR/IMPS Ref. No.)</label>
+          <input 
+            type="text" 
+            placeholder="Enter reference number" 
+            className="w-full p-2 border rounded"
+            value={referenceNumber}
+            onChange={(e) => setReferenceNumber(e.target.value)}
+          />
+        </div>
+        
+        <div>
+          <label className="block mb-2">Comments (Optional)</label>
+          <textarea 
+            placeholder="Enter any comments" 
+            className="w-full p-2 border rounded"
+            value={comments}
+            onChange={(e) => setComments(e.target.value)}
+          />
+        </div>
+        
+        <button 
+          className="w-full py-2 rounded text-white"
+          style={{backgroundColor: '#AACF45'}}
+          disabled={!addAmount || !referenceNumber}
+        >
+          Add Funds
+        </button>
+      </div>
+      
+      {/* Right Column - QR Code */}
+      <div className="flex-1 flex flex-col items-center justify-center border-l-0 md:border-l md:border-gray-200 md:pl-6">
+        <div className="text-center mb-4">
+          <h4 className="font-medium mb-1">Scan to Pay via UPI</h4>
+          <p className="text-sm text-gray-600">Use any UPI app to scan this code</p>
+        </div>
+        
+        {/* QR Code Placeholder */}
+        <div className="bg-white-100 p-4 rounded-lg mb-3">
+          <img 
+            src="/cleaned_qr.png" 
+            alt="UPI QR Code" 
+            className="w-48 h-48 object-contain"
+          />
+        </div>
+        
+        <div className="text-center">
+          <p className="font-medium mb-1">OR</p>
+          <p className="text-sm text-gray-600">Send to UPI ID:</p>
+          <p className="font-mono bg-gray-100 px-3 py-1 rounded-md mt-1">your.upi@id</p>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
       {/* Withdraw Tab */}
       {activeTab === 'withdraw' && (
         <div className="bg-white p-4 rounded-lg shadow-md">

@@ -24,7 +24,7 @@ const Sidebar: React.FC = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   // Color configuration
-  const primaryColor = '#08AFF1'; // A sophisticated blue
+  const primaryColor = '#08AFF1';
   const iconColor = primaryColor;
   const textColor = 'text-gray-800';
   const hoverEffect = 'hover:bg-gray-100 hover:bg-opacity-50';
@@ -54,7 +54,9 @@ const Sidebar: React.FC = () => {
   };
 
   return (
-    <div className={`bg-white shadow-md transition-all duration-300 ${isCollapsed ? 'w-20' : 'w-64'}`}>
+    <div className={`bg-white shadow-md transition-all duration-300 flex flex-col ${isCollapsed ? 'w-20' : 'w-64'}`}
+      style={{ height: 'calc(100vh - 1rem)' }}>
+      
       {/* Hamburger Menu Button */}
       <div className="p-5 flex justify-center">
         <button 
@@ -69,9 +71,10 @@ const Sidebar: React.FC = () => {
         </button>
       </div>
 
-      <div className="p-4">
+      {/* Scrollable Content Area */}
+      <div className="flex-1 overflow-y-auto p-4">
         {/* Sidebar Menu Items */}
-        <div className="space-y-1">
+        <div className="space-y-2">
           {/* Dashboard */}
           <div>
             <div 
@@ -83,7 +86,7 @@ const Sidebar: React.FC = () => {
               </div>
               {!isCollapsed && (
                 <>
-                  <span className={`flex-1 ${textColor} font-medium`}>Dashboard</span>
+                  <span className={`flex-1 ${textColor} font-semibold text-base`}>Dashboard</span>
                   {openMenus.dashboard ? (
                     <ChevronDown className="h-5 w-5 text-gray-500" />
                   ) : (
@@ -93,11 +96,11 @@ const Sidebar: React.FC = () => {
               )}
             </div>
             {!isCollapsed && openMenus.dashboard && (
-              <div className="pl-4 space-y-1 mt-1">
-                <div onClick={() => navigateTo('/dashboard')} className={`block p-2 rounded-md text-sm ${hoverEffect} ${textColor} cursor-pointer transition-colors`}>
+              <div className="pl-4 space-y-2 mt-1">
+                <div onClick={() => navigateTo('/dashboard')} className={`block p-3 rounded-md text-base ${hoverEffect} ${textColor} cursor-pointer transition-colors font-medium`}>
                   My Investment
                 </div>
-                <div onClick={() => navigateTo('/dashboard/details')} className={`block p-2 rounded-md text-sm ${hoverEffect} ${textColor} cursor-pointer transition-colors`}>
+                <div onClick={() => navigateTo('/dashboard/details')} className={`block p-3 rounded-md text-base ${hoverEffect} ${textColor} cursor-pointer transition-colors font-medium`}>
                   Investment Details
                 </div>
               </div>
@@ -115,7 +118,7 @@ const Sidebar: React.FC = () => {
               </div>
               {!isCollapsed && (
                 <>
-                  <span className={`flex-1 ${textColor} font-medium`}>Investments</span>
+                  <span className={`flex-1 ${textColor} font-semibold text-base`}>Investments</span>
                   {openMenus.investments ? (
                     <ChevronDown className="h-5 w-5 text-gray-500" />
                   ) : (
@@ -125,11 +128,11 @@ const Sidebar: React.FC = () => {
               )}
             </div>
             {!isCollapsed && openMenus.investments && (
-              <div className="pl-4 space-y-1 mt-1">
-                <div onClick={() => navigateTo('/investments/make')} className={`block p-2 rounded-md text-sm ${hoverEffect} ${textColor} cursor-pointer transition-colors`}>
+              <div className="pl-4 space-y-2 mt-1">
+                <div onClick={() => navigateTo('/investments/make')} className={`block p-3 rounded-md text-base ${hoverEffect} ${textColor} cursor-pointer transition-colors font-medium`}>
                   Make Investment
                 </div>
-                <div onClick={() => navigateTo('/investments/my')} className={`block p-2 rounded-md text-sm ${hoverEffect} ${textColor} cursor-pointer transition-colors`}>
+                <div onClick={() => navigateTo('/investments/my')} className={`block p-3 rounded-md text-base ${hoverEffect} ${textColor} cursor-pointer transition-colors font-medium`}>
                   My Investments
                 </div>
               </div>
@@ -147,7 +150,7 @@ const Sidebar: React.FC = () => {
               </div>
               {!isCollapsed && (
                 <>
-                  <span className={`flex-1 ${textColor} font-medium`}>Funds</span>
+                  <span className={`flex-1 ${textColor} font-semibold text-base`}>Funds</span>
                   {openMenus.funds ? (
                     <ChevronDown className="h-5 w-5 text-gray-500" />
                   ) : (
@@ -157,17 +160,17 @@ const Sidebar: React.FC = () => {
               )}
             </div>
             {!isCollapsed && openMenus.funds && (
-              <div className="pl-4 space-y-1 mt-1">
-                <div onClick={() => navigateTo('/funds/available')} className={`block p-2 rounded-md text-sm ${hoverEffect} ${textColor} cursor-pointer transition-colors`}>
+              <div className="pl-4 space-y-2 mt-1">
+                <div onClick={() => navigateTo('/funds/available')} className={`block p-3 rounded-md text-base ${hoverEffect} ${textColor} cursor-pointer transition-colors font-medium`}>
                   Funds Available
                 </div>
-                <div onClick={() => navigateTo('/funds/add')} className={`block p-2 rounded-md text-sm ${hoverEffect} ${textColor} cursor-pointer transition-colors`}>
+                <div onClick={() => navigateTo('/funds/add')} className={`block p-3 rounded-md text-base ${hoverEffect} ${textColor} cursor-pointer transition-colors font-medium`}>
                   Add Funds
                 </div>
-                <div onClick={() => navigateTo('/funds/withdraw')} className={`block p-2 rounded-md text-sm ${hoverEffect} ${textColor} cursor-pointer transition-colors`}>
+                <div onClick={() => navigateTo('/funds/withdraw')} className={`block p-3 rounded-md text-base ${hoverEffect} ${textColor} cursor-pointer transition-colors font-medium`}>
                   Withdraw
                 </div>
-                <div onClick={() => navigateTo('/funds/history')} className={`block p-2 rounded-md text-sm ${hoverEffect} ${textColor} cursor-pointer transition-colors`}>
+                <div onClick={() => navigateTo('/funds/history')} className={`block p-3 rounded-md text-base ${hoverEffect} ${textColor} cursor-pointer transition-colors font-medium`}>
                   Transaction History
                 </div>
               </div>
@@ -185,7 +188,7 @@ const Sidebar: React.FC = () => {
               </div>
               {!isCollapsed && (
                 <>
-                  <span className={`flex-1 ${textColor} font-medium`}>Ledger</span>
+                  <span className={`flex-1 ${textColor} font-semibold text-base`}>Ledger</span>
                   {openMenus.ledger ? (
                     <ChevronDown className="h-5 w-5 text-gray-500" />
                   ) : (
@@ -195,8 +198,8 @@ const Sidebar: React.FC = () => {
               )}
             </div>
             {!isCollapsed && openMenus.ledger && (
-              <div className="pl-4 space-y-1 mt-1">
-                <div onClick={() => navigateTo('/ledger')} className={`block p-2 rounded-md text-sm ${hoverEffect} ${textColor} cursor-pointer transition-colors`}>
+              <div className="pl-4 space-y-2 mt-1">
+                <div onClick={() => navigateTo('/ledger')} className={`block p-3 rounded-md text-base ${hoverEffect} ${textColor} cursor-pointer transition-colors font-medium`}>
                   View Ledger
                 </div>
               </div>
@@ -214,7 +217,7 @@ const Sidebar: React.FC = () => {
               </div>
               {!isCollapsed && (
                 <>
-                  <span className={`flex-1 ${textColor} font-medium`}>Referral</span>
+                  <span className={`flex-1 ${textColor} font-semibold text-base`}>Referral</span>
                   {openMenus.referral ? (
                     <ChevronDown className="h-5 w-5 text-gray-500" />
                   ) : (
@@ -224,11 +227,11 @@ const Sidebar: React.FC = () => {
               )}
             </div>
             {!isCollapsed && openMenus.referral && (
-              <div className="pl-4 space-y-1 mt-1">
-                <div onClick={() => navigateTo('/referral/overview')} className={`block p-2 rounded-md text-sm ${hoverEffect} ${textColor} cursor-pointer transition-colors`}>
+              <div className="pl-4 space-y-2 mt-1">
+                <div onClick={() => navigateTo('/referral/overview')} className={`block p-3 rounded-md text-base ${hoverEffect} ${textColor} cursor-pointer transition-colors font-medium`}>
                   Referral Overview
                 </div>
-                <div onClick={() => navigateTo('/referral/history')} className={`block p-2 rounded-md text-sm ${hoverEffect} ${textColor} cursor-pointer transition-colors`}>
+                <div onClick={() => navigateTo('/referral/history')} className={`block p-3 rounded-md text-base ${hoverEffect} ${textColor} cursor-pointer transition-colors font-medium`}>
                   Referral History
                 </div>
               </div>

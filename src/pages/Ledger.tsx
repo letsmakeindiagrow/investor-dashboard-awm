@@ -121,10 +121,10 @@ const Ledger: React.FC = () => {
                   <td className="py-2 px-3">{entry.date}</td>
                   <td className="py-2 px-3">{entry.voucher}</td>
                   <td className="py-2 px-3">{entry.narration}</td>
-                  <td className="py-2 px-3" style={{color: entry.debit > 0 ? '#08AFF1' : ''}}>
+                  <td className="py-2 px-3 text-blue-600">
                     {entry.debit > 0 ? `₹${entry.debit.toLocaleString()}` : '-'}
                   </td>
-                  <td className="py-2 px-3" style={{color: entry.credit > 0 ? '#AACF45' : ''}}>
+                  <td className="py-2 px-3 text-blue-600">
                     {entry.credit > 0 ? `₹${entry.credit.toLocaleString()}` : '-'}
                   </td>
                   <td className="py-2 px-3 font-semibold">₹{entry.balance.toLocaleString()}</td>
