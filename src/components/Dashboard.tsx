@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine } from 'recharts';
 
 const Dashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'overview' | 'details'>('overview');
@@ -92,7 +92,9 @@ const Dashboard: React.FC = () => {
             </div>
             <div className="bg-white p-4 rounded-lg shadow-md">
               <h3 className="text-sm text-gray-500">Profit & Loss</h3>
-              <p className={`text-2xl font-bold ${investmentData.reduce((acc, curr) => acc + curr.current, 0) - investmentData.reduce((acc, curr) => acc + curr.invested, 0) > 0 ? 'text-green-500' : 'text-red-500'}`}>₹{investmentData.reduce((acc, curr) => acc + curr.current, 0) - investmentData.reduce((acc, curr) => acc + curr.invested, 0)}</p>
+              <p className={`text-2xl font-bold ${investmentData.reduce((acc, curr) => acc + curr.current, 0) - investmentData.reduce((acc, curr) => acc + curr.invested, 0) > 0 ? 'text-green-500' : 'text-red-500'}`}>
+  ₹{(investmentData.reduce((acc, curr) => acc + curr.current, 0) - investmentData.reduce((acc, curr) => acc + curr.invested, 0)).toLocaleString()}
+</p>
             </div>
             <div className="bg-white p-4 rounded-lg shadow-md">
               <h3 className="text-sm text-gray-500">No. of Investments</h3>
@@ -101,19 +103,127 @@ const Dashboard: React.FC = () => {
           </div>
 
           {/* Investment Value Graph */}
-          <div className="bg-white p-4 rounded-lg shadow-md">
-            <h2 className="text-lg font-semibold mb-4">Investment Performance</h2>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={investmentData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Line type="monotone" dataKey="invested" stroke="#08AFF1" activeDot={{ r: 8 }} name="Invested Value" />
-                <Line type="monotone" dataKey="current" stroke="#AACF45" name="Current Value" />
-              </LineChart>
+          <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-semibold" style={{ color: '#08AFF1' }}>Investment Performance</h2>
+              <div className="flex space-x-2">
+                <button className="px-3 py-1 text-xs bg-blue-50 text-blue-600 rounded-full">1M</button>
+                <button className="px-3 py-1 text-xs bg-green-100 text-green-600 rounded-full">1Y</button>
+                <button className="px-3 py-1 text-xs bg-gray-100 text-gray-600 rounded-full">All</button>
+              </div>
+            </div>
+            
+            <ResponsiveContainer width="100%" height={350}>
+              <AreaChart
+                data={investmentData}
+                margin={{ top: 5, right: 20, left: 10, bottom: 5 }}
+              >
+                <defs>
+                  <linearGradient id="investedGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#08AFF1" stopOpacity={0.8}/>
+                    <stop offset="95%" stopColor="#08AFF1" stopOpacity={0.1}/>
+                  </linearGradient>
+                  <linearGradient id="currentGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#AACF45" stopOpacity={0.8}/>
+                    <stop offset="95%" stopColor="#AACF45" stopOpacity={0.1}/>
+                  </linearGradient>
+                </defs>
+                
+                <CartesianGrid 
+                  strokeDasharray="3 3" 
+                  vertical={false} 
+                  stroke="#f0f0f0" 
+                />
+                
+                <XAxis 
+                  dataKey="name" 
+                  axisLine={false} 
+                  tickLine={false}
+                  tick={{ fill: '#6b7280', fontSize: 12 }}
+                  tickMargin={10}
+                />
+                
+                <YAxis 
+                  axisLine={false} 
+                  tickLine={false}
+                  tick={{ fill: '#6b7280', fontSize: 12 }}
+                  tickFormatter={(value) => `₹${value.toLocaleString()}`}
+                />
+                
+                <Tooltip 
+                  contentStyle={{
+                    background: 'rgba(255, 255, 255, 0.96)',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '0.5rem',
+                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                    padding: '12px'
+                  }}
+                  formatter={(value, name) => [
+                    `₹${Number(value).toLocaleString()}`,
+                    name === 'invested' ? 'Invested Value' : 'Current Value'
+                  ]}
+                  labelFormatter={(label) => `Period: ${label}`}
+                />
+                
+                <Legend 
+                  verticalAlign="top"
+                  height={36}
+                  iconType="circle"
+                  iconSize={10}
+                  wrapperStyle={{
+                    paddingBottom: '20px'
+                  }}
+                  formatter={(value) => (
+                    <span className="text-sm text-gray-600">
+                      {value === 'invested' ? 'Invested Value' : 'Current Value'}
+                    </span>
+                  )}
+                />
+                
+                <Area 
+                  type="monotone" 
+                  dataKey="invested" 
+                  stroke="#08AFF1" 
+                  strokeWidth={3}
+                  fillOpacity={1} 
+                  fill="url(#investedGradient)"
+                  activeDot={{
+                    r: 6,
+                    strokeWidth: 2,
+                    fill: '#fff',
+                    stroke: '#08AFF1'
+                  }}
+                />
+                
+                <Area 
+                  type="monotone" 
+                  dataKey="current" 
+                  stroke="#AACF45" 
+                  strokeWidth={3}
+                  fillOpacity={1} 
+                  fill="url(#currentGradient)"
+                  activeDot={{
+                    r: 6,
+                    strokeWidth: 2,
+                    fill: '#fff',
+                    stroke: '#AACF45'
+                  }}
+                />
+                
+                <ReferenceLine y={0} stroke="#e5e7eb" />
+              </AreaChart>
             </ResponsiveContainer>
+            
+            <div className="flex justify-center mt-4 space-x-6">
+              <div className="flex items-center">
+                <div className="w-3 h-3 rounded-full bg-blue-500 mr-2"></div>
+                <span className="text-sm text-gray-600">Invested Value</span>
+              </div>
+              <div className="flex items-center">
+                <div className="w-3 h-3 rounded-full bg-green-500 mr-2"></div>
+                <span className="text-sm text-gray-600">Current Value</span>
+              </div>
+            </div>
           </div>
         </>
       )}
@@ -162,4 +272,4 @@ const Dashboard: React.FC = () => {
   );
 }
 
-export default Dashboard;
+export default Dashboard

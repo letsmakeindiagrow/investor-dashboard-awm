@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { Calendar } from 'lucide-react';
 
 // Sample investment plans data
 const investmentPlans = [
@@ -80,11 +81,44 @@ const Investments: React.FC = () => {
   const [selectedPlan, setSelectedPlan] = useState<number | null>(null);
   const [investmentAmount, setInvestmentAmount] = useState<string>('');
   const [investmentMode, setInvestmentMode] = useState<'Lumpsum' | 'SIP'>('Lumpsum');
+  const [sipDate, setSipDate] = useState<string>('1');
 
   useEffect(() => {
     const currentTab = location.pathname.includes('/make') ? 'make' : 'my';
     setActiveTab(currentTab);
   }, [location.pathname]);
+
+  // Helper function to get ordinal suffix (1st, 2nd, 3rd, etc.)
+  const getOrdinalSuffix = (day: number): string => {
+    if (day > 3 && day < 21) return 'th';
+    switch (day % 10) {
+      case 1: return 'st';
+      case 2: return 'nd';
+      case 3: return 'rd';
+      default: return 'th';
+    }
+  };
+
+  const handleSubmit = () => {
+    if (!selectedPlan || !investmentAmount) return;
+    
+    const plan = investmentPlans.find(p => p.id === selectedPlan);
+    if (!plan) return;
+
+    const amount = Number(investmentAmount);
+    if (amount < plan.minInvestment) return;
+
+    const investmentData = {
+      planId: selectedPlan,
+      amount,
+      mode: investmentMode,
+      ...(investmentMode === 'SIP' && { sipDate: parseInt(sipDate) })
+    };
+
+    console.log('Submitting investment:', investmentData);
+    // Here you would typically call an API to process the investment
+    alert(`Investment ${investmentMode === 'SIP' ? 'SIP' : ''} submitted successfully!`);
+  };
 
   return (
     <div className="space-y-6">
@@ -161,23 +195,50 @@ const Investments: React.FC = () => {
                         </label>
                       </div>
                     </div>
+
+                    {investmentMode === 'SIP' && (
+                      <div className="relative">
+                        <label className="block text-sm mb-1">SIP Date</label>
+                        <div className="flex items-center">
+                          <select
+                            className="w-full p-2 border rounded pr-8"
+                            value={sipDate}
+                            onChange={(e) => setSipDate(e.target.value)}
+                          >
+                            {Array.from({length: 28}, (_, i) => i + 1).map(day => (
+                              <option key={day} value={day.toString()}>{day}</option>
+                            ))}
+                            <option value="30">30</option>
+                            <option value="31">31</option>
+                          </select>
+                        </div>
+                        <p className="text-xs text-gray-500 mt-1">
+                          SIP will be processed on {sipDate}{getOrdinalSuffix(parseInt(sipDate))} of each month
+                        </p>
+                      </div>
+                    )}
+
                     <div>
-                      <label className="block text-sm mb-1">Investment Amount</label>
+                      <label className="block text-sm mb-1">
+                        {investmentMode === 'SIP' ? 'Monthly SIP Amount' : 'Investment Amount'}
+                      </label>
                       <input 
                         type="number" 
-                        placeholder="Enter Investment Amount" 
+                        placeholder={`Enter ${investmentMode === 'SIP' ? 'Monthly SIP' : 'Investment'} Amount`} 
                         className="w-full p-2 border rounded"
                         min={plan.minInvestment}
                         value={investmentAmount}
                         onChange={(e) => setInvestmentAmount(e.target.value)}
                       />
                     </div>
+
                     <button 
                       className="w-full py-2 rounded text-white"
                       style={{backgroundColor: '#08AFF1'}}
                       disabled={!investmentAmount || Number(investmentAmount) < plan.minInvestment}
+                      onClick={handleSubmit}
                     >
-                      Invest Now
+                      {investmentMode === 'SIP' ? 'Start SIP' : 'Invest Now'}
                     </button>
                   </div>
                 )}
@@ -229,6 +290,6 @@ const Investments: React.FC = () => {
       )}
     </div>
   );
-}
+};
 
 export default Investments;
