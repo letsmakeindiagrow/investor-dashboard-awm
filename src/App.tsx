@@ -1,9 +1,17 @@
 import React from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
 import Topbar from './components/Topbar';
 
 const App: React.FC = () => {
+  const navigate = useNavigate();
+  
+  React.useEffect(() => {
+    if (!localStorage.getItem('isLoggedIn')) {
+      navigate('/login');
+    }
+  }, [navigate]);
+
   return (
     <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
