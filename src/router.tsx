@@ -1,4 +1,6 @@
 import { createBrowserRouter } from "react-router-dom";
+import { useAuth } from "@clerk/clerk-react";
+import { Navigate } from "react-router-dom";
 import App from "./App";
 import Dashboard from "./components/Dashboard";
 import Investments from "./pages/Investments";
@@ -7,23 +9,37 @@ import Ledger from "./pages/Ledger";
 import Referral from "./pages/Referral";
 import Login from "./components/Login";
 import RegistrationForm from "./components/RegistrationForm";
+import LandingPage from "./components/LandingPage";
 
 const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
-  const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-  return isLoggedIn ? children : <Login />;
+  const { isSignedIn, isLoaded } = useAuth();
+
+  if (!isLoaded) {
+    return <div>Loading...</div>;
+  }
+
+  return isSignedIn ? children : <Navigate to="/login" replace />;
 };
 
 export const appRouter = createBrowserRouter([
   {
     path: "/",
-    element: <Login />,
+    element: <LandingPage />,
   },
   {
     path: "/login",
     element: <Login />,
   },
   {
+    path: "/login/*",
+    element: <Login />,
+  },
+  {
     path: "/register",
+    element: <RegistrationForm />,
+  },
+  {
+    path: "/register/*",
     element: <RegistrationForm />,
   },
   {
