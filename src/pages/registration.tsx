@@ -1,10 +1,8 @@
-import TempRegistration from "@/components/RegistrationForm";
-import Footer from "@/components/footer";
+import RegistrationForm from "../components/RegistrationForm";
 export default function Home() {
   return (
     <div className="relative min-h-screen bg-white">
-      <TempRegistration />
-      <Footer />
+      <RegistrationForm />
     </div>
   );
 }

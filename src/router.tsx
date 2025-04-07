@@ -34,8 +34,14 @@ export const appRouter = createBrowserRouter([
       </PrivateRoute>
     ),
     children: [
-      { path: "", element: <Dashboard /> },
-      { path: "details", element: <Dashboard /> },
+      { 
+        path: "", 
+        element: <Dashboard view="overview" /> 
+      },
+      { 
+        path: "details", 
+        element: <Dashboard view="details" /> 
+      },
       
       // Investments Routes
       { path: "investments", element: <Investments /> },

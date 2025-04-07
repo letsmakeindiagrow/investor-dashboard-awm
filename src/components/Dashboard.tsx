@@ -1,8 +1,22 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine } from 'recharts';
+import { useLocation, useNavigate } from 'react-router-dom';
 
-const Dashboard: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'overview' | 'details'>('overview');
+interface DashboardProps {
+  view?: 'overview' | 'details';
+}
+
+const Dashboard: React.FC<DashboardProps> = ({ view = 'overview' }) => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const handleTabChange = (newView: 'overview' | 'details') => {
+    if (newView === 'overview') {
+      navigate('/dashboard');
+    } else {
+      navigate('/dashboard/details');
+    }
+  };
 
   // Sample investment data
   const investmentData = [
@@ -62,23 +76,23 @@ const Dashboard: React.FC = () => {
       {/* Tabs */}
       <div className="flex border-b">
         <button 
-          className={`px-4 py-2 ${activeTab === 'overview' ? 'border-b-2 text-blue-500 border-blue-500' : 'text-gray-500'}`}
-          onClick={() => setActiveTab('overview')}
-          style={{ color: activeTab === 'overview' ? '#08AFF1' : '' }}
+          className={`px-4 py-2 ${view === 'overview' ? 'border-b-2 text-blue-500 border-blue-500' : 'text-gray-500'}`}
+          onClick={() => handleTabChange('overview')}
+          style={{ color: view === 'overview' ? '#08AFF1' : '' }}
         >
           My Investment
         </button>
         <button 
-          className={`px-4 py-2 ${activeTab === 'details' ? 'border-b-2 text-green-500 border-green-500' : 'text-gray-500'}`}
-          onClick={() => setActiveTab('details')}
-          style={{ color: activeTab === 'details' ? '#AACF45' : '' }}
+          className={`px-4 py-2 ${view === 'details' ? 'border-b-2 text-green-500 border-green-500' : 'text-gray-500'}`}
+          onClick={() => handleTabChange('details')}
+          style={{ color: view === 'details' ? '#AACF45' : '' }}
         >
           Investment Details
         </button>
       </div>
 
       {/* My Investment Overview Tab */}
-      {activeTab === 'overview' && (
+      {view === 'overview' && (
         <>
           {/* Investment Overview Cards */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -229,7 +243,7 @@ const Dashboard: React.FC = () => {
       )}
 
       {/* Investment Details Tab */}
-      {activeTab === 'details' && (
+      {view === 'details' && (
         <div className="bg-white p-4 rounded-lg shadow-md overflow-x-auto">
           <h2 className="text-lg font-semibold mb-4">Investment Details</h2>
           <table className="min-w-full text-sm text-left">

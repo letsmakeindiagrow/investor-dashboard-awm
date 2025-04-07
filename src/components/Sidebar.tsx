@@ -129,10 +129,10 @@ const Sidebar: React.FC = () => {
             </div>
             {!isCollapsed && openMenus.investments && (
               <div className="pl-4 space-y-2 mt-1">
-                <div onClick={() => navigateTo('/investments/make')} className={`block p-3 rounded-md text-base ${hoverEffect} ${textColor} cursor-pointer transition-colors font-medium`}>
+                <div onClick={() => navigateTo('/dashboard/investments/make')} className={`block p-3 rounded-md text-base ${hoverEffect} ${textColor} cursor-pointer transition-colors font-medium`}>
                   Make Investment
                 </div>
-                <div onClick={() => navigateTo('/investments/my')} className={`block p-3 rounded-md text-base ${hoverEffect} ${textColor} cursor-pointer transition-colors font-medium`}>
+                <div onClick={() => navigateTo('/dashboard/investments/my')} className={`block p-3 rounded-md text-base ${hoverEffect} ${textColor} cursor-pointer transition-colors font-medium`}>
                   My Investments
                 </div>
               </div>
@@ -161,16 +161,16 @@ const Sidebar: React.FC = () => {
             </div>
             {!isCollapsed && openMenus.funds && (
               <div className="pl-4 space-y-2 mt-1">
-                <div onClick={() => navigateTo('/funds/available')} className={`block p-3 rounded-md text-base ${hoverEffect} ${textColor} cursor-pointer transition-colors font-medium`}>
+                <div onClick={() => navigateTo('/dashboard/funds/available')} className={`block p-3 rounded-md text-base ${hoverEffect} ${textColor} cursor-pointer transition-colors font-medium`}>
                   Funds Available
                 </div>
-                <div onClick={() => navigateTo('/funds/add')} className={`block p-3 rounded-md text-base ${hoverEffect} ${textColor} cursor-pointer transition-colors font-medium`}>
+                <div onClick={() => navigateTo('/dashboard/funds/add')} className={`block p-3 rounded-md text-base ${hoverEffect} ${textColor} cursor-pointer transition-colors font-medium`}>
                   Add Funds
                 </div>
-                <div onClick={() => navigateTo('/funds/withdraw')} className={`block p-3 rounded-md text-base ${hoverEffect} ${textColor} cursor-pointer transition-colors font-medium`}>
+                <div onClick={() => navigateTo('/dashboard/funds/withdraw')} className={`block p-3 rounded-md text-base ${hoverEffect} ${textColor} cursor-pointer transition-colors font-medium`}>
                   Withdraw
                 </div>
-                <div onClick={() => navigateTo('/funds/history')} className={`block p-3 rounded-md text-base ${hoverEffect} ${textColor} cursor-pointer transition-colors font-medium`}>
+                <div onClick={() => navigateTo('/dashboard/funds/history')} className={`block p-3 rounded-md text-base ${hoverEffect} ${textColor} cursor-pointer transition-colors font-medium`}>
                   Transaction History
                 </div>
               </div>
@@ -199,7 +199,7 @@ const Sidebar: React.FC = () => {
             </div>
             {!isCollapsed && openMenus.ledger && (
               <div className="pl-4 space-y-2 mt-1">
-                <div onClick={() => navigateTo('/ledger')} className={`block p-3 rounded-md text-base ${hoverEffect} ${textColor} cursor-pointer transition-colors font-medium`}>
+                <div onClick={() => navigateTo('/dashboard/ledger')} className={`block p-3 rounded-md text-base ${hoverEffect} ${textColor} cursor-pointer transition-colors font-medium`}>
                   View Ledger
                 </div>
               </div>
@@ -228,10 +228,10 @@ const Sidebar: React.FC = () => {
             </div>
             {!isCollapsed && openMenus.referral && (
               <div className="pl-4 space-y-2 mt-1">
-                <div onClick={() => navigateTo('/referral/overview')} className={`block p-3 rounded-md text-base ${hoverEffect} ${textColor} cursor-pointer transition-colors font-medium`}>
+                <div onClick={() => navigateTo('/dashboard/referral/overview')} className={`block p-3 rounded-md text-base ${hoverEffect} ${textColor} cursor-pointer transition-colors font-medium`}>
                   Referral Overview
                 </div>
-                <div onClick={() => navigateTo('/referral/history')} className={`block p-3 rounded-md text-base ${hoverEffect} ${textColor} cursor-pointer transition-colors font-medium`}>
+                <div onClick={() => navigateTo('/dashboard/referral/history')} className={`block p-3 rounded-md text-base ${hoverEffect} ${textColor} cursor-pointer transition-colors font-medium`}>
                   Referral History
                 </div>
               </div>
