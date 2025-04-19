@@ -1,18 +1,8 @@
 import React, { useState } from 'react';
-import { ChevronDown, Settings, LogOut, Bell, HelpCircle } from 'lucide-react';
-import { useUser, useClerk } from '@clerk/clerk-react';
-import { useNavigate } from 'react-router-dom';
+import { ChevronDown, User, Settings, LogOut, Bell, HelpCircle } from 'lucide-react';
 
 const Topbar: React.FC = () => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const { user } = useUser();
-  const { signOut } = useClerk();
-  const navigate = useNavigate();
-
-  const handleSignOut = async () => {
-    await signOut();
-    navigate('/');
-  };
 
   return (
     <div className="bg-white shadow-md h-16 flex items-center justify-between px-6 relative">
@@ -35,16 +25,10 @@ const Topbar: React.FC = () => {
             className="flex items-center space-x-2 focus:outline-none"
             onClick={() => setIsProfileOpen(!isProfileOpen)}
           >
-            {user?.imageUrl ? (
-              <img src={user.imageUrl} alt="Profile" className="h-8 w-8 rounded-full object-cover" />
-            ) : (
-              <div className="h-8 w-8 rounded-full bg-[#00A7E1] flex items-center justify-center">
-                <span className="text-white font-medium">
-                  {user?.firstName?.[0] || user?.lastName?.[0] || 'U'}
-                </span>
-              </div>
-            )}
-            <span className="text-sm font-medium text-gray-700">{user?.firstName || 'User'}</span>
+            <div className="h-8 w-8 rounded-full bg-[#00A7E1] flex items-center justify-center">
+              <User className="h-5 w-5 text-white" />
+            </div>
+            <span className="text-sm font-medium text-gray-700">User</span>
             <ChevronDown className={`h-4 w-4 text-gray-500 transition-transform ${isProfileOpen ? 'transform rotate-180' : ''}`} />
           </button>
           
@@ -52,7 +36,7 @@ const Topbar: React.FC = () => {
           {isProfileOpen && (
             <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
               <div className="px-4 py-2 border-b border-gray-100">
-                <p className="text-sm font-medium text-gray-800">{user?.primaryEmailAddress?.emailAddress}</p>
+                <p className="text-sm font-medium text-gray-800">user@example.com</p>
               </div>
               <a href="#" className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                 <Settings className="mr-3 h-4 w-4 text-gray-500" />
@@ -64,7 +48,6 @@ const Topbar: React.FC = () => {
               </a>
               <div className="border-t border-gray-100"></div>
               <button 
-                onClick={handleSignOut}
                 className="w-full flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
               >
                 <LogOut className="mr-3 h-4 w-4 text-gray-500" />

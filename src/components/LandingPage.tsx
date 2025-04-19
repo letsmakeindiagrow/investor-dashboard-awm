@@ -1,5 +1,4 @@
 import React from "react";
-import { Link } from "react-router-dom";
 
 const LandingPage: React.FC = () => {
   return (
@@ -19,24 +18,28 @@ const LandingPage: React.FC = () => {
 
       {/* Buttons Section */}
       <div className="flex gap-6">
-        <Link
-          to="/login"
+        <a
+          href="https://login.aadyanviwealth.com"
           className="px-8 py-3 rounded-lg bg-[#00A7E1] text-white font-semibold hover:bg-[#0095c8] transition-colors duration-200 flex items-center gap-2"
+          target="_blank"
+          rel="noopener noreferrer"
         >
           Sign In
           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
             <path fillRule="evenodd" d="M3 3a1 1 0 011 1v12a1 1 0 11-2 0V4a1 1 0 011-1zm7.707 3.293a1 1 0 010 1.414L9.414 9H17a1 1 0 110 2H9.414l1.293 1.293a1 1 0 01-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0z" clipRule="evenodd" />
           </svg>
-        </Link>
-        <Link
-          to="/register"
+        </a>
+        <a
+          href="https://login.aadyanviwealth.com/register"
           className="px-8 py-3 rounded-lg bg-[#A5CF3D] text-white font-semibold hover:bg-[#94b937] transition-colors duration-200 flex items-center gap-2"
+          target="_blank"
+          rel="noopener noreferrer"
         >
           Create Account
           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
             <path d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6zM16 7a1 1 0 10-2 0v1h-1a1 1 0 100 2h1v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1V7z" />
           </svg>
-        </Link>
+        </a>
       </div>
 
       {/* Features Section */}

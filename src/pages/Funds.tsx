@@ -27,7 +27,7 @@ const Funds: React.FC = () => {
   // Handle tab change
   const handleTabChange = (tab: 'available' | 'add' | 'withdraw' | 'history') => {
     setActiveTab(tab);
-    navigate(`/funds/${tab}`);
+    navigate(`/dashboard/funds/${tab}`);
   };
   
   const [withdrawAmount, setWithdrawAmount] = useState('');
@@ -38,6 +38,11 @@ const Funds: React.FC = () => {
   const [dateRange, setDateRange] = useState('all');
   const [fromDate, setFromDate] = useState('');
   const [toDate, setToDate] = useState('');
+  const [addLoading, setAddLoading] = useState(false);
+  const [addMessage, setAddMessage] = useState<string | null>(null);
+  const [withdrawLoading, setWithdrawLoading] = useState(false);
+  const [withdrawMessage, setWithdrawMessage] = useState<string | null>(null);
+  const userId = 'USER_ID'; // TODO: Replace with actual user ID logic
 
   // Sample transaction history data
   const transactionHistory = [
@@ -72,6 +77,65 @@ const Funds: React.FC = () => {
       remark: 'Fund added'
     }
   ];
+
+  // Add Funds Handler
+  const handleAddFunds = async () => {
+    setAddLoading(true);
+    setAddMessage(null);
+    try {
+      const res = await fetch('http://localhost:5001/api/v1/investor/addFunds', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId,
+          paymentMethod,
+          amount: Number(addAmount),
+          referenceNumber,
+          comments,
+        }),
+      });
+      if (res.ok) {
+        setAddMessage('Funds added successfully!');
+        setAddAmount('');
+        setReferenceNumber('');
+        setComments('');
+      } else {
+        const data = await res.json();
+        setAddMessage(data.message || 'Failed to add funds.');
+      }
+    } catch (err) {
+      setAddMessage('Network error. Please try again.');
+    } finally {
+      setAddLoading(false);
+    }
+  };
+
+  // Withdraw Funds Handler
+  const handleWithdrawFunds = async () => {
+    setWithdrawLoading(true);
+    setWithdrawMessage(null);
+    try {
+      const res = await fetch('http://localhost:5001/api/v1/investor/withdrawFunds', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId,
+          amount: Number(withdrawAmount),
+        }),
+      });
+      if (res.ok) {
+        setWithdrawMessage('Withdrawal request submitted!');
+        setWithdrawAmount('');
+      } else {
+        const data = await res.json();
+        setWithdrawMessage(data.message || 'Failed to withdraw funds.');
+      }
+    } catch (err) {
+      setWithdrawMessage('Network error. Please try again.');
+    } finally {
+      setWithdrawLoading(false);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -123,91 +187,124 @@ const Funds: React.FC = () => {
       )}
 
       {/* Add Funds Tab */}
-{activeTab === 'add' && (
-  <div className="bg-white p-4 rounded-lg shadow-md">
-    <h3 className="text-lg font-semibold mb-4" style={{color: '#AACF45'}}>Add Funds</h3>
-    
-    <div className="flex flex-col md:flex-row gap-6">
-      {/* Left Column - Form */}
-      <div className="flex-1 space-y-4">
-        <div>
-          <label className="block mb-2">Payment Method</label>
-          <select 
-            className="w-full p-2 border rounded"
-            value={paymentMethod}
-            onChange={(e) => setPaymentMethod(e.target.value)}
-          >
-            <option value="UPI">UPI</option>
-            <option value="NEFT">NEFT (Account Details will be shared)</option>
-          </select>
+      {activeTab === 'add' && (
+        <div className="bg-white p-4 rounded-lg shadow-md">
+          <h3 className="text-lg font-semibold mb-4" style={{color: '#AACF45'}}>Add Funds</h3>
+          
+          <div className="flex flex-col md:flex-row gap-6">
+            {/* Left Column - Form */}
+            <div className="flex-1 space-y-4">
+              <div>
+                <label className="block mb-2">Payment Method</label>
+                <select 
+                  className="w-full p-2 border rounded"
+                  value={paymentMethod}
+                  onChange={(e) => setPaymentMethod(e.target.value)}
+                >
+                  <option value="UPI">UPI</option>
+                  <option value="NEFT">NEFT (Account Details will be shared)</option>
+                </select>
+              </div>
+              
+              <div>
+                <label className="block mb-2">Amount</label>
+                <input 
+                  type="number" 
+                  placeholder="Enter amount" 
+                  className="w-full p-2 border rounded"
+                  value={addAmount}
+                  onChange={(e) => setAddAmount(e.target.value)}
+                />
+              </div>
+              
+              <div>
+                <label className="block mb-2">Ref. No. (Last 4 Digits of UPI/UTR/IMPS Ref. No.)</label>
+                <input 
+                  type="text" 
+                  placeholder="Enter reference number" 
+                  className="w-full p-2 border rounded"
+                  value={referenceNumber}
+                  onChange={(e) => setReferenceNumber(e.target.value)}
+                />
+              </div>
+              
+              <div>
+                <label className="block mb-2">Comments (Optional)</label>
+                <textarea 
+                  placeholder="Enter any comments" 
+                  className="w-full p-2 border rounded"
+                  value={comments}
+                  onChange={(e) => setComments(e.target.value)}
+                />
+              </div>
+              
+              <button 
+                className="w-full py-2 rounded text-white"
+                style={{backgroundColor: '#AACF45'}}
+                disabled={!addAmount || !referenceNumber || addLoading}
+                onClick={handleAddFunds}
+              >
+                {addLoading ? 'Adding...' : 'Add Funds'}
+              </button>
+              {addMessage && (
+                <div className={`mt-2 text-sm ${addMessage.includes('success') ? 'text-green-600' : 'text-red-600'}`}>{addMessage}</div>
+              )}
+            </div>
+            
+            {/* Right Column - Conditional Content */}
+            <div className="flex-1 flex flex-col items-center justify-center border-l-0 md:border-l md:border-gray-200 md:pl-6">
+              {paymentMethod === 'UPI' ? (
+                <>
+                  <div className="text-center mb-4">
+                    <h4 className="font-medium mb-1">Scan to Pay via UPI</h4>
+                    <p className="text-sm text-gray-600">Use any UPI app to scan this code</p>
+                  </div>
+                  <div className="bg-white-100 p-4 rounded-lg mb-3">
+                    <img 
+                      src="/qr.jpg" 
+                      alt="UPI QR Code" 
+                      className="w-48 h-48 object-contain"
+                    />
+                  </div>
+                  <div className="text-center">
+                    <p className="font-medium mb-1">OR</p>
+                    <p className="text-sm text-gray-600">Send to UPI ID:</p>
+                    <p className="font-mono bg-gray-100 px-3 py-1 rounded-md mt-1">bharatpe09910698294@yesbankltd</p>
+                  </div>
+                </>
+              ) : paymentMethod === 'NEFT' ? (
+                <div className="w-full max-w-md mx-auto">
+                  <div className="border-2 border-[#00A7E1] bg-[#F8FCFF] rounded-xl p-6 shadow flex flex-col gap-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <svg className="h-6 w-6 text-[#00A7E1]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M3 10V6a1 1 0 011-1h16a1 1 0 011 1v4M3 10v8a1 1 0 001 1h16a1 1 0 001-1v-8M3 10h18" /></svg>
+                      <h4 className="font-semibold text-lg text-[#00A7E1]">Bank Account Details for NEFT/IMPS/RTGS</h4>
+                    </div>
+                    <div className="flex flex-col gap-3 text-base">
+                      <div className="flex items-center gap-2">
+                        <svg className="h-5 w-5 text-[#A5CF3D]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                        <span className="font-semibold">Account Name:</span>
+                        <span className="ml-2 text-gray-800 select-all">Aadyanvi Wealth Management Private Limited</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <svg className="h-5 w-5 text-[#A5CF3D]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                        <span className="font-semibold">Account Number:</span>
+                        <span className="ml-2 text-gray-800 font-mono text-lg select-all">030905005181</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <svg className="h-5 w-5 text-[#A5CF3D]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                        <span className="font-semibold">IFSC:</span>
+                        <span className="ml-2 text-gray-800 font-mono text-lg select-all">ICIC0000309</span>
+                      </div>
+                    </div>
+                    <div className="mt-2 text-xs text-gray-500">Please ensure you enter the correct account details when making a transfer.</div>
+                  </div>
+                </div>
+              ) : null}
+            </div>
+          </div>
         </div>
-        
-        <div>
-          <label className="block mb-2">Amount</label>
-          <input 
-            type="number" 
-            placeholder="Enter amount" 
-            className="w-full p-2 border rounded"
-            value={addAmount}
-            onChange={(e) => setAddAmount(e.target.value)}
-          />
-        </div>
-        
-        <div>
-          <label className="block mb-2">Ref. No. (Last 4 Digits of UPI/UTR/IMPS Ref. No.)</label>
-          <input 
-            type="text" 
-            placeholder="Enter reference number" 
-            className="w-full p-2 border rounded"
-            value={referenceNumber}
-            onChange={(e) => setReferenceNumber(e.target.value)}
-          />
-        </div>
-        
-        <div>
-          <label className="block mb-2">Comments (Optional)</label>
-          <textarea 
-            placeholder="Enter any comments" 
-            className="w-full p-2 border rounded"
-            value={comments}
-            onChange={(e) => setComments(e.target.value)}
-          />
-        </div>
-        
-        <button 
-          className="w-full py-2 rounded text-white"
-          style={{backgroundColor: '#AACF45'}}
-          disabled={!addAmount || !referenceNumber}
-        >
-          Add Funds
-        </button>
-      </div>
-      
-      {/* Right Column - QR Code */}
-      <div className="flex-1 flex flex-col items-center justify-center border-l-0 md:border-l md:border-gray-200 md:pl-6">
-        <div className="text-center mb-4">
-          <h4 className="font-medium mb-1">Scan to Pay via UPI</h4>
-          <p className="text-sm text-gray-600">Use any UPI app to scan this code</p>
-        </div>
-        
-        {/* QR Code Placeholder */}
-        <div className="bg-white-100 p-4 rounded-lg mb-3">
-          <img 
-            src="/cleaned_qr.png" 
-            alt="UPI QR Code" 
-            className="w-48 h-48 object-contain"
-          />
-        </div>
-        
-        <div className="text-center">
-          <p className="font-medium mb-1">OR</p>
-          <p className="text-sm text-gray-600">Send to UPI ID:</p>
-          <p className="font-mono bg-gray-100 px-3 py-1 rounded-md mt-1">your.upi@id</p>
-        </div>
-      </div>
-    </div>
-  </div>
-)}
+      )}
+
       {/* Withdraw Tab */}
       {activeTab === 'withdraw' && (
         <div className="bg-white p-4 rounded-lg shadow-md">
@@ -252,10 +349,14 @@ const Funds: React.FC = () => {
             <button 
               className="w-full py-2 rounded text-white"
               style={{backgroundColor: '#08AFF1'}}
-              disabled={!withdrawAmount || Number(withdrawAmount) > 100000}
+              disabled={!withdrawAmount || Number(withdrawAmount) > 100000 || withdrawLoading}
+              onClick={handleWithdrawFunds}
             >
-              Proceed to Withdraw
+              {withdrawLoading ? 'Processing...' : 'Proceed to Withdraw'}
             </button>
+            {withdrawMessage && (
+              <div className={`mt-2 text-sm ${withdrawMessage.includes('success') ? 'text-green-600' : 'text-red-600'}`}>{withdrawMessage}</div>
+            )}
           </div>
         </div>
       )}

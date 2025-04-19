@@ -1,6 +1,4 @@
 import { createBrowserRouter } from "react-router-dom";
-import { useAuth } from "@clerk/clerk-react";
-import { Navigate } from "react-router-dom";
 import App from "./App";
 import Dashboard from "./components/Dashboard";
 import Investments from "./pages/Investments";
@@ -11,14 +9,9 @@ import Login from "./components/Login";
 import RegistrationForm from "./components/RegistrationForm";
 import LandingPage from "./components/LandingPage";
 
+// PrivateRoute is now a passthrough (no auth)
 const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
-  const { isSignedIn, isLoaded } = useAuth();
-
-  if (!isLoaded) {
-    return <div>Loading...</div>;
-  }
-
-  return isSignedIn ? children : <Navigate to="/login" replace />;
+  return <>{children}</>;
 };
 
 export const appRouter = createBrowserRouter([
