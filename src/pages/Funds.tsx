@@ -118,23 +118,19 @@ const Funds: React.FC = () => {
     setWithdrawLoading(true);
     setWithdrawMessage(null);
     try {
-      const res = await fetch(
+      const res = await axios.post(
         "https://backend.aadyanviwealth.com/api/v1/investor/withdrawFunds",
         {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            userId,
-            amount: Number(withdrawAmount),
-          }),
-        }
+          userId,
+          amount: Number(withdrawAmount),
+        },
+        { headers: { "Content-Type": "application/json" }, withCredentials: true }
       );
-      if (res.ok) {
+      if (res.status === 200 || res.status === 201) {
         setWithdrawMessage("Withdrawal request submitted!");
         setWithdrawAmount("");
       } else {
-        const data = await res.json();
-        setWithdrawMessage(data.message || "Failed to withdraw funds.");
+        setWithdrawMessage("Failed to withdraw funds.");
       }
     } catch (err) {
       setWithdrawMessage("Network error. Please try again.");
