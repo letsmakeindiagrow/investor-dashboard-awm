@@ -83,7 +83,7 @@ const Funds: React.FC = () => {
     setAddLoading(true);
     setAddMessage(null);
     try {
-      const res = await fetch('http://backend.aadyanviwealth.com/api/v1/investor/addFunds', {
+      const res = await fetch('https://backend.aadyanviwealth.com/api/v1/investor/addFunds', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -115,7 +115,7 @@ const Funds: React.FC = () => {
     setWithdrawLoading(true);
     setWithdrawMessage(null);
     try {
-      const res = await fetch('http://backend.aadyanviwealth.com/api/v1/investor/withdrawFunds', {
+      const res = await fetch('https://backend.aadyanviwealth.com/api/v1/investor/withdrawFunds', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
