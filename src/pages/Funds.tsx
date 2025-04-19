@@ -121,10 +121,8 @@ const Funds: React.FC = () => {
       const res = await axios.post(
         "https://backend.aadyanviwealth.com/api/v1/investor/withdrawFunds",
         {
-          userId,
           amount: Number(withdrawAmount),
         },
-        { headers: { "Content-Type": "application/json" }, withCredentials: true }
       );
       if (res.status === 200 || res.status === 201) {
         setWithdrawMessage("Withdrawal request submitted!");
