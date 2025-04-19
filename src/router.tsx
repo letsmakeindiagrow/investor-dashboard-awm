@@ -37,11 +37,7 @@ export const appRouter = createBrowserRouter([
   },
   {
     path: "/dashboard",
-    element: (
-      <PrivateRoute>
-        <App />
-      </PrivateRoute>
-    ),
+    element: <App />,
     children: [
       { 
         path: "", 
