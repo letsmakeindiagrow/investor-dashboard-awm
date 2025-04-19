@@ -98,7 +98,7 @@ const Funds: React.FC = () => {
         },
         { withCredentials: true }
       );
-      if (res.status === 200) {
+      if (res.status === 200 || res.status === 201) {
         setAddMessage("Funds added successfully!");
         setAddAmount("");
         setReferenceNumber("");
