@@ -572,10 +572,10 @@ const Funds: React.FC = () => {
               <tbody>
                 {transactionHistory.map((transaction) => (
                   <tr
-                    key={transaction.transactionId}
+                    key={transaction.transactionsId}
                     className="border-b hover:bg-gray-50"
                   >
-                    <td className="py-2 px-3">{transaction.transactionId}</td>
+                    <td className="py-2 px-3">{transaction.transactionsId}</td>
                     <td className="py-2 px-3">{transaction.datetime}</td>
                     <td className="py-2 px-3">{transaction.method}</td>
                     <td className="py-2 px-3">{transaction.type}</td>
