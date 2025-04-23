@@ -47,7 +47,6 @@ const Funds: React.FC = () => {
   const [addMessage, setAddMessage] = useState<string | null>(null);
   const [withdrawLoading, setWithdrawLoading] = useState(false);
   const [withdrawMessage, setWithdrawMessage] = useState<string | null>(null);
-  const userId = "USER_ID"; // TODO: Replace with actual user ID logic
 
   // Sample transaction history data
   const transactionHistory = [
@@ -123,6 +122,7 @@ const Funds: React.FC = () => {
         {
           amount: Number(withdrawAmount),
         },
+        { withCredentials: true }
       );
       if (res.status === 200 || res.status === 201) {
         setWithdrawMessage("Withdrawal request submitted!");
