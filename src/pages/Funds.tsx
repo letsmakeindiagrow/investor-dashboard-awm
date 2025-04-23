@@ -47,40 +47,56 @@ const Funds: React.FC = () => {
   const [addMessage, setAddMessage] = useState<string | null>(null);
   const [withdrawLoading, setWithdrawLoading] = useState(false);
   const [withdrawMessage, setWithdrawMessage] = useState<string | null>(null);
+  const [transactionHistory, setTransactionHistory] = useState<any[]>([]);
 
   // Sample transaction history data
-  const transactionHistory = [
-    {
-      id: "TID1001",
-      date: "2024-03-15 14:30:22",
-      type: "Deposit",
-      amount: 10000,
-      method: "UPI",
-      refNo: "UPI123456",
-      balance: 10000,
-      remark: "Fund added",
-    },
-    {
-      id: "TID1002",
-      date: "2024-03-10 11:15:45",
-      type: "Withdrawal",
-      amount: 5000,
-      method: "NEFT",
-      refNo: "NEFT789012",
-      balance: 5000,
-      remark: "Fund withdrawn",
-    },
-    {
-      id: "TID1003",
-      date: "2024-03-20 09:45:12",
-      type: "Deposit",
-      amount: 25000,
-      method: "UPI",
-      refNo: "UPI654321",
-      balance: 30000,
-      remark: "Fund added",
-    },
-  ];
+  // const transactionHistory = [
+  //   {
+  //     id: "TID1001",
+  //     date: "2024-03-15 14:30:22",
+  //     type: "Deposit",
+  //     amount: 10000,
+  //     method: "UPI",
+  //     refNo: "UPI123456",
+  //     balance: 10000,
+  //     remark: "Fund added",
+  //   },
+  //   {
+  //     id: "TID1002",
+  //     date: "2024-03-10 11:15:45",
+  //     type: "Withdrawal",
+  //     amount: 5000,
+  //     method: "NEFT",
+  //     refNo: "NEFT789012",
+  //     balance: 5000,
+  //     remark: "Fund withdrawn",
+  //   },
+  //   {
+  //     id: "TID1003",
+  //     date: "2024-03-20 09:45:12",
+  //     type: "Deposit",
+  //     amount: 25000,
+  //     method: "UPI",
+  //     refNo: "UPI654321",
+  //     balance: 30000,
+  //     remark: "Fund added",
+  //   },
+  // ];
+
+  const handleGetTransactionHistory = async () => {
+    const res = await axios.get(
+      "https://backend.aadyanviwealth.com/api/v1/investor/getTransactions",
+      { withCredentials: true }
+    );
+    if (res.status === 200 || res.status === 201) {
+      setTransactionHistory(res.data.data);
+      console.log(res.data.data);
+    }
+  };
+
+  useEffect(() => {
+    handleGetTransactionHistory();
+  }, []);
 
   // Add Funds Handler
   const handleAddFunds = async () => {
