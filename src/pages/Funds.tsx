@@ -572,11 +572,11 @@ const Funds: React.FC = () => {
               <tbody>
                 {transactionHistory.map((transaction) => (
                   <tr
-                    key={transaction.id}
+                    key={transaction.transactionId}
                     className="border-b hover:bg-gray-50"
                   >
-                    <td className="py-2 px-3">{transaction.id}</td>
-                    <td className="py-2 px-3">{transaction.date}</td>
+                    <td className="py-2 px-3">{transaction.transactionId}</td>
+                    <td className="py-2 px-3">{transaction.datetime}</td>
                     <td className="py-2 px-3">{transaction.method}</td>
                     <td className="py-2 px-3">{transaction.type}</td>
                     <td
@@ -591,9 +591,10 @@ const Funds: React.FC = () => {
                       {transaction.type === "Deposit" ? "+" : "-"}₹
                       {transaction.amount.toLocaleString()}/-
                     </td>
-                    <td className="py-2 px-3">{transaction.refNo}</td>
+                    <td className="py-2 px-3">{transaction.refNumber}</td>
                     <td className="py-2 px-3">
-                      ₹{transaction.balance.toLocaleString()}/-
+                      {/* ₹{transaction.balance.toLocaleString()}/- */}
+                      ₹100/- */
                     </td>
                     <td className="py-2 px-3">{transaction.remark}</td>
                   </tr>
