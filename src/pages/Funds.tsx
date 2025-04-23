@@ -89,8 +89,8 @@ const Funds: React.FC = () => {
       { withCredentials: true }
     );
     if (res.status === 200 || res.status === 201) {
-      setTransactionHistory(res.data.data);
-      console.log(res.data.data);
+      setTransactionHistory(res.data);
+      console.log(res.data);
     }
   };
 
