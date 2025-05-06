@@ -49,8 +49,6 @@ const Funds: React.FC = () => {
   const [withdrawMessage, setWithdrawMessage] = useState<string | null>(null);
   const [transactionHistory, setTransactionHistory] = useState<any[]>([]);
 
-  
-
   // Sample transaction history data
   // const transactionHistory = [
   //   {
@@ -87,7 +85,7 @@ const Funds: React.FC = () => {
 
   const handleGetTransactionHistory = async () => {
     const res = await axios.get(
-      "https://backend.aadyanviwealth.com/api/v1/investor/getTransactions",
+      "https://backend.local.com/api/v1/investor/getTransactions",
       { withCredentials: true }
     );
     if (res.status === 200 || res.status === 201) {
@@ -106,7 +104,7 @@ const Funds: React.FC = () => {
     setAddMessage(null);
     try {
       const res = await axios.post(
-        "https://backend.aadyanviwealth.com/api/v1/investor/addFunds",
+        "https://backend.local.com/api/v1/investor/addFunds",
         {
           paymentMethod,
           amount: Number(addAmount),
@@ -136,7 +134,7 @@ const Funds: React.FC = () => {
     setWithdrawMessage(null);
     try {
       const res = await axios.post(
-        "https://backend.aadyanviwealth.com/api/v1/investor/withdrawFunds",
+        "https://backend.local.com/api/v1/investor/withdrawFunds",
         {
           amount: Number(withdrawAmount),
         },

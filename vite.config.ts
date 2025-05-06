@@ -10,4 +10,8 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  server: {
+    // ... any existing server config
+    allowedHosts: ["dashboard.local.com"],
+  },
 });

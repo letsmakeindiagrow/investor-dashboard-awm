@@ -1,28 +1,27 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import axios from 'axios';
+import axios from "axios";
 
 interface InvestmentPlan {
   id: number;
   name: string;
   minInvestment: number;
   expectedReturn: string;
-  risk: string;
-  period: string;
+  investmentTerm: string;
 }
 
 interface Investment {
   id: number;
-  plan: string;
-  investedValue: number;
-  currentValue: number;
-  date: string;
-  mode: string;
-  period: string;
-  roi: number;
-  pnl: number;
-  withdrawal: string;
-  maturity: string;
+  investmentPlanId: number;
+  investedAmount: number;
+  // currentValue: number;
+  investmentDate: string;
+  investmentMode: string;
+  // investmentTerm: string;
+  // roi: number;
+  // pnl: number;
+  withdrawalFrequency: string;
+  maturityDate: string;
 }
 
 const Investments: React.FC = () => {
@@ -32,9 +31,11 @@ const Investments: React.FC = () => {
   const [activeTab, setActiveTab] = useState<"make" | "my">(initialTab);
   const [selectedPlan, setSelectedPlan] = useState<number | null>(null);
   const [investmentAmount, setInvestmentAmount] = useState<string>("");
-  const [investmentMode, setInvestmentMode] = useState<"Lumpsum" | "SIP">("Lumpsum");
+  const [investmentMode, setInvestmentMode] = useState<"Lumpsum" | "SIP">(
+    "Lumpsum"
+  );
   const [sipDate, setSipDate] = useState<string>("1");
-  
+
   // New state for fetched data
   const [investmentPlans, setInvestmentPlans] = useState<InvestmentPlan[]>([]);
   const [myInvestments, setMyInvestments] = useState<Investment[]>([]);
@@ -50,13 +51,17 @@ const Investments: React.FC = () => {
   useEffect(() => {
     const fetchPlans = async () => {
       try {
-        const response = await axios.get('http://localhost:5001/api/v1/investor/plans', {
-          withCredentials: true
-        });
-        setInvestmentPlans(response.data.plans);
+        const response = await axios.get(
+          "https://backend.local.com/api/v1/investor/getInvestmentPlans",
+          {
+            withCredentials: true,
+          }
+        );
+        console.log(response.data.investmentPlans);
+        setInvestmentPlans(response.data.investmentPlans);
       } catch (err) {
-        setError('Failed to fetch investment plans');
-        console.error('Error fetching plans:', err);
+        setError("Failed to fetch investment plans");
+        console.error("Error fetching plans:", err);
       }
     };
 
@@ -67,13 +72,17 @@ const Investments: React.FC = () => {
   useEffect(() => {
     const fetchInvestments = async () => {
       try {
-        const response = await axios.get('http://localhost:5001/api/v1/investor/investments', {
-          withCredentials: true
-        });
+        const response = await axios.get(
+          "https://backend.local.com/api/v1/investor/getInvestments",
+          {
+            withCredentials: true,
+          }
+        );
+        console.log(response.data.investments);
         setMyInvestments(response.data.investments);
       } catch (err) {
-        setError('Failed to fetch investments');
-        console.error('Error fetching investments:', err);
+        setError("Failed to fetch investments");
+        console.error("Error fetching investments:", err);
       } finally {
         setLoading(false);
       }
@@ -114,26 +123,39 @@ const Investments: React.FC = () => {
     };
 
     try {
-      const response = await axios.post('https://backend.aadyanviwealth.com/api/v1/investor/invest', investmentData, {
-        withCredentials: true
-      });
-      
+      const response = await axios.post(
+        "https://backend.local.com/api/v1/investor/invest",
+        investmentData,
+        {
+          withCredentials: true,
+        }
+      );
+
       if (response.data.success) {
-        alert(`Investment ${investmentMode === "SIP" ? "SIP" : ""} submitted successfully!`);
+        alert(
+          `Investment ${
+            investmentMode === "SIP" ? "SIP" : ""
+          } submitted successfully!`
+        );
         // Refresh investments list
-        const updatedInvestments = await axios.get('https://backend.aadyanviwealth.com/api/v1/investor/investments', {
-          withCredentials: true
-        });
+        const updatedInvestments = await axios.get(
+          "https://backend.local.com/api/v1/investor/investments",
+          {
+            withCredentials: true,
+          }
+        );
         setMyInvestments(updatedInvestments.data.investments);
       }
     } catch (error) {
-      console.error('Error submitting investment:', error);
-      alert('Failed to submit investment. Please try again.');
+      console.error("Error submitting investment:", error);
+      alert("Failed to submit investment. Please try again.");
     }
   };
 
   if (loading) {
-    return <div className="flex justify-center items-center h-64">Loading...</div>;
+    return (
+      <div className="flex justify-center items-center h-64">Loading...</div>
+    );
   }
 
   if (error) {
@@ -152,7 +174,7 @@ const Investments: React.FC = () => {
           }`}
           onClick={() => {
             setActiveTab("make");
-            navigate("/investments/make");
+            navigate("/dashboard/investments/make");
           }}
           style={{ color: activeTab === "make" ? "#08AFF1" : "" }}
         >
@@ -164,7 +186,7 @@ const Investments: React.FC = () => {
           }`}
           onClick={() => {
             setActiveTab("my");
-            navigate("/investments/my");
+            navigate("/dashboard/investments/my");
           }}
           style={{ color: activeTab === "my" ? "#AACF45" : "" }}
         >
@@ -212,8 +234,8 @@ const Investments: React.FC = () => {
                       {plan.expectedReturn}
                     </span>
                   </p>
-                  <p>Risk Level: {plan.risk}</p>
-                  <p>Investment Period: {plan.period}</p>
+                  {/* <p>Risk Level: {plan.risk}</p> */}
+                  <p>Investment Period: {plan.investmentTerm}</p>
                 </div>
                 {selectedPlan === plan.id && (
                   <div className="mt-4 space-y-3">
@@ -342,24 +364,24 @@ const Investments: React.FC = () => {
               {myInvestments.map((item, index) => (
                 <tr key={item.id} className="border-b hover:bg-gray-50">
                   <td className="py-2 px-3">{index + 1}</td>
-                  <td className="py-2 px-3">{item.plan}</td>
+                  <td className="py-2 px-3">{item.investmentPlanId}</td>
                   <td className="py-2 px-3">
-                    ₹{item.investedValue.toLocaleString()}
+                    ₹{item.investedAmount.toLocaleString()}
                   </td>
                   <td className="py-2 px-3">
-                    ₹{item.currentValue.toLocaleString()}
+                    {/* ₹{item.currentValue.toLocaleString()} */}
                   </td>
-                  <td className="py-2 px-3">{item.date}</td>
-                  <td className="py-2 px-3">{item.mode}</td>
-                  <td className="py-2 px-3">{item.period}</td>
-                  <td className="py-2 px-3" style={{ color: "#08AFF1" }}>
+                  <td className="py-2 px-3">{item.investmentDate}</td>
+                  <td className="py-2 px-3">{item.investmentMode}</td>
+                  {/* <td className="py-2 px-3">{item.investmentTerm}</td> */}
+                  {/* <td className="py-2 px-3" style={{ color: "#08AFF1" }}>
                     {item.roi}%
-                  </td>
+                  </td> */}
                   <td className="py-2 px-3" style={{ color: "#AACF45" }}>
-                    ₹{item.pnl.toLocaleString()}
+                    {/* ₹{item.pnl.toLocaleString()} */}
                   </td>
-                  <td className="py-2 px-3">{item.withdrawal}</td>
-                  <td className="py-2 px-3">{item.maturity}</td>
+                  <td className="py-2 px-3">{item.withdrawalFrequency}</td>
+                  <td className="py-2 px-3">{item.maturityDate}</td>
                 </tr>
               ))}
             </tbody>
