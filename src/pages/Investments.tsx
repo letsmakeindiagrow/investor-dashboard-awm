@@ -1,76 +1,29 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import axios from 'axios';
 
-// Sample investment plans data
-const investmentPlans = [
-  {
-    id: 1,
-    name: "Equity Growth Fund",
-    minInvestment: 5000,
-    expectedReturn: "12-15%",
-    risk: "High",
-    period: "3-5 years",
-  },
-  {
-    id: 2,
-    name: "Balanced Mutual Fund",
-    minInvestment: 3000,
-    expectedReturn: "8-10%",
-    risk: "Medium",
-    period: "2-4 years",
-  },
-  {
-    id: 3,
-    name: "Debt Fund",
-    minInvestment: 1000,
-    expectedReturn: "6-8%",
-    risk: "Low",
-    period: "1-3 years",
-  },
-];
+interface InvestmentPlan {
+  id: number;
+  name: string;
+  minInvestment: number;
+  expectedReturn: string;
+  risk: string;
+  period: string;
+}
 
-// Sample my investments data
-const myInvestments = [
-  {
-    id: 1,
-    plan: "Equity Growth Fund",
-    investedValue: 50000,
-    currentValue: 55000,
-    date: "2024-01-15",
-    mode: "Lumpsum",
-    period: "3 years",
-    roi: 10,
-    pnl: 5000,
-    withdrawal: "Quarterly",
-    maturity: "2027-01-15",
-  },
-  {
-    id: 2,
-    plan: "Balanced Fund",
-    investedValue: 75000,
-    currentValue: 78750,
-    date: "2024-02-01",
-    mode: "SIP",
-    period: "5 years",
-    roi: 5,
-    pnl: 3750,
-    withdrawal: "Annual",
-    maturity: "2029-02-01",
-  },
-  {
-    id: 3,
-    plan: "Debt Fund",
-    investedValue: 100000,
-    currentValue: 106000,
-    date: "2024-02-15",
-    mode: "Lumpsum",
-    period: "2 years",
-    roi: 6,
-    pnl: 6000,
-    withdrawal: "Maturity",
-    maturity: "2026-02-15",
-  },
-];
+interface Investment {
+  id: number;
+  plan: string;
+  investedValue: number;
+  currentValue: number;
+  date: string;
+  mode: string;
+  period: string;
+  roi: number;
+  pnl: number;
+  withdrawal: string;
+  maturity: string;
+}
 
 const Investments: React.FC = () => {
   const location = useLocation();
@@ -79,15 +32,55 @@ const Investments: React.FC = () => {
   const [activeTab, setActiveTab] = useState<"make" | "my">(initialTab);
   const [selectedPlan, setSelectedPlan] = useState<number | null>(null);
   const [investmentAmount, setInvestmentAmount] = useState<string>("");
-  const [investmentMode, setInvestmentMode] = useState<"Lumpsum" | "SIP">(
-    "Lumpsum"
-  );
+  const [investmentMode, setInvestmentMode] = useState<"Lumpsum" | "SIP">("Lumpsum");
   const [sipDate, setSipDate] = useState<string>("1");
+  
+  // New state for fetched data
+  const [investmentPlans, setInvestmentPlans] = useState<InvestmentPlan[]>([]);
+  const [myInvestments, setMyInvestments] = useState<Investment[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const currentTab = location.pathname.includes("/make") ? "make" : "my";
     setActiveTab(currentTab);
   }, [location.pathname]);
+
+  // Fetch investment plans
+  useEffect(() => {
+    const fetchPlans = async () => {
+      try {
+        const response = await axios.get('http://localhost:5001/api/v1/investor/plans', {
+          withCredentials: true
+        });
+        setInvestmentPlans(response.data.plans);
+      } catch (err) {
+        setError('Failed to fetch investment plans');
+        console.error('Error fetching plans:', err);
+      }
+    };
+
+    fetchPlans();
+  }, []);
+
+  // Fetch user investments
+  useEffect(() => {
+    const fetchInvestments = async () => {
+      try {
+        const response = await axios.get('http://localhost:5001/api/v1/investor/investments', {
+          withCredentials: true
+        });
+        setMyInvestments(response.data.investments);
+      } catch (err) {
+        setError('Failed to fetch investments');
+        console.error('Error fetching investments:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchInvestments();
+  }, []);
 
   // Helper function to get ordinal suffix (1st, 2nd, 3rd, etc.)
   const getOrdinalSuffix = (day: number): string => {
@@ -104,7 +97,7 @@ const Investments: React.FC = () => {
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!selectedPlan || !investmentAmount) return;
 
     const plan = investmentPlans.find((p) => p.id === selectedPlan);
@@ -120,14 +113,32 @@ const Investments: React.FC = () => {
       ...(investmentMode === "SIP" && { sipDate: parseInt(sipDate) }),
     };
 
-    console.log("Submitting investment:", investmentData);
-    // Here you would typically call an API to process the investment
-    alert(
-      `Investment ${
-        investmentMode === "SIP" ? "SIP" : ""
-      } submitted successfully!`
-    );
+    try {
+      const response = await axios.post('http://localhost:5001/api/v1/investor/invest', investmentData, {
+        withCredentials: true
+      });
+      
+      if (response.data.success) {
+        alert(`Investment ${investmentMode === "SIP" ? "SIP" : ""} submitted successfully!`);
+        // Refresh investments list
+        const updatedInvestments = await axios.get('http://localhost:5001/api/v1/investor/investments', {
+          withCredentials: true
+        });
+        setMyInvestments(updatedInvestments.data.investments);
+      }
+    } catch (error) {
+      console.error('Error submitting investment:', error);
+      alert('Failed to submit investment. Please try again.');
+    }
   };
+
+  if (loading) {
+    return <div className="flex justify-center items-center h-64">Loading...</div>;
+  }
+
+  if (error) {
+    return <div className="text-red-500 text-center p-4">{error}</div>;
+  }
 
   return (
     <div className="space-y-6">
