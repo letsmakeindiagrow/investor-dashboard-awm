@@ -114,14 +114,14 @@ const Investments: React.FC = () => {
     };
 
     try {
-      const response = await axios.post('http://localhost:5001/api/v1/investor/invest', investmentData, {
+      const response = await axios.post('https://backend.aadyanviwealth.com/api/v1/investor/invest', investmentData, {
         withCredentials: true
       });
       
       if (response.data.success) {
         alert(`Investment ${investmentMode === "SIP" ? "SIP" : ""} submitted successfully!`);
         // Refresh investments list
-        const updatedInvestments = await axios.get('http://localhost:5001/api/v1/investor/investments', {
+        const updatedInvestments = await axios.get('https://backend.aadyanviwealth.com/api/v1/investor/investments', {
           withCredentials: true
         });
         setMyInvestments(updatedInvestments.data.investments);
