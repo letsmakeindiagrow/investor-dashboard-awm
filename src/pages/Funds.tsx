@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 
+const API_URL = "http://localhost:5001/api/v1/investor";
+
 const Funds: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -85,7 +87,7 @@ const Funds: React.FC = () => {
 
   const handleGetTransactionHistory = async () => {
     const res = await axios.get(
-      "https://backend.local.com/api/v1/investor/getTransactions",
+      `${API_URL}/getTransactions`,
       { withCredentials: true }
     );
     if (res.status === 200 || res.status === 201) {
@@ -104,7 +106,7 @@ const Funds: React.FC = () => {
     setAddMessage(null);
     try {
       const res = await axios.post(
-        "https://backend.local.com/api/v1/investor/addFunds",
+        `${API_URL}/addFunds`,
         {
           paymentMethod,
           amount: Number(addAmount),
@@ -134,7 +136,7 @@ const Funds: React.FC = () => {
     setWithdrawMessage(null);
     try {
       const res = await axios.post(
-        "https://backend.local.com/api/v1/investor/withdrawFunds",
+        `${API_URL}/withdrawFunds`,
         {
           amount: Number(withdrawAmount),
         },
