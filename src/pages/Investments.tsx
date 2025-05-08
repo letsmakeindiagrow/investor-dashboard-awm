@@ -43,15 +43,13 @@ const Investments: React.FC = () => {
   const [activeTab, setActiveTab] = useState<"make" | "my">(initialTab);
   const [selectedPlan, setSelectedPlan] = useState<number | null>(null);
   const [investmentAmount, setInvestmentAmount] = useState<string>("");
-  const [investmentMode, setInvestmentMode] = useState<"LUMPSUM" | "SIP">(
-    "LUMPSUM"
-  );
   const [showSipComingSoon, setShowSipComingSoon] = useState(false);
   const [withdrawalFrequency, setWithdrawalFrequency] =
     useState<string>("QUARTERLY");
   const [subscribeLoading, setSubscribeLoading] = useState(false);
   const [subscribeError, setSubscribeError] = useState<string | null>(null);
   const [subscribeSuccess, setSubscribeSuccess] = useState<string | null>(null);
+  const [filterType, setFilterType] = useState<"ALL" | "SIP" | "LUMPSUM">("ALL");
 
   // Add useEffect to handle SIP message timeout
   useEffect(() => {
@@ -161,7 +159,7 @@ const Investments: React.FC = () => {
     const requestData: SubscribeInvestmentRequest = {
       investmentPlanId: String(selectedPlan),
       investedAmount: amount,
-      investmentMode: "LUMPSUM",
+      investmentMode: plan.type,
       withdrawalFrequency: withdrawalFrequency,
     };
 
@@ -255,8 +253,45 @@ const Investments: React.FC = () => {
           >
             Available Investment Plans
           </h2>
+          
+          {/* Filter Tabs */}
+          <div className="flex space-x-4 mb-6">
+            <button
+              className={`px-4 py-2 rounded-full ${
+                filterType === "ALL"
+                  ? "bg-blue-100 text-blue-600"
+                  : "bg-gray-100 text-gray-600"
+              }`}
+              onClick={() => setFilterType("ALL")}
+            >
+              All
+            </button>
+            <button
+              className={`px-4 py-2 rounded-full ${
+                filterType === "SIP"
+                  ? "bg-blue-100 text-blue-600"
+                  : "bg-gray-100 text-gray-600"
+              }`}
+              onClick={() => setFilterType("SIP")}
+            >
+              SIP
+            </button>
+            <button
+              className={`px-4 py-2 rounded-full ${
+                filterType === "LUMPSUM"
+                  ? "bg-blue-100 text-blue-600"
+                  : "bg-gray-100 text-gray-600"
+              }`}
+              onClick={() => setFilterType("LUMPSUM")}
+            >
+              LUMPSUM
+            </button>
+          </div>
+
           <div className="grid md:grid-cols-3 gap-4">
-            {investmentPlans.map((plan) => (
+            {investmentPlans
+              .filter(plan => filterType === "ALL" || plan.type === filterType)
+              .map((plan) => (
               <div
                 key={plan.id}
                 className={`bg-white p-4 rounded-lg shadow-md cursor-pointer transition-all 
@@ -341,39 +376,10 @@ const Investments: React.FC = () => {
                             Investment Mode
                           </label>
                           <div className="flex space-x-4">
-                            <label className="flex items-center">
-                              <input
-                                type="radio"
-                                name="investmentMode"
-                                value="LUMPSUM"
-                                checked={investmentMode === "LUMPSUM"}
-                                onChange={() => {
-                                  setInvestmentMode("LUMPSUM");
-                                  setShowSipComingSoon(false);
-                                }}
-                                className="mr-2"
-                              />
-                              LUMPSUM
-                            </label>
-                            <label className="flex items-center text-gray-400 cursor-not-allowed">
-                              <input
-                                type="radio"
-                                name="investmentMode"
-                                value="SIP"
-                                checked={false}
-                                onChange={() => {
-                                  setShowSipComingSoon(true);
-                                }}
-                                className="mr-2 cursor-not-allowed"
-                              />
-                              SIP
-                            </label>
-                          </div>
-                          {showSipComingSoon && (
-                            <div className="text-sm text-orange-500 mt-2">
-                              SIP option is coming soon!
+                            <div className="text-gray-700 font-medium">
+                              {plan.type}
                             </div>
-                          )}
+                          </div>
                         </div>
 
                         <div>
@@ -411,15 +417,20 @@ const Investments: React.FC = () => {
 
                         <button
                           className="w-full py-2 rounded text-white"
-                          style={{ backgroundColor: "#08AFF1" }}
+                          style={{ backgroundColor: plan.type === "SIP" ? "#9CA3AF" : "#08AFF1" }}
                           disabled={
+                            plan.type === "SIP" ||
                             !investmentAmount ||
                             Number(investmentAmount) < plan.minInvestment ||
                             subscribeLoading
                           }
                           onClick={handleLumpsumSubmit}
                         >
-                          {subscribeLoading ? "Processing..." : "Invest Now"}
+                          {plan.type === "SIP" 
+                            ? "Coming Soon" 
+                            : subscribeLoading 
+                              ? "Processing..." 
+                              : "Invest Now"}
                         </button>
                         {subscribeError && selectedPlan === plan.id && (
                           <div className="text-red-500 mt-2">
