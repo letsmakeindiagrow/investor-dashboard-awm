@@ -34,7 +34,7 @@ interface SubscribeInvestmentResponse {
   investment: Investment;
 }
 
-const API_URL = "http://localhost:5001/api/v1/investor";
+const API_URL = `${import.meta.env.VITE_API_URL}/api/v1/investor`;
 
 const Investments: React.FC = () => {
   const location = useLocation();
@@ -43,9 +43,12 @@ const Investments: React.FC = () => {
   const [activeTab, setActiveTab] = useState<"make" | "my">(initialTab);
   const [selectedPlan, setSelectedPlan] = useState<number | null>(null);
   const [investmentAmount, setInvestmentAmount] = useState<string>("");
-  const [investmentMode, setInvestmentMode] = useState<"LUMPSUM" | "SIP">("LUMPSUM");
+  const [investmentMode, setInvestmentMode] = useState<"LUMPSUM" | "SIP">(
+    "LUMPSUM"
+  );
   const [showSipComingSoon, setShowSipComingSoon] = useState(false);
-  const [withdrawalFrequency, setWithdrawalFrequency] = useState<string>("QUARTERLY");
+  const [withdrawalFrequency, setWithdrawalFrequency] =
+    useState<string>("QUARTERLY");
   const [subscribeLoading, setSubscribeLoading] = useState(false);
   const [subscribeError, setSubscribeError] = useState<string | null>(null);
   const [subscribeSuccess, setSubscribeSuccess] = useState<string | null>(null);
@@ -80,12 +83,9 @@ const Investments: React.FC = () => {
   useEffect(() => {
     const fetchPlans = async () => {
       try {
-        const response = await axios.get(
-          `${API_URL}/getInvestmentPlans`,
-          {
-            withCredentials: true,
-          }
-        );
+        const response = await axios.get(`${API_URL}/getInvestmentPlans`, {
+          withCredentials: true,
+        });
         console.log(response.data.investmentPlans);
         setInvestmentPlans(response.data.investmentPlans);
       } catch (err) {
@@ -101,12 +101,9 @@ const Investments: React.FC = () => {
   useEffect(() => {
     const fetchInvestments = async () => {
       try {
-        const response = await axios.get(
-          `${API_URL}/getInvestments`,
-          {
-            withCredentials: true,
-          }
-        );
+        const response = await axios.get(`${API_URL}/getInvestments`, {
+          withCredentials: true,
+        });
         console.log(response.data.investments);
         setMyInvestments(response.data.investments);
       } catch (err) {
@@ -168,18 +165,18 @@ const Investments: React.FC = () => {
       withdrawalFrequency: withdrawalFrequency,
     };
 
-    console.log('Request Data:', requestData);
+    console.log("Request Data:", requestData);
 
     setSubscribeLoading(true);
     try {
       const response = await axios.post<SubscribeInvestmentResponse>(
         `${API_URL}/subscribeInvestment`,
         requestData,
-        { 
+        {
           withCredentials: true,
           headers: {
-            'Content-Type': 'application/json'
-          }
+            "Content-Type": "application/json",
+          },
         }
       );
 
@@ -196,7 +193,7 @@ const Investments: React.FC = () => {
         setSelectedPlan(null);
       }
     } catch (error: any) {
-      console.error('Error details:', error.response?.data);
+      console.error("Error details:", error.response?.data);
       if (axios.isAxiosError(error) && error.response) {
         setSubscribeError(error.response.data.message || "An error occurred.");
       } else {
@@ -252,7 +249,10 @@ const Investments: React.FC = () => {
       {/* Make Investment Tab */}
       {activeTab === "make" && (
         <div>
-          <h2 className="text-xl font-semibold mb-4" style={{ color: "#08AFF1" }}>
+          <h2
+            className="text-xl font-semibold mb-4"
+            style={{ color: "#08AFF1" }}
+          >
             Available Investment Plans
           </h2>
           <div className="grid md:grid-cols-3 gap-4">
@@ -260,14 +260,22 @@ const Investments: React.FC = () => {
               <div
                 key={plan.id}
                 className={`bg-white p-4 rounded-lg shadow-md cursor-pointer transition-all 
-                  ${selectedPlan === plan.id ? "border-2 border-blue-400" : "hover:shadow-xl"}`}
+                  ${
+                    selectedPlan === plan.id
+                      ? "border-2 border-blue-400"
+                      : "hover:shadow-xl"
+                  }`}
                 onClick={() => setSelectedPlan(plan.id)}
                 style={{
-                  borderColor: selectedPlan === plan.id ? "#08AFF1" : "transparent",
+                  borderColor:
+                    selectedPlan === plan.id ? "#08AFF1" : "transparent",
                   zIndex: selectedPlan === plan.id ? 1 : 0,
                 }}
               >
-                <h3 className="text-lg font-semibold mb-2" style={{ color: "#08AFF1" }}>
+                <h3
+                  className="text-lg font-semibold mb-2"
+                  style={{ color: "#08AFF1" }}
+                >
                   {plan.name}
                 </h3>
                 <div className="space-y-2 text-sm">
@@ -297,28 +305,41 @@ const Investments: React.FC = () => {
             >
               <div
                 className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md relative"
-                onClick={e => e.stopPropagation()}
+                onClick={(e) => e.stopPropagation()}
               >
                 {(() => {
-                  const plan = investmentPlans.find((p) => p.id === selectedPlan);
+                  const plan = investmentPlans.find(
+                    (p) => p.id === selectedPlan
+                  );
                   if (!plan) return null;
                   return (
                     <>
-                      <h3 className="text-lg font-semibold mb-2" style={{ color: "#08AFF1" }}>
+                      <h3
+                        className="text-lg font-semibold mb-2"
+                        style={{ color: "#08AFF1" }}
+                      >
                         {plan.name}
                       </h3>
                       <div className="space-y-2 text-sm mb-4">
                         <p>
-                          Min. Investment: <span style={{ color: "#AACF45" }}>₹{plan.minInvestment.toLocaleString()}</span>
+                          Min. Investment:{" "}
+                          <span style={{ color: "#AACF45" }}>
+                            ₹{plan.minInvestment.toLocaleString()}
+                          </span>
                         </p>
                         <p>
-                          Expected Return: <span style={{ color: "#AACF45" }}>{plan.expectedReturn}</span>
+                          Expected Return:{" "}
+                          <span style={{ color: "#AACF45" }}>
+                            {plan.expectedReturn}
+                          </span>
                         </p>
                         <p>Investment Period: {plan.investmentTerm}</p>
                       </div>
                       <div className="mt-4 space-y-3">
                         <div>
-                          <label className="block text-sm mb-1">Investment Mode</label>
+                          <label className="block text-sm mb-1">
+                            Investment Mode
+                          </label>
                           <div className="flex space-x-4">
                             <label className="flex items-center">
                               <input
@@ -356,11 +377,15 @@ const Investments: React.FC = () => {
                         </div>
 
                         <div>
-                          <label className="block text-sm mb-1">Withdrawal Frequency</label>
+                          <label className="block text-sm mb-1">
+                            Withdrawal Frequency
+                          </label>
                           <select
                             className="w-full p-2 border rounded"
                             value={withdrawalFrequency}
-                            onChange={(e) => setWithdrawalFrequency(e.target.value)}
+                            onChange={(e) =>
+                              setWithdrawalFrequency(e.target.value)
+                            }
                           >
                             <option value="QUARTERLY">Quarterly</option>
                             <option value="ANNUAL">Annual</option>
@@ -369,14 +394,18 @@ const Investments: React.FC = () => {
                         </div>
 
                         <div>
-                          <label className="block text-sm mb-1">Investment Amount</label>
+                          <label className="block text-sm mb-1">
+                            Investment Amount
+                          </label>
                           <input
                             type="number"
                             placeholder="Enter Investment Amount"
                             className="w-full p-2 border rounded"
                             min={plan.minInvestment}
                             value={investmentAmount}
-                            onChange={(e) => setInvestmentAmount(e.target.value)}
+                            onChange={(e) =>
+                              setInvestmentAmount(e.target.value)
+                            }
                           />
                         </div>
 
@@ -393,11 +422,11 @@ const Investments: React.FC = () => {
                           {subscribeLoading ? "Processing..." : "Invest Now"}
                         </button>
                         {subscribeError && selectedPlan === plan.id && (
-                          <div className="text-red-500 mt-2">{subscribeError}</div>
+                          <div className="text-red-500 mt-2">
+                            {subscribeError}
+                          </div>
                         )}
-                        {subscribeSuccess && selectedPlan === plan.id && (
-                          null
-                        )}
+                        {subscribeSuccess && selectedPlan === plan.id && null}
                       </div>
                       <button
                         className="absolute top-2 right-2 text-gray-400 hover:text-gray-600"
@@ -418,7 +447,10 @@ const Investments: React.FC = () => {
       {/* My Investments Tab */}
       {activeTab === "my" && (
         <div className="bg-white p-4 rounded-lg shadow-md overflow-x-auto">
-          <h2 className="text-xl font-semibold mb-4" style={{ color: "#AACF45" }}>
+          <h2
+            className="text-xl font-semibold mb-4"
+            style={{ color: "#AACF45" }}
+          >
             My Investments
           </h2>
           <table className="min-w-full text-sm text-left">
@@ -463,7 +495,9 @@ const Investments: React.FC = () => {
       {subscribeSuccess && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30 z-50">
           <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-xs text-center relative">
-            <div className="text-green-600 text-lg font-semibold mb-2">{subscribeSuccess}</div>
+            <div className="text-green-600 text-lg font-semibold mb-2">
+              {subscribeSuccess}
+            </div>
             <button
               className="absolute top-2 right-2 text-gray-400 hover:text-gray-600"
               onClick={() => setSubscribeSuccess(null)}

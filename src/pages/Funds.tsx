@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 
-const API_URL = "http://localhost:5001/api/v1/investor";
+const API_URL = `${import.meta.env.VITE_API_URL}/api/v1/investor`;
 
 const Funds: React.FC = () => {
   const location = useLocation();
@@ -86,10 +86,9 @@ const Funds: React.FC = () => {
   // ];
 
   const handleGetTransactionHistory = async () => {
-    const res = await axios.get(
-      `${API_URL}/getTransactions`,
-      { withCredentials: true }
-    );
+    const res = await axios.get(`${API_URL}/getTransactions`, {
+      withCredentials: true,
+    });
     if (res.status === 200 || res.status === 201) {
       setTransactionHistory(res.data);
       console.log(res.data);
@@ -595,8 +594,7 @@ const Funds: React.FC = () => {
                     </td>
                     <td className="py-2 px-3">{transaction.refNumber}</td>
                     <td className="py-2 px-3">
-                      {/* ₹{transaction.balance.toLocaleString()}/- */}
-                      ₹100/- */
+                      ₹{transaction?.balance?.toLocaleString()}/-
                     </td>
                     <td className="py-2 px-3">{transaction.remark}</td>
                   </tr>
