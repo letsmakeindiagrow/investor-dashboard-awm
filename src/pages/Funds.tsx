@@ -50,7 +50,7 @@ const Funds: React.FC = () => {
   const [withdrawLoading, setWithdrawLoading] = useState(false);
   const [withdrawMessage, setWithdrawMessage] = useState<string | null>(null);
   const [transactionHistory, setTransactionHistory] = useState<any[]>([]);
-
+  const [balance, setBalance] = useState<number>(0);
   // Sample transaction history data
   // const transactionHistory = [
   //   {
@@ -154,6 +154,23 @@ const Funds: React.FC = () => {
     }
   };
 
+  const fetchBalance = async () =>{
+    try{
+      const response = await axios.get(`${API_URL}/getBalance`,{
+        withCredentials: true,
+      });
+      if(response.status === 200){
+        setBalance(response.data.balance.availableBalance);
+      } 
+    }
+    catch(error){
+      console.error("Error fetching balance:", error);
+    }
+  }
+  useEffect(() => {
+    fetchBalance();
+  }, []);
+
   return (
     <div className="space-y-6">
       {/* Tabs */}
@@ -200,7 +217,7 @@ const Funds: React.FC = () => {
               Total Balance
             </h3>
             <p className="text-3xl font-bold" style={{ color: "#08AFF1" }}>
-              ₹1,25,000
+              ₹{balance}
             </p>
           </div>
           <div className="bg-white p-4 rounded-lg shadow-md">

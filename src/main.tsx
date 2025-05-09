@@ -6,7 +6,7 @@ import "./index.css";
 import { setCookie } from "./utils/cookies";
 setCookie(
   "auth_token",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1OTJhMzQxMi0zOTM3LTQwNjMtODFkMi0zZDZhYzVhNjUxYTMiLCJlbWFpbCI6InB1c2hrYXIxNzEzQGdtYWlsLmNvbSIsImlhdCI6MTc0NjcyNDM5MSwiZXhwIjoxNzQ2NzYwMzkxfQ.SAFvNJ2a9TwqA-a50gwNCj-bltyY9JVAqK1TlYc2w3Q"
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1OTJhMzQxMi0zOTM3LTQwNjMtODFkMi0zZDZhYzVhNjUxYTMiLCJlbWFpbCI6InB1c2hrYXIxNzEzQGdtYWlsLmNvbSIsImlhdCI6MTc0Njc4NzE3MywiZXhwIjoxNzQ2ODIzMTczfQ.4IG5Phe7Dd__MjGvfPcgHrw0Hk02m0Asb5VYYxYkZoQ"
 );
 
 ReactDOM.createRoot(document.getElementById("root")!).render(

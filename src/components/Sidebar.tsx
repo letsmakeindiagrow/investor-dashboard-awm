@@ -98,7 +98,7 @@ const Sidebar: React.FC = () => {
             {!isCollapsed && openMenus.dashboard && (
               <div className="pl-4 space-y-2 mt-1">
                 <div onClick={() => navigateTo('/dashboard')} className={`block p-3 rounded-md text-base ${hoverEffect} ${textColor} cursor-pointer transition-colors font-medium`}>
-                  My Investment
+                  My Portfolio
                 </div>
                 <div onClick={() => navigateTo('/dashboard/details')} className={`block p-3 rounded-md text-base ${hoverEffect} ${textColor} cursor-pointer transition-colors font-medium`}>
                   Investment Details

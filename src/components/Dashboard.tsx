@@ -93,7 +93,7 @@ const Dashboard: React.FC<DashboardProps> = ({ view = "overview" }) => {
           onClick={() => handleTabChange("overview")}
           style={{ color: view === "overview" ? "#08AFF1" : "" }}
         >
-          My Investment
+          My Portfolio
         </button>
         <button
           className={`px-4 py-2 ${
