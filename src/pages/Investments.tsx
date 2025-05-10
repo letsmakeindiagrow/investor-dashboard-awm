@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { differenceInDays } from 'date-fns';
+import Decimal from 'decimal.js';
 
 interface InvestmentPlan {
   id: number;
@@ -10,6 +12,7 @@ interface InvestmentPlan {
   investmentTerm: string;
   type: string;
   status: string;
+  roiAAR: number;
 }
 
 interface Investment {
@@ -34,6 +37,18 @@ interface SubscribeInvestmentResponse {
   investment: Investment;
 }
 
+interface WithdrawInvestmentResponse {
+  message: string;
+  transaction: any;
+}
+
+interface WithdrawalDetails {
+  netAmountPaid: number;
+  expensePercentageApplied: number;
+  expenseAmountDeducted: number;
+  lockInStageAchieved: number;
+}
+
 const API_URL = `${import.meta.env.VITE_API_URL}/api/v1/investor`;
 
 const Investments: React.FC = () => {
@@ -50,6 +65,10 @@ const Investments: React.FC = () => {
   const [subscribeError, setSubscribeError] = useState<string | null>(null);
   const [subscribeSuccess, setSubscribeSuccess] = useState<string | null>(null);
   const [filterType, setFilterType] = useState<"ALL" | "SIP" | "LUMPSUM">("ALL");
+  const [withdrawLoading, setWithdrawLoading] = useState<number | null>(null);
+  const [withdrawMessage, setWithdrawMessage] = useState<{id: number, message: string} | null>(null);
+  const [showWithdrawConfirm, setShowWithdrawConfirm] = useState<number | null>(null);
+  const [withdrawalDetails, setWithdrawalDetails] = useState<WithdrawalDetails | null>(null);
 
   // Add useEffect to handle SIP message timeout
   useEffect(() => {
@@ -65,6 +84,26 @@ const Investments: React.FC = () => {
       }
     };
   }, [showSipComingSoon]);
+
+  // Success modal auto-dismiss
+  useEffect(() => {
+    if (subscribeSuccess) {
+      const timer = setTimeout(() => {
+        setSubscribeSuccess(null);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [subscribeSuccess]);
+
+  // Withdrawal message auto-dismiss
+  useEffect(() => {
+    if (withdrawMessage) {
+      const timer = setTimeout(() => {
+        setWithdrawMessage(null);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [withdrawMessage]);
 
   // New state for fetched data
   const [investmentPlans, setInvestmentPlans] = useState<InvestmentPlan[]>([]);
@@ -82,7 +121,7 @@ const Investments: React.FC = () => {
     const fetchPlans = async () => {
       try {
         const response = await axios.get(`${API_URL}/getInvestmentPlans`, {
-          withCredentials: true,
+            withCredentials: true,
         });
         console.log(response.data.investmentPlans);
         setInvestmentPlans(response.data.investmentPlans);
@@ -100,7 +139,7 @@ const Investments: React.FC = () => {
     const fetchInvestments = async () => {
       try {
         const response = await axios.get(`${API_URL}/getInvestments`, {
-          withCredentials: true,
+            withCredentials: true,
         });
         console.log(response.data.investments);
         setMyInvestments(response.data.investments);
@@ -114,16 +153,6 @@ const Investments: React.FC = () => {
 
     fetchInvestments();
   }, []);
-
-  // Success modal auto-dismiss
-  useEffect(() => {
-    if (subscribeSuccess) {
-      const timer = setTimeout(() => {
-        setSubscribeSuccess(null);
-      }, 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [subscribeSuccess]);
 
   const handleLumpsumSubmit = async () => {
     setSubscribeError(null);
@@ -199,6 +228,104 @@ const Investments: React.FC = () => {
       }
     } finally {
       setSubscribeLoading(false);
+    }
+  };
+
+  const handleWithdrawInvestment = async (investmentId: number) => {
+    setWithdrawLoading(investmentId);
+    setWithdrawMessage(null);
+    
+    try {
+      const response = await axios.post<WithdrawInvestmentResponse>(
+        `${API_URL}/withdrawPreMaturity`,
+        { investmentPlanId: investmentId },
+        { withCredentials: true }
+      );
+      
+      if (response.data.message) {
+        setWithdrawMessage({ 
+          id: investmentId, 
+          message: response.data.message 
+        });
+        // Refresh investments list
+        const updatedInvestments = await axios.get(`${API_URL}/getInvestments`, {
+          withCredentials: true
+        });
+        setMyInvestments(updatedInvestments.data.investments);
+      }
+    } catch (error: any) {
+      setWithdrawMessage({ 
+        id: investmentId, 
+        message: error.response?.data?.message || "Failed to withdraw investment" 
+      });
+    } finally {
+      setWithdrawLoading(null);
+    }
+  };
+
+  const fetchWithdrawalDetails = async (investmentId: number) => {
+    try {
+      // Find the investment
+      const investment = myInvestments.find(inv => inv.id === investmentId);
+      if (!investment) {
+        throw new Error("Investment not found");
+      }
+
+      // Find the investment plan
+      const plan = investmentPlans.find(p => p.id === investment.investmentPlanId);
+      if (!plan) {
+        throw new Error("Investment plan not found");
+      }
+
+      // Calculate time elapsed and lock-in period
+      const T_elaspsed = differenceInDays(new Date(), new Date(investment.investmentDate));
+      const T_lockIn = Number(plan.investmentTerm) * 365;
+      const P_completed = (T_elaspsed / T_lockIn) * 100;
+
+      // Determine lock-in stage and penalty
+      let lockInStage = 0;
+      let expensePercentageApplied = 0;
+      if (0 < P_completed && P_completed <= 25) {
+        lockInStage = 1;
+        expensePercentageApplied = 5;
+      } else if (25 < P_completed && P_completed <= 50) {
+        lockInStage = 2;
+        expensePercentageApplied = 3.5;
+      } else if (50 < P_completed && P_completed <= 75) {
+        lockInStage = 3;
+        expensePercentageApplied = 2.5;
+      } else if (75 < P_completed && P_completed <= 100) {
+        lockInStage = 4;
+        expensePercentageApplied = 0;
+      }
+
+      // Calculate gains and penalties
+      const principalAsDecimal = new Decimal(investment.investedAmount);
+      const roiRate = new Decimal(plan.roiAAR);
+
+      const gainComponent = principalAsDecimal
+        .times(roiRate.div(100))
+        .times(new Decimal(T_elaspsed).div(365));
+
+      const totalGain = principalAsDecimal.plus(gainComponent);
+      const exitExpense = totalGain.times(expensePercentageApplied).div(100);
+      const NetPayout = totalGain.minus(exitExpense);
+
+      // Set the withdrawal details
+      setWithdrawalDetails({
+        netAmountPaid: NetPayout.toNumber(),
+        expensePercentageApplied,
+        expenseAmountDeducted: exitExpense.toNumber(),
+        lockInStageAchieved: lockInStage
+      });
+      
+      setShowWithdrawConfirm(investmentId);
+    } catch (error: any) {
+      console.error("Error in fetchWithdrawalDetails:", error);
+      setWithdrawMessage({
+        id: investmentId,
+        message: error.message || "Failed to calculate withdrawal details"
+      });
     }
   };
 
@@ -370,17 +497,17 @@ const Investments: React.FC = () => {
                         </p>
                         <p>Investment Period: {plan.investmentTerm}</p>
                       </div>
-                      <div className="mt-4 space-y-3">
-                        <div>
-                          <label className="block text-sm mb-1">
-                            Investment Mode
-                          </label>
-                          <div className="flex space-x-4">
+                  <div className="mt-4 space-y-3">
+                    <div>
+                      <label className="block text-sm mb-1">
+                        Investment Mode
+                      </label>
+                      <div className="flex space-x-4">
                             <div className="text-gray-700 font-medium">
                               {plan.type}
                             </div>
-                          </div>
-                        </div>
+                      </div>
+                    </div>
 
                         <div>
                           <label className="block text-sm mb-1">
@@ -399,28 +526,28 @@ const Investments: React.FC = () => {
                           </select>
                         </div>
 
-                        <div>
-                          <label className="block text-sm mb-1">
+                    <div>
+                      <label className="block text-sm mb-1">
                             Investment Amount
-                          </label>
-                          <input
-                            type="number"
+                      </label>
+                      <input
+                        type="number"
                             placeholder="Enter Investment Amount"
-                            className="w-full p-2 border rounded"
-                            min={plan.minInvestment}
-                            value={investmentAmount}
+                        className="w-full p-2 border rounded"
+                        min={plan.minInvestment}
+                        value={investmentAmount}
                             onChange={(e) =>
                               setInvestmentAmount(e.target.value)
                             }
-                          />
-                        </div>
+                      />
+                    </div>
 
-                        <button
-                          className="w-full py-2 rounded text-white"
+                    <button
+                      className="w-full py-2 rounded text-white"
                           style={{ backgroundColor: plan.type === "SIP" ? "#9CA3AF" : "#08AFF1" }}
-                          disabled={
+                      disabled={
                             plan.type === "SIP" ||
-                            !investmentAmount ||
+                        !investmentAmount ||
                             Number(investmentAmount) < plan.minInvestment ||
                             subscribeLoading
                           }
@@ -431,12 +558,12 @@ const Investments: React.FC = () => {
                             : subscribeLoading 
                               ? "Processing..." 
                               : "Invest Now"}
-                        </button>
+                    </button>
                         {subscribeError && selectedPlan === plan.id && (
                           <div className="text-red-500 mt-2">
                             {subscribeError}
-                          </div>
-                        )}
+                  </div>
+                )}
                         {subscribeSuccess && selectedPlan === plan.id && null}
                       </div>
                       <button
@@ -450,7 +577,7 @@ const Investments: React.FC = () => {
                   );
                 })()}
               </div>
-            </div>
+          </div>
           )}
         </div>
       )}
@@ -478,6 +605,7 @@ const Investments: React.FC = () => {
                 <th className="py-2 px-3 border-b">PnL(Rs.)</th>
                 <th className="py-2 px-3 border-b">Withdrawal Plan</th>
                 <th className="py-2 px-3 border-b">Date of Maturity</th>
+                <th className="py-2 px-3 border-b">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -495,6 +623,28 @@ const Investments: React.FC = () => {
                   <td className="py-2 px-3">{item.investmentMode}</td>
                   <td className="py-2 px-3">{item.maturityDate}</td>
                   <td className="py-2 px-3">{item.withdrawalFrequency}</td>
+                  <td className="py-2 px-3">
+                    <button
+                      className={`px-4 py-2 rounded text-white ${
+                        withdrawLoading === item.id 
+                          ? 'bg-gray-400' 
+                          : 'bg-red-500 hover:bg-red-600'
+                      }`}
+                      disabled={withdrawLoading === item.id}
+                      onClick={() => fetchWithdrawalDetails(item.id)}
+                    >
+                      {withdrawLoading === item.id ? 'Processing...' : 'Withdraw'}
+                    </button>
+                    {withdrawMessage?.id === item.id && (
+                      <div className={`mt-1 text-sm ${
+                        withdrawMessage.message.includes('success') 
+                          ? 'text-green-600' 
+                          : 'text-red-600'
+                      }`}>
+                        {withdrawMessage.message}
+                      </div>
+                    )}
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -516,6 +666,70 @@ const Investments: React.FC = () => {
             >
               &times;
             </button>
+          </div>
+        </div>
+      )}
+
+      {showWithdrawConfirm && withdrawalDetails && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30 z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+            <h3 className="text-lg font-semibold mb-4">Confirm Withdrawal</h3>
+            
+            <div className="mb-4 space-y-3">
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <h4 className="font-medium mb-2">Withdrawal Details</h4>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Lock-in Stage:</span>
+                    <span className="font-medium">Stage {withdrawalDetails.lockInStageAchieved}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Penalty Percentage:</span>
+                    <span className="font-medium text-red-500">{withdrawalDetails.expensePercentageApplied}%</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Penalty Amount:</span>
+                    <span className="font-medium text-red-500">
+                      ₹{withdrawalDetails.expenseAmountDeducted.toLocaleString()}
+                    </span>
+                  </div>
+                  <div className="border-t pt-2 mt-2">
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Net Amount to Receive:</span>
+                      <span className="font-medium text-green-600">
+                        ₹{withdrawalDetails.netAmountPaid.toLocaleString()}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <p className="text-sm text-gray-600">
+                Are you sure you want to proceed with the withdrawal? The penalty amount will be deducted from your total value.
+              </p>
+            </div>
+
+            <div className="flex justify-end space-x-4">
+              <button
+                className="px-4 py-2 text-gray-600 hover:text-gray-800"
+                onClick={() => {
+                  setShowWithdrawConfirm(null);
+                  setWithdrawalDetails(null);
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                onClick={() => {
+                  handleWithdrawInvestment(showWithdrawConfirm);
+                  setShowWithdrawConfirm(null);
+                  setWithdrawalDetails(null);
+                }}
+              >
+                Confirm Withdrawal
+              </button>
+            </div>
           </div>
         </div>
       )}
