@@ -1,53 +1,78 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+
+interface LedgerEntry {
+  id: string;
+  createdAt: string;
+  voucherType: string;
+  Narration: string | null;
+  debitAmount: number | null;
+  creditAmount: number | null;
+  balance: number | null;
+}
+
+const API_URL = `${import.meta.env.VITE_API_URL}/api/v1/investor`;
 
 const Ledger: React.FC = () => {
   const [dateRange, setDateRange] = useState<'all' | 'custom'>('all');
   const [fromDate, setFromDate] = useState('');
   const [toDate, setToDate] = useState('');
+  const [ledgerEntries, setLedgerEntries] = useState<LedgerEntry[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Sample ledger data
-  const ledgerEntries = [
-    {
-      date: '2024-03-15 14:30:22',
-      voucher: 'Bank Receipt',
-      narration: 'Funds Addition via UPI',
-      debit: 0,
-      credit: 10000,
-      balance: 10000
-    },
-    {
-      date: '2024-03-10 11:15:45',
-      voucher: 'Bank Payment',
-      narration: 'Fund Withdrawal to Bank Account',
-      debit: 5000,
-      credit: 0,
-      balance: 5000
-    },
-    {
-      date: '2024-03-05 09:45:12',
-      voucher: 'Journal Voucher',
-      narration: 'TDS Expense',
-      debit: 500,
-      credit: 0,
-      balance: 4500
-    },
-    {
-      date: '2024-03-20 16:22:33',
-      voucher: 'Bank Receipt',
-      narration: 'Funds Addition via NEFT',
-      debit: 0,
-      credit: 25000,
-      balance: 29500
-    },
-    {
-      date: '2024-03-25 10:05:18',
-      voucher: 'Book Voucher',
-      narration: 'Profit from Equity Fund Investment',
-      debit: 0,
-      credit: 2500,
-      balance: 32000
+  useEffect(() => {
+    fetchLedger();
+  }, []);
+
+  const fetchLedger = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get(`${API_URL}/ledger`, {
+        withCredentials: true
+      });
+      setLedgerEntries(response.data);
+      setError(null);
+    } catch (err: any) {
+      setError(err.response?.data?.message || "Failed to fetch ledger entries");
+      console.error("Error fetching ledger:", err);
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
+
+  const filteredEntries = ledgerEntries.filter(entry => {
+    if (dateRange === 'all') return true;
+    
+    const entryDate = new Date(entry.createdAt);
+    const from = fromDate ? new Date(fromDate) : null;
+    const to = toDate ? new Date(toDate) : null;
+
+    if (from && to) {
+      return entryDate >= from && entryDate <= to;
+    } else if (from) {
+      return entryDate >= from;
+    } else if (to) {
+      return entryDate <= to;
+    }
+    return true;
+  });
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        Loading...
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-red-500 text-center p-4">
+        {error}
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -113,21 +138,23 @@ const Ledger: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {ledgerEntries.map((entry, index) => (
+              {filteredEntries.map((entry) => (
                 <tr 
-                  key={index} 
+                  key={entry.id} 
                   className="border-b hover:bg-gray-50 transition-colors"
                 >
-                  <td className="py-2 px-3">{entry.date}</td>
-                  <td className="py-2 px-3">{entry.voucher}</td>
-                  <td className="py-2 px-3">{entry.narration}</td>
+                  <td className="py-2 px-3">{new Date(entry.createdAt).toLocaleString()}</td>
+                  <td className="py-2 px-3">{entry.voucherType}</td>
+                  <td className="py-2 px-3">{entry.Narration || '-'}</td>
                   <td className="py-2 px-3 text-blue-600">
-                    {entry.debit > 0 ? `₹${entry.debit.toLocaleString()}` : '-'}
+                    {entry.debitAmount ? `₹${entry.debitAmount.toLocaleString()}` : '-'}
                   </td>
                   <td className="py-2 px-3 text-blue-600">
-                    {entry.credit > 0 ? `₹${entry.credit.toLocaleString()}` : '-'}
+                    {entry.creditAmount ? `₹${entry.creditAmount.toLocaleString()}` : '-'}
                   </td>
-                  <td className="py-2 px-3 font-semibold">₹{entry.balance.toLocaleString()}</td>
+                  <td className="py-2 px-3 font-semibold">
+                    {entry.balance ? `₹${entry.balance.toLocaleString()}` : '-'}
+                  </td>
                 </tr>
               ))}
             </tbody>
