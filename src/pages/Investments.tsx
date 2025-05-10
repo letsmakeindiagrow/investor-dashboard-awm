@@ -47,6 +47,13 @@ interface WithdrawalDetails {
   expensePercentageApplied: number;
   expenseAmountDeducted: number;
   lockInStageAchieved: number;
+  transaction: {
+    fundTransaction: {
+      type: string;
+      method: string;
+      status: string;
+    };
+  };
 }
 
 const API_URL = `${import.meta.env.VITE_API_URL}/api/v1/investor`;
@@ -231,38 +238,6 @@ const Investments: React.FC = () => {
     }
   };
 
-  const handleWithdrawInvestment = async (investmentId: number) => {
-    setWithdrawLoading(investmentId);
-    setWithdrawMessage(null);
-    
-    try {
-      const response = await axios.post<WithdrawInvestmentResponse>(
-        `${API_URL}/withdrawPreMaturity`,
-        { investmentPlanId: investmentId },
-        { withCredentials: true }
-      );
-      
-      if (response.data.message) {
-        setWithdrawMessage({ 
-          id: investmentId, 
-          message: response.data.message 
-        });
-        // Refresh investments list
-        const updatedInvestments = await axios.get(`${API_URL}/getInvestments`, {
-          withCredentials: true
-        });
-        setMyInvestments(updatedInvestments.data.investments);
-      }
-    } catch (error: any) {
-      setWithdrawMessage({ 
-        id: investmentId, 
-        message: error.response?.data?.message || "Failed to withdraw investment" 
-      });
-    } finally {
-      setWithdrawLoading(null);
-    }
-  };
-
   const fetchWithdrawalDetails = async (investmentId: number) => {
     try {
       // Find the investment
@@ -316,7 +291,14 @@ const Investments: React.FC = () => {
         netAmountPaid: NetPayout.toNumber(),
         expensePercentageApplied,
         expenseAmountDeducted: exitExpense.toNumber(),
-        lockInStageAchieved: lockInStage
+        lockInStageAchieved: lockInStage,
+        transaction: {
+          fundTransaction: {
+            type: "Pre-Maturity Exit",
+            method: "NEFT",
+            status: "Processing"
+          }
+        }
       });
       
       setShowWithdrawConfirm(investmentId);
@@ -326,6 +308,38 @@ const Investments: React.FC = () => {
         id: investmentId,
         message: error.message || "Failed to calculate withdrawal details"
       });
+    }
+  };
+
+  const handleWithdrawInvestment = async (investmentId: number) => {
+    setWithdrawLoading(investmentId);
+    setWithdrawMessage(null);
+    
+    try {
+      const response = await axios.post(
+        `${API_URL}/withdrawPreMaturity`,
+        { investmentPlanId: investmentId },
+        { withCredentials: true }
+      );
+      
+      if (response.data.message) {
+        setWithdrawMessage({ 
+          id: investmentId, 
+          message: response.data.message 
+        });
+        // Refresh investments list
+        const updatedInvestments = await axios.get(`${API_URL}/getInvestments`, {
+          withCredentials: true
+        });
+        setMyInvestments(updatedInvestments.data.investments);
+      }
+    } catch (error: any) {
+      setWithdrawMessage({ 
+        id: investmentId, 
+        message: error.response?.data?.message || "Failed to withdraw investment" 
+      });
+    } finally {
+      setWithdrawLoading(null);
     }
   };
 
@@ -700,6 +714,24 @@ const Investments: React.FC = () => {
                         ₹{withdrawalDetails.netAmountPaid.toLocaleString()}
                       </span>
                     </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-blue-50 p-4 rounded-lg">
+                <h4 className="font-medium mb-2 text-blue-700">Transaction Details</h4>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Transaction Type:</span>
+                    <span className="font-medium">{withdrawalDetails.transaction.fundTransaction.type}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Payment Method:</span>
+                    <span className="font-medium">{withdrawalDetails.transaction.fundTransaction.method}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Status:</span>
+                    <span className="font-medium text-yellow-600">{withdrawalDetails.transaction.fundTransaction.status}</span>
                   </div>
                 </div>
               </div>
