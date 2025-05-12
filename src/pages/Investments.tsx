@@ -37,10 +37,6 @@ interface SubscribeInvestmentResponse {
   investment: Investment;
 }
 
-interface WithdrawInvestmentResponse {
-  message: string;
-  transaction: any;
-}
 
 interface WithdrawalDetails {
   netAmountPaid: number;
