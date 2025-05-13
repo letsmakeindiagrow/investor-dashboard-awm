@@ -5,24 +5,33 @@ import { differenceInDays } from 'date-fns';
 import Decimal from 'decimal.js';
 
 interface InvestmentPlan {
-  id: number;
+  id: string;
   name: string;
   minInvestment: number;
   expectedReturn: string;
-  investmentTerm: string;
+  investmentTerm: number;
   type: string;
   status: string;
-  roiAAR: number;
+  roiAAR: string;
 }
 
 interface Investment {
-  id: number;
-  investmentPlanId: number;
+  id: string;
   investedAmount: number;
   investmentDate: string;
-  investmentMode: string;
-  withdrawalFrequency: string;
   maturityDate: string;
+  totalMaturedValue: number | null;
+  withdrawalFrequency: string;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+  userId: string;
+  investmentPlanId: string;
+  investmentPlan: {
+    investmentTerm: number;
+    roiAAR: string;
+    type: string;
+  };
 }
 
 interface SubscribeInvestmentRequest {
@@ -59,7 +68,7 @@ const Investments: React.FC = () => {
   const navigate = useNavigate();
   const initialTab = location.pathname.includes("/make") ? "make" : "my";
   const [activeTab, setActiveTab] = useState<"make" | "my">(initialTab);
-  const [selectedPlan, setSelectedPlan] = useState<number | null>(null);
+  const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
   const [investmentAmount, setInvestmentAmount] = useState<string>("");
   const [showSipComingSoon, setShowSipComingSoon] = useState(false);
   const [withdrawalFrequency, setWithdrawalFrequency] =
@@ -68,9 +77,9 @@ const Investments: React.FC = () => {
   const [subscribeError, setSubscribeError] = useState<string | null>(null);
   const [subscribeSuccess, setSubscribeSuccess] = useState<string | null>(null);
   const [filterType, setFilterType] = useState<"ALL" | "SIP" | "LUMPSUM">("ALL");
-  const [withdrawLoading, setWithdrawLoading] = useState<number | null>(null);
-  const [withdrawMessage, setWithdrawMessage] = useState<{id: number, message: string} | null>(null);
-  const [showWithdrawConfirm, setShowWithdrawConfirm] = useState<number | null>(null);
+  const [withdrawLoading, setWithdrawLoading] = useState<string | null>(null);
+  const [withdrawMessage, setWithdrawMessage] = useState<{id: string, message: string} | null>(null);
+  const [showWithdrawConfirm, setShowWithdrawConfirm] = useState<string | null>(null);
   const [withdrawalDetails, setWithdrawalDetails] = useState<WithdrawalDetails | null>(null);
 
   // Add useEffect to handle SIP message timeout
@@ -189,7 +198,7 @@ const Investments: React.FC = () => {
     }
 
     const requestData: SubscribeInvestmentRequest = {
-      investmentPlanId: String(selectedPlan),
+      investmentPlanId: selectedPlan,
       investedAmount: amount,
       investmentMode: plan.type,
       withdrawalFrequency: withdrawalFrequency,
@@ -234,7 +243,7 @@ const Investments: React.FC = () => {
     }
   };
 
-  const fetchWithdrawalDetails = async (investmentId: number) => {
+  const fetchWithdrawalDetails = async (investmentId: string) => {
     try {
       // Find the investment
       const investment = myInvestments.find(inv => inv.id === investmentId);
@@ -307,7 +316,7 @@ const Investments: React.FC = () => {
     }
   };
 
-  const handleWithdrawInvestment = async (investmentId: number) => {
+  const handleWithdrawInvestment = async (investmentId: string) => {
     setWithdrawLoading(investmentId);
     setWithdrawMessage(null);
     
@@ -507,17 +516,17 @@ const Investments: React.FC = () => {
                         </p>
                         <p>Investment Period: {plan.investmentTerm}</p>
                       </div>
-                  <div className="mt-4 space-y-3">
-                    <div>
-                      <label className="block text-sm mb-1">
-                        Investment Mode
-                      </label>
-                      <div className="flex space-x-4">
+                      <div className="mt-4 space-y-3">
+                        <div>
+                          <label className="block text-sm mb-1">
+                            Investment Mode
+                          </label>
+                          <div className="flex space-x-4">
                             <div className="text-gray-700 font-medium">
                               {plan.type}
                             </div>
-                      </div>
-                    </div>
+                          </div>
+                        </div>
 
                         <div>
                           <label className="block text-sm mb-1">
@@ -536,28 +545,28 @@ const Investments: React.FC = () => {
                           </select>
                         </div>
 
-                    <div>
-                      <label className="block text-sm mb-1">
+                        <div>
+                          <label className="block text-sm mb-1">
                             Investment Amount
-                      </label>
-                      <input
-                        type="number"
+                          </label>
+                          <input
+                            type="number"
                             placeholder="Enter Investment Amount"
-                        className="w-full p-2 border rounded"
-                        min={plan.minInvestment}
-                        value={investmentAmount}
+                            className="w-full p-2 border rounded"
+                            min={plan.minInvestment}
+                            value={investmentAmount}
                             onChange={(e) =>
                               setInvestmentAmount(e.target.value)
                             }
-                      />
-                    </div>
+                          />
+                        </div>
 
-                    <button
-                      className="w-full py-2 rounded text-white"
+                        <button
+                          className="w-full py-2 rounded text-white"
                           style={{ backgroundColor: plan.type === "SIP" ? "#9CA3AF" : "#08AFF1" }}
-                      disabled={
+                          disabled={
                             plan.type === "SIP" ||
-                        !investmentAmount ||
+                            !investmentAmount ||
                             Number(investmentAmount) < plan.minInvestment ||
                             subscribeLoading
                           }
@@ -568,12 +577,12 @@ const Investments: React.FC = () => {
                             : subscribeLoading 
                               ? "Processing..." 
                               : "Invest Now"}
-                    </button>
+                        </button>
                         {subscribeError && selectedPlan === plan.id && (
                           <div className="text-red-500 mt-2">
                             {subscribeError}
-                  </div>
-                )}
+                          </div>
+                        )}
                         {subscribeSuccess && selectedPlan === plan.id && null}
                       </div>
                       <button
@@ -587,7 +596,7 @@ const Investments: React.FC = () => {
                   );
                 })()}
               </div>
-          </div>
+            </div>
           )}
         </div>
       )}
@@ -606,15 +615,13 @@ const Investments: React.FC = () => {
               <tr className="bg-gray-50">
                 <th className="py-2 px-3 border-b">No.</th>
                 <th className="py-2 px-3 border-b">Investment Plan</th>
-                <th className="py-2 px-3 border-b">Invested Value</th>
-                <th className="py-2 px-3 border-b">Current Value</th>
-                <th className="py-2 px-3 border-b">Date of Investment</th>
-                <th className="py-2 px-3 border-b">Investment Mode</th>
-                <th className="py-2 px-3 border-b">Investment Period</th>
-                <th className="py-2 px-3 border-b">RoI(%)</th>
-                <th className="py-2 px-3 border-b">PnL(Rs.)</th>
-                <th className="py-2 px-3 border-b">Withdrawal Plan</th>
-                <th className="py-2 px-3 border-b">Date of Maturity</th>
+                <th className="py-2 px-3 border-b">Invested Amount</th>
+                <th className="py-2 px-3 border-b">Investment Date</th>
+                <th className="py-2 px-3 border-b">Maturity Date</th>
+                <th className="py-2 px-3 border-b">Investment Type</th>
+                <th className="py-2 px-3 border-b">Withdrawal Frequency</th>
+                <th className="py-2 px-3 border-b">Expected RoI (%)</th>
+                <th className="py-2 px-3 border-b">Status</th>
                 <th className="py-2 px-3 border-b">Actions</th>
               </tr>
             </thead>
@@ -627,12 +634,21 @@ const Investments: React.FC = () => {
                     ₹{item.investedAmount.toLocaleString()}
                   </td>
                   <td className="py-2 px-3">
-                    {/* ₹{item.currentValue.toLocaleString()} */}
+                    {new Date(item.investmentDate).toLocaleDateString()}
                   </td>
-                  <td className="py-2 px-3">{item.investmentDate}</td>
-                  <td className="py-2 px-3">{item.investmentMode}</td>
-                  <td className="py-2 px-3">{item.maturityDate}</td>
+                  <td className="py-2 px-3">
+                    {new Date(item.maturityDate).toLocaleDateString()}
+                  </td>
+                  <td className="py-2 px-3">{item.investmentPlan.type}</td>
                   <td className="py-2 px-3">{item.withdrawalFrequency}</td>
+                  <td className="py-2 px-3">{item.investmentPlan.roiAAR}%</td>
+                  <td className="py-2 px-3">
+                    <span className={`px-2 py-1 rounded-full text-xs ${
+                      item.status === 'ACTIVE' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                    }`}>
+                      {item.status}
+                    </span>
+                  </td>
                   <td className="py-2 px-3">
                     <button
                       className={`px-4 py-2 rounded text-white ${
