@@ -34,7 +34,7 @@ const Funds: React.FC = () => {
     tab: "available" | "add" | "withdraw" | "history"
   ) => {
     setActiveTab(tab);
-    navigate(`/dashboard/funds/${tab}`);
+    navigate(`/funds/${tab}`);
   };
 
   const [withdrawAmount, setWithdrawAmount] = useState("");
@@ -154,19 +154,18 @@ const Funds: React.FC = () => {
     }
   };
 
-  const fetchBalance = async () =>{
-    try{
-      const response = await axios.get(`${API_URL}/getBalance`,{
+  const fetchBalance = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/getBalance`, {
         withCredentials: true,
       });
-      if(response.status === 200){
+      if (response.status === 200) {
         setBalance(response.data.balance.availableBalance);
-      } 
-    }
-    catch(error){
+      }
+    } catch (error) {
       console.error("Error fetching balance:", error);
     }
-  }
+  };
   useEffect(() => {
     fetchBalance();
   }, []);

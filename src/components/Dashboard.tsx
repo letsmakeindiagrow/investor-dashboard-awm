@@ -23,7 +23,7 @@ const Dashboard: React.FC<DashboardProps> = ({ view = "overview" }) => {
     if (newView === "overview") {
       navigate("/dashboard");
     } else {
-      navigate("/dashboard/details");
+      navigate("/details");
     }
   };
 

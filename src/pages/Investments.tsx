@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { differenceInDays } from 'date-fns';
-import Decimal from 'decimal.js';
+import { differenceInDays } from "date-fns";
+import Decimal from "decimal.js";
 
 interface InvestmentPlan {
   id: number;
@@ -37,10 +37,10 @@ interface SubscribeInvestmentResponse {
   investment: Investment;
 }
 
-interface WithdrawInvestmentResponse {
-  message: string;
-  transaction: any;
-}
+// interface WithdrawInvestmentResponse {
+//   message: string;
+//   transaction: any;
+// }
 
 interface WithdrawalDetails {
   netAmountPaid: number;
@@ -71,11 +71,19 @@ const Investments: React.FC = () => {
   const [subscribeLoading, setSubscribeLoading] = useState(false);
   const [subscribeError, setSubscribeError] = useState<string | null>(null);
   const [subscribeSuccess, setSubscribeSuccess] = useState<string | null>(null);
-  const [filterType, setFilterType] = useState<"ALL" | "SIP" | "LUMPSUM">("ALL");
+  const [filterType, setFilterType] = useState<"ALL" | "SIP" | "LUMPSUM">(
+    "ALL"
+  );
   const [withdrawLoading, setWithdrawLoading] = useState<number | null>(null);
-  const [withdrawMessage, setWithdrawMessage] = useState<{id: number, message: string} | null>(null);
-  const [showWithdrawConfirm, setShowWithdrawConfirm] = useState<number | null>(null);
-  const [withdrawalDetails, setWithdrawalDetails] = useState<WithdrawalDetails | null>(null);
+  const [withdrawMessage, setWithdrawMessage] = useState<{
+    id: number;
+    message: string;
+  } | null>(null);
+  const [showWithdrawConfirm, setShowWithdrawConfirm] = useState<number | null>(
+    null
+  );
+  const [withdrawalDetails, setWithdrawalDetails] =
+    useState<WithdrawalDetails | null>(null);
 
   // Add useEffect to handle SIP message timeout
   useEffect(() => {
@@ -128,7 +136,7 @@ const Investments: React.FC = () => {
     const fetchPlans = async () => {
       try {
         const response = await axios.get(`${API_URL}/getInvestmentPlans`, {
-            withCredentials: true,
+          withCredentials: true,
         });
         console.log(response.data.investmentPlans);
         setInvestmentPlans(response.data.investmentPlans);
@@ -146,7 +154,7 @@ const Investments: React.FC = () => {
     const fetchInvestments = async () => {
       try {
         const response = await axios.get(`${API_URL}/getInvestments`, {
-            withCredentials: true,
+          withCredentials: true,
         });
         console.log(response.data.investments);
         setMyInvestments(response.data.investments);
@@ -241,19 +249,24 @@ const Investments: React.FC = () => {
   const fetchWithdrawalDetails = async (investmentId: number) => {
     try {
       // Find the investment
-      const investment = myInvestments.find(inv => inv.id === investmentId);
+      const investment = myInvestments.find((inv) => inv.id === investmentId);
       if (!investment) {
         throw new Error("Investment not found");
       }
 
       // Find the investment plan
-      const plan = investmentPlans.find(p => p.id === investment.investmentPlanId);
+      const plan = investmentPlans.find(
+        (p) => p.id === investment.investmentPlanId
+      );
       if (!plan) {
         throw new Error("Investment plan not found");
       }
 
       // Calculate time elapsed and lock-in period
-      const T_elaspsed = differenceInDays(new Date(), new Date(investment.investmentDate));
+      const T_elaspsed = differenceInDays(
+        new Date(),
+        new Date(investment.investmentDate)
+      );
       const T_lockIn = Number(plan.investmentTerm) * 365;
       const P_completed = (T_elaspsed / T_lockIn) * 100;
 
@@ -296,17 +309,17 @@ const Investments: React.FC = () => {
           fundTransaction: {
             type: "Pre-Maturity Exit",
             method: "NEFT",
-            status: "Processing"
-          }
-        }
+            status: "Processing",
+          },
+        },
       });
-      
+
       setShowWithdrawConfirm(investmentId);
     } catch (error: any) {
       console.error("Error in fetchWithdrawalDetails:", error);
       setWithdrawMessage({
         id: investmentId,
-        message: error.message || "Failed to calculate withdrawal details"
+        message: error.message || "Failed to calculate withdrawal details",
       });
     }
   };
@@ -314,29 +327,33 @@ const Investments: React.FC = () => {
   const handleWithdrawInvestment = async (investmentId: number) => {
     setWithdrawLoading(investmentId);
     setWithdrawMessage(null);
-    
+
     try {
       const response = await axios.post(
         `${API_URL}/withdrawPreMaturity`,
         { investmentPlanId: investmentId },
         { withCredentials: true }
       );
-      
+
       if (response.data.message) {
-        setWithdrawMessage({ 
-          id: investmentId, 
-          message: response.data.message 
+        setWithdrawMessage({
+          id: investmentId,
+          message: response.data.message,
         });
         // Refresh investments list
-        const updatedInvestments = await axios.get(`${API_URL}/getInvestments`, {
-          withCredentials: true
-        });
+        const updatedInvestments = await axios.get(
+          `${API_URL}/getInvestments`,
+          {
+            withCredentials: true,
+          }
+        );
         setMyInvestments(updatedInvestments.data.investments);
       }
     } catch (error: any) {
-      setWithdrawMessage({ 
-        id: investmentId, 
-        message: error.response?.data?.message || "Failed to withdraw investment" 
+      setWithdrawMessage({
+        id: investmentId,
+        message:
+          error.response?.data?.message || "Failed to withdraw investment",
       });
     } finally {
       setWithdrawLoading(null);
@@ -394,7 +411,7 @@ const Investments: React.FC = () => {
           >
             Available Investment Plans
           </h2>
-          
+
           {/* Filter Tabs */}
           <div className="flex space-x-4 mb-6">
             <button
@@ -431,46 +448,48 @@ const Investments: React.FC = () => {
 
           <div className="grid md:grid-cols-3 gap-4">
             {investmentPlans
-              .filter(plan => filterType === "ALL" || plan.type === filterType)
+              .filter(
+                (plan) => filterType === "ALL" || plan.type === filterType
+              )
               .map((plan) => (
-              <div
-                key={plan.id}
-                className={`bg-white p-4 rounded-lg shadow-md cursor-pointer transition-all 
+                <div
+                  key={plan.id}
+                  className={`bg-white p-4 rounded-lg shadow-md cursor-pointer transition-all 
                   ${
                     selectedPlan === plan.id
                       ? "border-2 border-blue-400"
                       : "hover:shadow-xl"
                   }`}
-                onClick={() => setSelectedPlan(plan.id)}
-                style={{
-                  borderColor:
-                    selectedPlan === plan.id ? "#08AFF1" : "transparent",
-                  zIndex: selectedPlan === plan.id ? 1 : 0,
-                }}
-              >
-                <h3
-                  className="text-lg font-semibold mb-2"
-                  style={{ color: "#08AFF1" }}
+                  onClick={() => setSelectedPlan(plan.id)}
+                  style={{
+                    borderColor:
+                      selectedPlan === plan.id ? "#08AFF1" : "transparent",
+                    zIndex: selectedPlan === plan.id ? 1 : 0,
+                  }}
                 >
-                  {plan.name}
-                </h3>
-                <div className="space-y-2 text-sm">
-                  <p>
-                    Min. Investment:{" "}
-                    <span style={{ color: "#AACF45" }}>
-                      ₹{plan.minInvestment.toLocaleString()}
-                    </span>
-                  </p>
-                  <p>
-                    Expected Return:{" "}
-                    <span style={{ color: "#AACF45" }}>
-                      {plan.expectedReturn}
-                    </span>
-                  </p>
-                  <p>Investment Period: {plan.investmentTerm}</p>
+                  <h3
+                    className="text-lg font-semibold mb-2"
+                    style={{ color: "#08AFF1" }}
+                  >
+                    {plan.name}
+                  </h3>
+                  <div className="space-y-2 text-sm">
+                    <p>
+                      Min. Investment:{" "}
+                      <span style={{ color: "#AACF45" }}>
+                        ₹{plan.minInvestment.toLocaleString()}
+                      </span>
+                    </p>
+                    <p>
+                      Expected Return:{" "}
+                      <span style={{ color: "#AACF45" }}>
+                        {plan.expectedReturn}
+                      </span>
+                    </p>
+                    <p>Investment Period: {plan.investmentTerm}</p>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
           </div>
 
           {/* Modal overlay for expanded card */}
@@ -511,17 +530,17 @@ const Investments: React.FC = () => {
                         </p>
                         <p>Investment Period: {plan.investmentTerm}</p>
                       </div>
-                  <div className="mt-4 space-y-3">
-                    <div>
-                      <label className="block text-sm mb-1">
-                        Investment Mode
-                      </label>
-                      <div className="flex space-x-4">
+                      <div className="mt-4 space-y-3">
+                        <div>
+                          <label className="block text-sm mb-1">
+                            Investment Mode
+                          </label>
+                          <div className="flex space-x-4">
                             <div className="text-gray-700 font-medium">
                               {plan.type}
                             </div>
-                      </div>
-                    </div>
+                          </div>
+                        </div>
 
                         <div>
                           <label className="block text-sm mb-1">
@@ -540,44 +559,47 @@ const Investments: React.FC = () => {
                           </select>
                         </div>
 
-                    <div>
-                      <label className="block text-sm mb-1">
+                        <div>
+                          <label className="block text-sm mb-1">
                             Investment Amount
-                      </label>
-                      <input
-                        type="number"
+                          </label>
+                          <input
+                            type="number"
                             placeholder="Enter Investment Amount"
-                        className="w-full p-2 border rounded"
-                        min={plan.minInvestment}
-                        value={investmentAmount}
+                            className="w-full p-2 border rounded"
+                            min={plan.minInvestment}
+                            value={investmentAmount}
                             onChange={(e) =>
                               setInvestmentAmount(e.target.value)
                             }
-                      />
-                    </div>
+                          />
+                        </div>
 
-                    <button
-                      className="w-full py-2 rounded text-white"
-                          style={{ backgroundColor: plan.type === "SIP" ? "#9CA3AF" : "#08AFF1" }}
-                      disabled={
+                        <button
+                          className="w-full py-2 rounded text-white"
+                          style={{
+                            backgroundColor:
+                              plan.type === "SIP" ? "#9CA3AF" : "#08AFF1",
+                          }}
+                          disabled={
                             plan.type === "SIP" ||
-                        !investmentAmount ||
+                            !investmentAmount ||
                             Number(investmentAmount) < plan.minInvestment ||
                             subscribeLoading
                           }
                           onClick={handleLumpsumSubmit}
                         >
-                          {plan.type === "SIP" 
-                            ? "Coming Soon" 
-                            : subscribeLoading 
-                              ? "Processing..." 
-                              : "Invest Now"}
-                    </button>
+                          {plan.type === "SIP"
+                            ? "Coming Soon"
+                            : subscribeLoading
+                            ? "Processing..."
+                            : "Invest Now"}
+                        </button>
                         {subscribeError && selectedPlan === plan.id && (
                           <div className="text-red-500 mt-2">
                             {subscribeError}
-                  </div>
-                )}
+                          </div>
+                        )}
                         {subscribeSuccess && selectedPlan === plan.id && null}
                       </div>
                       <button
@@ -591,7 +613,7 @@ const Investments: React.FC = () => {
                   );
                 })()}
               </div>
-          </div>
+            </div>
           )}
         </div>
       )}
@@ -640,21 +662,25 @@ const Investments: React.FC = () => {
                   <td className="py-2 px-3">
                     <button
                       className={`px-4 py-2 rounded text-white ${
-                        withdrawLoading === item.id 
-                          ? 'bg-gray-400' 
-                          : 'bg-red-500 hover:bg-red-600'
+                        withdrawLoading === item.id
+                          ? "bg-gray-400"
+                          : "bg-red-500 hover:bg-red-600"
                       }`}
                       disabled={withdrawLoading === item.id}
                       onClick={() => fetchWithdrawalDetails(item.id)}
                     >
-                      {withdrawLoading === item.id ? 'Processing...' : 'Withdraw'}
+                      {withdrawLoading === item.id
+                        ? "Processing..."
+                        : "Withdraw"}
                     </button>
                     {withdrawMessage?.id === item.id && (
-                      <div className={`mt-1 text-sm ${
-                        withdrawMessage.message.includes('success') 
-                          ? 'text-green-600' 
-                          : 'text-red-600'
-                      }`}>
+                      <div
+                        className={`mt-1 text-sm ${
+                          withdrawMessage.message.includes("success")
+                            ? "text-green-600"
+                            : "text-red-600"
+                        }`}
+                      >
                         {withdrawMessage.message}
                       </div>
                     )}
@@ -688,28 +714,35 @@ const Investments: React.FC = () => {
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30 z-50">
           <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
             <h3 className="text-lg font-semibold mb-4">Confirm Withdrawal</h3>
-            
+
             <div className="mb-4 space-y-3">
               <div className="bg-gray-50 p-4 rounded-lg">
                 <h4 className="font-medium mb-2">Withdrawal Details</h4>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span className="text-gray-600">Lock-in Stage:</span>
-                    <span className="font-medium">Stage {withdrawalDetails.lockInStageAchieved}</span>
+                    <span className="font-medium">
+                      Stage {withdrawalDetails.lockInStageAchieved}
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Penalty Percentage:</span>
-                    <span className="font-medium text-red-500">{withdrawalDetails.expensePercentageApplied}%</span>
+                    <span className="font-medium text-red-500">
+                      {withdrawalDetails.expensePercentageApplied}%
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Penalty Amount:</span>
                     <span className="font-medium text-red-500">
-                      ₹{withdrawalDetails.expenseAmountDeducted.toLocaleString()}
+                      ₹
+                      {withdrawalDetails.expenseAmountDeducted.toLocaleString()}
                     </span>
                   </div>
                   <div className="border-t pt-2 mt-2">
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Net Amount to Receive:</span>
+                      <span className="text-gray-600">
+                        Net Amount to Receive:
+                      </span>
                       <span className="font-medium text-green-600">
                         ₹{withdrawalDetails.netAmountPaid.toLocaleString()}
                       </span>
@@ -719,25 +752,34 @@ const Investments: React.FC = () => {
               </div>
 
               <div className="bg-blue-50 p-4 rounded-lg">
-                <h4 className="font-medium mb-2 text-blue-700">Transaction Details</h4>
+                <h4 className="font-medium mb-2 text-blue-700">
+                  Transaction Details
+                </h4>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span className="text-gray-600">Transaction Type:</span>
-                    <span className="font-medium">{withdrawalDetails.transaction.fundTransaction.type}</span>
+                    <span className="font-medium">
+                      {withdrawalDetails.transaction.fundTransaction.type}
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Payment Method:</span>
-                    <span className="font-medium">{withdrawalDetails.transaction.fundTransaction.method}</span>
+                    <span className="font-medium">
+                      {withdrawalDetails.transaction.fundTransaction.method}
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Status:</span>
-                    <span className="font-medium text-yellow-600">{withdrawalDetails.transaction.fundTransaction.status}</span>
+                    <span className="font-medium text-yellow-600">
+                      {withdrawalDetails.transaction.fundTransaction.status}
+                    </span>
                   </div>
                 </div>
               </div>
 
               <p className="text-sm text-gray-600">
-                Are you sure you want to proceed with the withdrawal? The penalty amount will be deducted from your total value.
+                Are you sure you want to proceed with the withdrawal? The
+                penalty amount will be deducted from your total value.
               </p>
             </div>
 
