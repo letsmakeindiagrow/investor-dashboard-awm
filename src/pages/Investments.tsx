@@ -246,61 +246,25 @@ const Investments: React.FC = () => {
     }
   };
 
-  const handleWithdrawInvestment = async (investmentId: number) => {
-    setWithdrawLoading(investmentId);
-    setWithdrawMessage(null);
-
-    try {
-      const response = await axios.post(
-        `${API_URL}/withdrawPreMaturity`,
-        { investmentPlanId: investmentId },
-        { withCredentials: true }
-      );
-
-      if (response.data.message) {
-        setWithdrawMessage({
-          id: investmentId,
-          message: response.data.message,
-        });
-        // Refresh investments list
-        const updatedInvestments = await axios.get(
-          `${API_URL}/getInvestments`,
-          {
-            withCredentials: true,
-          }
-        );
-        setMyInvestments(updatedInvestments.data.investments);
-      }
-    } catch (error: any) {
-      setWithdrawMessage({
-        id: investmentId,
-        message:
-          error.response?.data?.message || "Failed to withdraw investment",
-      });
-    } finally {
-      setWithdrawLoading(null);
-      setShowWithdrawConfirm(null);
-      setWithdrawalDetails(null);
-    }
-  };
-
   const fetchWithdrawalDetails = async (investmentId: number) => {
     try {
-      // Find the investment
+      console.log("Starting withdrawal details fetch for ID:", investmentId);
+      console.log("Current investments:", myInvestments);
+      
       const investment = myInvestments.find((inv) => inv.id === investmentId);
       if (!investment) {
+        console.error("Investment not found for ID:", investmentId);
         throw new Error("Investment not found");
       }
 
-      // Find the investment plan
       const plan = investmentPlans.find(
         (p) => p.id === investment.investmentPlanId
       );
       if (!plan) {
+        console.error("Plan not found for investment:", investment);
         throw new Error("Investment plan not found");
       }
 
-      // Calculate time elapsed and lock-in period
       const T_elaspsed = differenceInDays(
         new Date(),
         new Date(investment.investmentDate)
@@ -308,7 +272,6 @@ const Investments: React.FC = () => {
       const T_lockIn = Number(plan.investmentTerm) * 365;
       const P_completed = (T_elaspsed / T_lockIn) * 100;
 
-      // Determine lock-in stage and penalty
       let lockInStage = 0;
       let expensePercentageApplied = 0;
       if (0 < P_completed && P_completed <= 25) {
@@ -325,7 +288,6 @@ const Investments: React.FC = () => {
         expensePercentageApplied = 0;
       }
 
-      // Calculate gains and penalties
       const principalAsDecimal = new Decimal(investment.investedAmount);
       const roiRate = new Decimal(plan.roiAAR);
 
@@ -337,7 +299,6 @@ const Investments: React.FC = () => {
       const exitExpense = totalGain.times(expensePercentageApplied).div(100);
       const NetPayout = totalGain.minus(exitExpense);
 
-      // Set the withdrawal details
       setWithdrawalDetails({
         netAmountPaid: NetPayout.toNumber(),
         expensePercentageApplied,
@@ -359,6 +320,49 @@ const Investments: React.FC = () => {
         id: investmentId,
         message: error.message || "Failed to calculate withdrawal details",
       });
+    }
+  };
+
+  const handleWithdrawInvestment = async (investmentId: number) => {
+    console.log("Handling withdrawal for investment:", investmentId);
+    setWithdrawLoading(investmentId);
+    setWithdrawMessage(null);
+
+    try {
+      const response = await axios.post(
+        `${API_URL}/withdrawPreMaturity`,
+        { investmentPlanId: investmentId },
+        { withCredentials: true }
+      );
+
+      console.log("Withdrawal response:", response.data);
+
+      if (response.data.message) {
+        setWithdrawMessage({
+          id: investmentId,
+          message: response.data.message,
+        });
+        // Refresh investments list
+        const updatedInvestments = await axios.get(
+          `${API_URL}/getInvestments`,
+          {
+            withCredentials: true,
+          }
+        );
+        console.log("Updated investments:", updatedInvestments.data);
+        setMyInvestments(updatedInvestments.data.investments);
+      }
+    } catch (error: any) {
+      console.error("Withdrawal error:", error.response?.data || error);
+      setWithdrawMessage({
+        id: investmentId,
+        message:
+          error.response?.data?.message || "Failed to withdraw investment",
+      });
+    } finally {
+      setWithdrawLoading(null);
+      setShowWithdrawConfirm(null);
+      setWithdrawalDetails(null);
     }
   };
 
