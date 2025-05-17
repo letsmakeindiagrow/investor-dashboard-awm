@@ -246,6 +246,44 @@ const Investments: React.FC = () => {
     }
   };
 
+  const handleWithdrawInvestment = async (investmentId: number) => {
+    setWithdrawLoading(investmentId);
+    setWithdrawMessage(null);
+
+    try {
+      const response = await axios.post(
+        `${API_URL}/withdrawPreMaturity`,
+        { investmentPlanId: investmentId },
+        { withCredentials: true }
+      );
+
+      if (response.data.message) {
+        setWithdrawMessage({
+          id: investmentId,
+          message: response.data.message,
+        });
+        // Refresh investments list
+        const updatedInvestments = await axios.get(
+          `${API_URL}/getInvestments`,
+          {
+            withCredentials: true,
+          }
+        );
+        setMyInvestments(updatedInvestments.data.investments);
+      }
+    } catch (error: any) {
+      setWithdrawMessage({
+        id: investmentId,
+        message:
+          error.response?.data?.message || "Failed to withdraw investment",
+      });
+    } finally {
+      setWithdrawLoading(null);
+      setShowWithdrawConfirm(null);
+      setWithdrawalDetails(null);
+    }
+  };
+
   const fetchWithdrawalDetails = async (investmentId: number) => {
     try {
       // Find the investment
@@ -321,42 +359,6 @@ const Investments: React.FC = () => {
         id: investmentId,
         message: error.message || "Failed to calculate withdrawal details",
       });
-    }
-  };
-
-  const handleWithdrawInvestment = async (investmentId: number) => {
-    setWithdrawLoading(investmentId);
-    setWithdrawMessage(null);
-
-    try {
-      const response = await axios.post(
-        `${API_URL}/withdrawPreMaturity`,
-        { investmentPlanId: investmentId },
-        { withCredentials: true }
-      );
-
-      if (response.data.message) {
-        setWithdrawMessage({
-          id: investmentId,
-          message: response.data.message,
-        });
-        // Refresh investments list
-        const updatedInvestments = await axios.get(
-          `${API_URL}/getInvestments`,
-          {
-            withCredentials: true,
-          }
-        );
-        setMyInvestments(updatedInvestments.data.investments);
-      }
-    } catch (error: any) {
-      setWithdrawMessage({
-        id: investmentId,
-        message:
-          error.response?.data?.message || "Failed to withdraw investment",
-      });
-    } finally {
-      setWithdrawLoading(null);
     }
   };
 
@@ -710,6 +712,7 @@ const Investments: React.FC = () => {
         </div>
       )}
 
+      {/* Withdrawal Confirmation Modal */}
       {showWithdrawConfirm && withdrawalDetails && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30 z-50">
           <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
@@ -734,15 +737,12 @@ const Investments: React.FC = () => {
                   <div className="flex justify-between">
                     <span className="text-gray-600">Penalty Amount:</span>
                     <span className="font-medium text-red-500">
-                      ₹
-                      {withdrawalDetails.expenseAmountDeducted.toLocaleString()}
+                      ₹{withdrawalDetails.expenseAmountDeducted.toLocaleString()}
                     </span>
                   </div>
                   <div className="border-t pt-2 mt-2">
                     <div className="flex justify-between">
-                      <span className="text-gray-600">
-                        Net Amount to Receive:
-                      </span>
+                      <span className="text-gray-600">Net Amount to Receive:</span>
                       <span className="font-medium text-green-600">
                         ₹{withdrawalDetails.netAmountPaid.toLocaleString()}
                       </span>
@@ -752,9 +752,7 @@ const Investments: React.FC = () => {
               </div>
 
               <div className="bg-blue-50 p-4 rounded-lg">
-                <h4 className="font-medium mb-2 text-blue-700">
-                  Transaction Details
-                </h4>
+                <h4 className="font-medium mb-2 text-blue-700">Transaction Details</h4>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span className="text-gray-600">Transaction Type:</span>
@@ -778,8 +776,7 @@ const Investments: React.FC = () => {
               </div>
 
               <p className="text-sm text-gray-600">
-                Are you sure you want to proceed with the withdrawal? The
-                penalty amount will be deducted from your total value.
+                Are you sure you want to proceed with the withdrawal? The penalty amount will be deducted from your total value.
               </p>
             </div>
 
@@ -795,11 +792,7 @@ const Investments: React.FC = () => {
               </button>
               <button
                 className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-                onClick={() => {
-                  handleWithdrawInvestment(showWithdrawConfirm);
-                  setShowWithdrawConfirm(null);
-                  setWithdrawalDetails(null);
-                }}
+                onClick={() => handleWithdrawInvestment(showWithdrawConfirm)}
               >
                 Confirm Withdrawal
               </button>
