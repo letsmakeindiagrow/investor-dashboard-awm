@@ -639,12 +639,10 @@ const Investments: React.FC = () => {
                 <th className="py-2 px-3 border-b">No.</th>
                 <th className="py-2 px-3 border-b">Investment Plan</th>
                 <th className="py-2 px-3 border-b">Invested Value</th>
-                <th className="py-2 px-3 border-b">Current Value</th>
                 <th className="py-2 px-3 border-b">Date of Investment</th>
                 <th className="py-2 px-3 border-b">Investment Mode</th>
                 <th className="py-2 px-3 border-b">Investment Period</th>
                 <th className="py-2 px-3 border-b">RoI(%)</th>
-                <th className="py-2 px-3 border-b">PnL(Rs.)</th>
                 <th className="py-2 px-3 border-b">Withdrawal Plan</th>
                 <th className="py-2 px-3 border-b">Date of Maturity</th>
                 <th className="py-2 px-3 border-b">Actions</th>
@@ -660,9 +658,6 @@ const Investments: React.FC = () => {
                   <td className="py-2 px-3 text-right">
                     {item.investedAmount ? `₹${item.investedAmount.toLocaleString()}` : '—'}
                   </td>
-                  <td className="py-2 px-3 text-right">
-                    {item.currentValue ? `₹${item.currentValue.toLocaleString()}` : '—'}
-                  </td>
                   <td className="py-2 px-3 text-center">
                     {item.investmentDate ? new Date(item.investmentDate).toLocaleDateString() : '—'}
                   </td>
@@ -673,7 +668,6 @@ const Investments: React.FC = () => {
                   <td className="py-2 px-3 text-right">
                     {investmentPlans.find(p => p.id === item.investmentPlanId)?.roiAAR ?? '—'}
                   </td>
-                  <td className="py-2 px-3 text-right">—</td>
                   <td className="py-2 px-3 text-center">{item.withdrawalFrequency || '—'}</td>
                   <td className="py-2 px-3 text-center">
                     <button
