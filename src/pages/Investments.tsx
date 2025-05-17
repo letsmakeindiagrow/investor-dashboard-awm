@@ -653,19 +653,29 @@ const Investments: React.FC = () => {
             <tbody>
               {myInvestments.map((item, index) => (
                 <tr key={item.id} className="border-b hover:bg-gray-50">
-                  <td className="py-2 px-3">{index + 1}</td>
-                  <td className="py-2 px-3">{item.investmentPlanId}</td>
-                  <td className="py-2 px-3">
-                    ₹{item.investedAmount.toLocaleString()}
+                  <td className="py-2 px-3 text-center">{index + 1}</td>
+                  <td className="py-2 px-3 text-left">
+                    {investmentPlans.find(p => p.id === item.investmentPlanId)?.name || item.investmentPlanId}
                   </td>
-                  <td className="py-2 px-3">
-                    {/* ₹{item.currentValue.toLocaleString()} */}
+                  <td className="py-2 px-3 text-right">
+                    {item.investedAmount ? `₹${item.investedAmount.toLocaleString()}` : '—'}
                   </td>
-                  <td className="py-2 px-3">{item.investmentDate}</td>
-                  <td className="py-2 px-3">{item.investmentMode}</td>
-                  <td className="py-2 px-3">{item.maturityDate}</td>
-                  <td className="py-2 px-3">{item.withdrawalFrequency}</td>
-                  <td className="py-2 px-3">
+                  <td className="py-2 px-3 text-right">
+                    {item.currentValue ? `₹${item.currentValue.toLocaleString()}` : '—'}
+                  </td>
+                  <td className="py-2 px-3 text-center">
+                    {item.investmentDate ? new Date(item.investmentDate).toLocaleDateString() : '—'}
+                  </td>
+                  <td className="py-2 px-3 text-center">{item.investmentMode || '—'}</td>
+                  <td className="py-2 px-3 text-center">
+                    {item.maturityDate ? new Date(item.maturityDate).toLocaleDateString() : '—'}
+                  </td>
+                  <td className="py-2 px-3 text-right">
+                    {investmentPlans.find(p => p.id === item.investmentPlanId)?.roiAAR ?? '—'}
+                  </td>
+                  <td className="py-2 px-3 text-right">—</td>
+                  <td className="py-2 px-3 text-center">{item.withdrawalFrequency || '—'}</td>
+                  <td className="py-2 px-3 text-center">
                     <button
                       className={`px-4 py-2 rounded text-white ${
                         withdrawLoading === item.id
