@@ -5,7 +5,7 @@ import { differenceInDays } from "date-fns";
 import Decimal from "decimal.js";
 
 interface InvestmentPlan {
-  id: number;
+  id: string;
   name: string;
   minInvestment: number;
   expectedReturn: string;
@@ -16,13 +16,18 @@ interface InvestmentPlan {
 }
 
 interface Investment {
-  id: number;
-  investmentPlanId: number;
+  id: string;
   investedAmount: number;
   investmentDate: string;
-  investmentMode: string;
-  withdrawalFrequency: string;
   maturityDate: string;
+  withdrawalFrequency: string;
+  status: string;
+  investmentPlanId: string;
+  investmentPlan: {
+    investmentTerm: number;
+    roiAAR: string;
+    type: string;
+  };
 }
 
 interface SubscribeInvestmentRequest {
@@ -63,7 +68,7 @@ const Investments: React.FC = () => {
   const navigate = useNavigate();
   const initialTab = location.pathname.includes("/make") ? "make" : "my";
   const [activeTab, setActiveTab] = useState<"make" | "my">(initialTab);
-  const [selectedPlan, setSelectedPlan] = useState<number | null>(null);
+  const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
   const [investmentAmount, setInvestmentAmount] = useState<string>("");
   const [showSipComingSoon, setShowSipComingSoon] = useState(false);
   const [withdrawalFrequency, setWithdrawalFrequency] =
@@ -74,12 +79,12 @@ const Investments: React.FC = () => {
   const [filterType, setFilterType] = useState<"ALL" | "SIP" | "LUMPSUM">(
     "ALL"
   );
-  const [withdrawLoading, setWithdrawLoading] = useState<number | null>(null);
+  const [withdrawLoading, setWithdrawLoading] = useState<string | null>(null);
   const [withdrawMessage, setWithdrawMessage] = useState<{
-    id: number;
+    id: string;
     message: string;
   } | null>(null);
-  const [showWithdrawConfirm, setShowWithdrawConfirm] = useState<number | null>(
+  const [showWithdrawConfirm, setShowWithdrawConfirm] = useState<string | null>(
     null
   );
   const [withdrawalDetails, setWithdrawalDetails] =
@@ -201,7 +206,7 @@ const Investments: React.FC = () => {
     }
 
     const requestData: SubscribeInvestmentRequest = {
-      investmentPlanId: String(selectedPlan),
+      investmentPlanId: selectedPlan,
       investedAmount: amount,
       investmentMode: plan.type,
       withdrawalFrequency: withdrawalFrequency,
@@ -246,7 +251,7 @@ const Investments: React.FC = () => {
     }
   };
 
-  const fetchWithdrawalDetails = async (investmentId: number) => {
+  const fetchWithdrawalDetails = async (investmentId: string) => {
     try {
       console.log("Starting withdrawal details fetch for ID:", investmentId);
       console.log("Current investments:", myInvestments);
@@ -323,7 +328,7 @@ const Investments: React.FC = () => {
     }
   };
 
-  const handleWithdrawInvestment = async (investmentId: number) => {
+  const handleWithdrawInvestment = async (investmentId: string) => {
     console.log("Handling withdrawal for investment:", investmentId);
     setWithdrawLoading(investmentId);
     setWithdrawMessage(null);
@@ -637,13 +642,12 @@ const Investments: React.FC = () => {
             <thead>
               <tr className="bg-gray-50">
                 <th className="py-2 px-3 border-b">No.</th>
-                <th className="py-2 px-3 border-b">Investment Plan</th>
+                <th className="py-2 px-3 border-b">Plan Type</th>
                 <th className="py-2 px-3 border-b">Invested Value</th>
                 <th className="py-2 px-3 border-b">Date of Investment</th>
-                <th className="py-2 px-3 border-b">Investment Mode</th>
                 <th className="py-2 px-3 border-b">Investment Period</th>
                 <th className="py-2 px-3 border-b">RoI(%)</th>
-                <th className="py-2 px-3 border-b">Withdrawal Plan</th>
+                <th className="py-2 px-3 border-b">Withdrawal Frequency</th>
                 <th className="py-2 px-3 border-b">Date of Maturity</th>
                 <th className="py-2 px-3 border-b">Actions</th>
               </tr>
@@ -652,23 +656,23 @@ const Investments: React.FC = () => {
               {myInvestments.map((item, index) => (
                 <tr key={item.id} className="border-b hover:bg-gray-50">
                   <td className="py-2 px-3 text-center">{index + 1}</td>
-                  <td className="py-2 px-3 text-left">
-                    {investmentPlans.find(p => p.id === item.investmentPlanId)?.name || item.investmentPlanId}
-                  </td>
+                  <td className="py-2 px-3 text-left">{item.investmentPlan?.type || '—'}</td>
                   <td className="py-2 px-3 text-right">
                     {item.investedAmount ? `₹${item.investedAmount.toLocaleString()}` : '—'}
                   </td>
                   <td className="py-2 px-3 text-center">
                     {item.investmentDate ? new Date(item.investmentDate).toLocaleDateString() : '—'}
                   </td>
-                  <td className="py-2 px-3 text-center">{item.investmentMode || '—'}</td>
+                  <td className="py-2 px-3 text-center">
+                    {item.investmentPlan?.investmentTerm ? `${item.investmentPlan.investmentTerm} yr` : '—'}
+                  </td>
+                  <td className="py-2 px-3 text-right">
+                    {item.investmentPlan?.roiAAR ?? '—'}
+                  </td>
+                  <td className="py-2 px-3 text-center">{item.withdrawalFrequency || '—'}</td>
                   <td className="py-2 px-3 text-center">
                     {item.maturityDate ? new Date(item.maturityDate).toLocaleDateString() : '—'}
                   </td>
-                  <td className="py-2 px-3 text-right">
-                    {investmentPlans.find(p => p.id === item.investmentPlanId)?.roiAAR ?? '—'}
-                  </td>
-                  <td className="py-2 px-3 text-center">{item.withdrawalFrequency || '—'}</td>
                   <td className="py-2 px-3 text-center">
                     <button
                       className={`px-4 py-2 rounded text-white ${
