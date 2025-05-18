@@ -86,7 +86,7 @@ const Funds: React.FC = () => {
   // ];
 
   const handleGetTransactionHistory = async () => {
-    const res = await axios.get(`/getTransactions`, {
+    const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/v1/investor/getTransactions`, {
       withCredentials: true,
     });
     if (res.status === 200 || res.status === 201) {
@@ -105,7 +105,7 @@ const Funds: React.FC = () => {
     setAddMessage(null);
     try {
       const res = await axios.post(
-        `/addFunds`,
+        `${import.meta.env.VITE_API_URL}/api/v1/investor/addFunds`,
         {
           paymentMethod,
           amount: Number(addAmount),
@@ -135,7 +135,7 @@ const Funds: React.FC = () => {
     setWithdrawMessage(null);
     try {
       const res = await axios.post(
-        `/withdrawFunds`,
+        `${import.meta.env.VITE_API_URL}/api/v1/investor/withdrawFunds`,
         {
           amount: Number(withdrawAmount),
         },
@@ -156,7 +156,7 @@ const Funds: React.FC = () => {
 
   const fetchBalance = async () => {
     try {
-      const response = await axios.get(`/getBalance`, {
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/v1/investor/getBalance`, {
         withCredentials: true,
       });
       if (response.status === 200) {

@@ -27,8 +27,8 @@ const Dashboard: React.FC<DashboardProps> = ({ view = "overview" }) => {
     const fetchInvestmentData = async () => {
       try {
         const [currentValueRes, investmentsRes] = await Promise.all([
-          axios.get('/api/v1/investor/totalCurrentValue'),
-          axios.get('/api/v1/investor/totalInvestment')
+          axios.get(`${import.meta.env.VITE_API_URL}/api/v1/investor/totalCurrentValue`),
+          axios.get(`${import.meta.env.VITE_API_URL}/api/v1/investor/totalInvestment`)
         ]);
 
         setTotalCurrentValue(Number(currentValueRes.data?.totalCurrentValue || 0));

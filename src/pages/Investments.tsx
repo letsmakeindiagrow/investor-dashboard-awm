@@ -140,7 +140,7 @@ const Investments: React.FC = () => {
   useEffect(() => {
     const fetchPlans = async () => {
       try {
-        const response = await axios.get(`/getInvestmentPlans`, {
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/v1/investor/getInvestmentPlans`, {
           withCredentials: true,
         });
         console.log(response.data.investmentPlans);
@@ -158,7 +158,7 @@ const Investments: React.FC = () => {
   useEffect(() => {
     const fetchInvestments = async () => {
       try {
-        const response = await axios.get(`/getInvestments`, {
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/v1/investor/getInvestments`, {
           withCredentials: true,
         });
         console.log(response.data.investments);
@@ -217,7 +217,7 @@ const Investments: React.FC = () => {
     setSubscribeLoading(true);
     try {
       const response = await axios.post<SubscribeInvestmentResponse>(
-        `/subscribeInvestment`,
+        `${import.meta.env.VITE_API_URL}/api/v1/investor/subscribeInvestment`,
         requestData,
         {
           withCredentials: true,
@@ -231,7 +231,7 @@ const Investments: React.FC = () => {
         setSubscribeSuccess(response.data.message);
         // Refresh investments list
         const updatedInvestments = await axios.get(
-          `/getInvestments`,
+          `${import.meta.env.VITE_API_URL}/api/v1/investor/getInvestments`,
           { withCredentials: true }
         );
         setMyInvestments(updatedInvestments.data.investments);
@@ -335,7 +335,7 @@ const Investments: React.FC = () => {
 
     try {
       const response = await axios.post(
-        `/withdrawPreMaturity`,
+        `${import.meta.env.VITE_API_URL}/api/v1/investor/withdrawPreMaturity`,
         { investmentPlanId: investmentId },
         { withCredentials: true }
       );
@@ -349,7 +349,7 @@ const Investments: React.FC = () => {
         });
         // Refresh investments list
         const updatedInvestments = await axios.get(
-          `/getInvestments`,
+          `${import.meta.env.VITE_API_URL}/api/v1/investor/getInvestments`,
           {
             withCredentials: true,
           }

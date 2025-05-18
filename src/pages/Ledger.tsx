@@ -28,7 +28,7 @@ const Ledger: React.FC = () => {
   const fetchLedger = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`/ledger`, {
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/v1/investor/ledger`, {
         withCredentials: true
       });
       setLedgerEntries(response.data);
