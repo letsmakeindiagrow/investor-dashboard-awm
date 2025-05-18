@@ -21,27 +21,33 @@ const Dashboard: React.FC<DashboardProps> = ({ view = "overview" }) => {
   const navigate = useNavigate();
   const [totalCurrentValue, setTotalCurrentValue] = useState<number>(0);
   const [totalInvestedValue, setTotalInvestedValue] = useState<number>(0);
+  const [totalInvestmentsCount, setTotalInvestmentsCount] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const fetchInvestmentData = async () => {
       try {
-        const [currentValueRes, investmentsRes] = await Promise.all([
+        const [currentValueRes, investmentsRes, investmentsCountRes] = await Promise.all([
           axios.get(`${import.meta.env.VITE_API_URL}/api/v1/investor/totalCurrentValue`, {
             withCredentials: true
           }),
           axios.get(`${import.meta.env.VITE_API_URL}/api/v1/investor/totalInvestment`, {
+            withCredentials: true
+          }),
+          axios.get(`${import.meta.env.VITE_API_URL}/api/v1/investor/totalInvestments`, {
             withCredentials: true
           })
         ]);
 
         setTotalCurrentValue(Number(currentValueRes.data?.totalCurrentValue || 0));
         setTotalInvestedValue(Number(investmentsRes.data?.totalInvestment?._sum?.investedAmount || 0));
+        setTotalInvestmentsCount(investmentsCountRes.data?.totalInvestmentGain?._count || 0);
         setLoading(false);
       } catch (error) {
         console.error('Error fetching investment data:', error);
         setTotalCurrentValue(0);
         setTotalInvestedValue(0);
+        setTotalInvestmentsCount(0);
         setLoading(false);
       }
     };
@@ -166,7 +172,7 @@ const Dashboard: React.FC<DashboardProps> = ({ view = "overview" }) => {
             <div className="bg-white p-4 rounded-lg shadow-md">
               <h3 className="text-sm text-gray-500">No. of Investments</h3>
               <p className="text-2xl font-bold text-black">
-                {loading ? 'Loading...' : totalInvestedValue}
+                {loading ? 'Loading...' : totalInvestmentsCount}
               </p>
             </div>
           </div>
