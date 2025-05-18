@@ -31,11 +31,13 @@ const Dashboard: React.FC<DashboardProps> = ({ view = "overview" }) => {
           axios.get('/api/investments/totalInvestment')
         ]);
 
-        setTotalCurrentValue(Number(currentValueRes.data.totalCurrentValue));
-        setTotalInvestedValue(Number(investmentsRes.data.totalInvestment._sum.investedAmount) || 0);
+        setTotalCurrentValue(Number(currentValueRes.data?.totalCurrentValue || 0));
+        setTotalInvestedValue(Number(investmentsRes.data?.totalInvestment?._sum?.investedAmount || 0));
         setLoading(false);
       } catch (error) {
         console.error('Error fetching investment data:', error);
+        setTotalCurrentValue(0);
+        setTotalInvestedValue(0);
         setLoading(false);
       }
     };
