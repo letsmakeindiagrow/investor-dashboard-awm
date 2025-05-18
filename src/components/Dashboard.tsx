@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   AreaChart,
   Area,
@@ -11,6 +11,7 @@ import {
   ReferenceLine,
 } from "recharts";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 interface DashboardProps {
   view?: "overview" | "details";
@@ -18,6 +19,31 @@ interface DashboardProps {
 
 const Dashboard: React.FC<DashboardProps> = ({ view = "overview" }) => {
   const navigate = useNavigate();
+  const [totalCurrentValue, setTotalCurrentValue] = useState<number>(0);
+  const [totalInvestedValue, setTotalInvestedValue] = useState<number>(0);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    const fetchInvestmentData = async () => {
+      try {
+        const [currentValueRes, investmentsRes] = await Promise.all([
+          axios.get('/api/investments/totalCurrentValue'),
+          axios.get('/api/investments/totalInvestment')
+        ]);
+
+        setTotalCurrentValue(Number(currentValueRes.data.totalCurrentValue));
+        setTotalInvestedValue(Number(investmentsRes.data.totalInvestment._sum.investedAmount) || 0);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching investment data:', error);
+        setLoading(false);
+      }
+    };
+
+    fetchInvestmentData();
+  }, []);
+
+  const profitLoss = totalCurrentValue - totalInvestedValue;
 
   const handleTabChange = (newView: "overview" | "details") => {
     if (newView === "overview") {
@@ -115,36 +141,27 @@ const Dashboard: React.FC<DashboardProps> = ({ view = "overview" }) => {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="bg-white p-4 rounded-lg shadow-md">
               <h3 className="text-sm text-gray-500">Total Invested Value</h3>
-              <p className="text-2xl font-bold text-black">₹225,000</p>
+              <p className="text-2xl font-bold text-black">
+                {loading ? 'Loading...' : `₹${totalInvestedValue.toLocaleString()}`}
+              </p>
             </div>
             <div className="bg-white p-4 rounded-lg shadow-md">
               <h3 className="text-sm text-gray-500">Total Current Value</h3>
-              <p className="text-2xl font-bold text-black">₹239,750</p>
+              <p className="text-2xl font-bold text-black">
+                {loading ? 'Loading...' : `₹${totalCurrentValue.toLocaleString()}`}
+              </p>
             </div>
             <div className="bg-white p-4 rounded-lg shadow-md">
               <h3 className="text-sm text-gray-500">Profit & Loss</h3>
-              <p
-                className={`text-2xl font-bold ${
-                  investmentData.reduce((acc, curr) => acc + curr.current, 0) -
-                    investmentData.reduce(
-                      (acc, curr) => acc + curr.invested,
-                      0
-                    ) >
-                  0
-                    ? "text-green-500"
-                    : "text-red-500"
-                }`}
-              >
-                ₹
-                {(
-                  investmentData.reduce((acc, curr) => acc + curr.current, 0) -
-                  investmentData.reduce((acc, curr) => acc + curr.invested, 0)
-                ).toLocaleString()}
+              <p className={`text-2xl font-bold ${profitLoss >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                {loading ? 'Loading...' : `₹${profitLoss.toLocaleString()}`}
               </p>
             </div>
             <div className="bg-white p-4 rounded-lg shadow-md">
               <h3 className="text-sm text-gray-500">No. of Investments</h3>
-              <p className="text-2xl font-bold text-black">3</p>
+              <p className="text-2xl font-bold text-black">
+                {loading ? 'Loading...' : totalInvestedValue}
+              </p>
             </div>
           </div>
 
