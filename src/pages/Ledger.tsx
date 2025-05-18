@@ -11,7 +11,7 @@ interface LedgerEntry {
   balance: number | null;
 }
 
-const API_URL = `${import.meta.env.VITE_API_URL}/api/v1/investor`;
+
 
 const Ledger: React.FC = () => {
   const [dateRange, setDateRange] = useState<'all' | 'custom'>('all');
@@ -28,7 +28,7 @@ const Ledger: React.FC = () => {
   const fetchLedger = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${API_URL}/ledger`, {
+      const response = await axios.get(`/ledger`, {
         withCredentials: true
       });
       setLedgerEntries(response.data);

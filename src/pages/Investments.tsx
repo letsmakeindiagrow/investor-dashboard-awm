@@ -61,7 +61,7 @@ interface WithdrawalDetails {
   };
 }
 
-const API_URL = `${import.meta.env.VITE_API_URL}/api/v1/investor`;
+
 
 const Investments: React.FC = () => {
   const location = useLocation();
@@ -140,7 +140,7 @@ const Investments: React.FC = () => {
   useEffect(() => {
     const fetchPlans = async () => {
       try {
-        const response = await axios.get(`${API_URL}/getInvestmentPlans`, {
+        const response = await axios.get(`/getInvestmentPlans`, {
           withCredentials: true,
         });
         console.log(response.data.investmentPlans);
@@ -158,7 +158,7 @@ const Investments: React.FC = () => {
   useEffect(() => {
     const fetchInvestments = async () => {
       try {
-        const response = await axios.get(`${API_URL}/getInvestments`, {
+        const response = await axios.get(`/getInvestments`, {
           withCredentials: true,
         });
         console.log(response.data.investments);
@@ -217,7 +217,7 @@ const Investments: React.FC = () => {
     setSubscribeLoading(true);
     try {
       const response = await axios.post<SubscribeInvestmentResponse>(
-        `${API_URL}/subscribeInvestment`,
+        `/subscribeInvestment`,
         requestData,
         {
           withCredentials: true,
@@ -231,7 +231,7 @@ const Investments: React.FC = () => {
         setSubscribeSuccess(response.data.message);
         // Refresh investments list
         const updatedInvestments = await axios.get(
-          `${API_URL}/getInvestments`,
+          `/getInvestments`,
           { withCredentials: true }
         );
         setMyInvestments(updatedInvestments.data.investments);
@@ -335,7 +335,7 @@ const Investments: React.FC = () => {
 
     try {
       const response = await axios.post(
-        `${API_URL}/withdrawPreMaturity`,
+        `/withdrawPreMaturity`,
         { investmentPlanId: investmentId },
         { withCredentials: true }
       );
@@ -349,7 +349,7 @@ const Investments: React.FC = () => {
         });
         // Refresh investments list
         const updatedInvestments = await axios.get(
-          `${API_URL}/getInvestments`,
+          `/getInvestments`,
           {
             withCredentials: true,
           }

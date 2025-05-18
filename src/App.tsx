@@ -5,12 +5,12 @@ import Topbar from "./components/Topbar";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
-const API_URL = import.meta.env.VITE_API_URL;
+
 const LOGIN_URL = import.meta.env.VITE_LOGIN_URL;
 
 const checkAuth = async () => {
   try {
-    const res = await axios.get(`${API_URL}/api/v1/investor/checkAuth`, {
+    const res = await axios.get(`/api/v1/investor/checkAuth`, {
       withCredentials: true,
     });
     return res.data.authenticated;
