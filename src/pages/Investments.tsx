@@ -255,7 +255,7 @@ const Investments: React.FC = () => {
     try {
       console.log("Starting withdrawal details fetch for ID:", investmentId);
       console.log("Current investments:", myInvestments);
-      
+
       const investment = myInvestments.find((inv) => inv.id === investmentId);
       if (!investment) {
         console.error("Investment not found for ID:", investmentId);
@@ -393,7 +393,7 @@ const Investments: React.FC = () => {
           }`}
           onClick={() => {
             setActiveTab("make");
-            navigate("/dashboard/investments/make");
+            navigate("/investments/make");
           }}
           style={{ color: activeTab === "make" ? "#08AFF1" : "" }}
         >
@@ -405,7 +405,7 @@ const Investments: React.FC = () => {
           }`}
           onClick={() => {
             setActiveTab("my");
-            navigate("/dashboard/investments/my");
+            navigate("/investments/my");
           }}
           style={{ color: activeTab === "my" ? "#AACF45" : "" }}
         >
@@ -656,22 +656,34 @@ const Investments: React.FC = () => {
               {myInvestments.map((item, index) => (
                 <tr key={item.id} className="border-b hover:bg-gray-50">
                   <td className="py-2 px-3 text-center">{index + 1}</td>
-                  <td className="py-2 px-3 text-left">{item.investmentPlan?.type || '—'}</td>
-                  <td className="py-2 px-3 text-right">
-                    {item.investedAmount ? `₹${item.investedAmount.toLocaleString()}` : '—'}
-                  </td>
-                  <td className="py-2 px-3 text-center">
-                    {item.investmentDate ? new Date(item.investmentDate).toLocaleDateString() : '—'}
-                  </td>
-                  <td className="py-2 px-3 text-center">
-                    {item.investmentPlan?.investmentTerm ? `${item.investmentPlan.investmentTerm} yr` : '—'}
+                  <td className="py-2 px-3 text-left">
+                    {item.investmentPlan?.type || "—"}
                   </td>
                   <td className="py-2 px-3 text-right">
-                    {item.investmentPlan?.roiAAR ?? '—'}
+                    {item.investedAmount
+                      ? `₹${item.investedAmount.toLocaleString()}`
+                      : "—"}
                   </td>
-                  <td className="py-2 px-3 text-center">{item.withdrawalFrequency || '—'}</td>
                   <td className="py-2 px-3 text-center">
-                    {item.maturityDate ? new Date(item.maturityDate).toLocaleDateString() : '—'}
+                    {item.investmentDate
+                      ? new Date(item.investmentDate).toLocaleDateString()
+                      : "—"}
+                  </td>
+                  <td className="py-2 px-3 text-center">
+                    {item.investmentPlan?.investmentTerm
+                      ? `${item.investmentPlan.investmentTerm} yr`
+                      : "—"}
+                  </td>
+                  <td className="py-2 px-3 text-right">
+                    {item.investmentPlan?.roiAAR ?? "—"}
+                  </td>
+                  <td className="py-2 px-3 text-center">
+                    {item.withdrawalFrequency || "—"}
+                  </td>
+                  <td className="py-2 px-3 text-center">
+                    {item.maturityDate
+                      ? new Date(item.maturityDate).toLocaleDateString()
+                      : "—"}
                   </td>
                   <td className="py-2 px-3 text-center">
                     <button
@@ -749,12 +761,15 @@ const Investments: React.FC = () => {
                   <div className="flex justify-between">
                     <span className="text-gray-600">Penalty Amount:</span>
                     <span className="font-medium text-red-500">
-                      ₹{withdrawalDetails.expenseAmountDeducted.toLocaleString()}
+                      ₹
+                      {withdrawalDetails.expenseAmountDeducted.toLocaleString()}
                     </span>
                   </div>
                   <div className="border-t pt-2 mt-2">
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Net Amount to Receive:</span>
+                      <span className="text-gray-600">
+                        Net Amount to Receive:
+                      </span>
                       <span className="font-medium text-green-600">
                         ₹{withdrawalDetails.netAmountPaid.toLocaleString()}
                       </span>
@@ -764,7 +779,9 @@ const Investments: React.FC = () => {
               </div>
 
               <div className="bg-blue-50 p-4 rounded-lg">
-                <h4 className="font-medium mb-2 text-blue-700">Transaction Details</h4>
+                <h4 className="font-medium mb-2 text-blue-700">
+                  Transaction Details
+                </h4>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span className="text-gray-600">Transaction Type:</span>
@@ -788,7 +805,8 @@ const Investments: React.FC = () => {
               </div>
 
               <p className="text-sm text-gray-600">
-                Are you sure you want to proceed with the withdrawal? The penalty amount will be deducted from your total value.
+                Are you sure you want to proceed with the withdrawal? The
+                penalty amount will be deducted from your total value.
               </p>
             </div>
 
