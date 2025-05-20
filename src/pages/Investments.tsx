@@ -920,5 +920,5 @@ const Investments: React.FC = () => {
     </div>
   );
 };
-
+// comment for deployment
 export default Investments;
