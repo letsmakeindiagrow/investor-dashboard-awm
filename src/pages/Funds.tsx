@@ -134,6 +134,11 @@ const Funds: React.FC = () => {
   const handleWithdrawFunds = async () => {
     setWithdrawLoading(true);
     setWithdrawMessage(null);
+    if (Number(withdrawAmount) > (balance ?? 0)) {
+      setWithdrawMessage("Withdraw amount cannot exceed available balance.");
+      setWithdrawLoading(false);
+      return;
+    }
     try {
       const res = await axios.post(
         `${import.meta.env.VITE_API_URL}/api/v1/investor/withdrawFunds`,
