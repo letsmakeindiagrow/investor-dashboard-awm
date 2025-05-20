@@ -162,7 +162,7 @@ const Funds: React.FC = () => {
       });
       if (response.status === 200) {
         setBalance(response.data.balance.availableBalance);
-        setWithdrawableBalance(response.data.balance.withdrawableBalance);
+        setWithdrawableBalance(response.data.balance.availableBalance);
       }
     } catch (error) {
       console.error("Error fetching balance:", error);
