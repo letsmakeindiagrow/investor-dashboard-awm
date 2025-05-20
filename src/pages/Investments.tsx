@@ -615,7 +615,8 @@ const Investments: React.FC = () => {
                             plan.type === "SIP" ||
                             !investmentAmount ||
                             Number(investmentAmount) < plan.minInvestment ||
-                            subscribeLoading
+                            subscribeLoading ||
+                            Number(investmentAmount) > balance
                           }
                           onClick={handleLumpsumSubmit}
                         >
@@ -625,7 +626,34 @@ const Investments: React.FC = () => {
                             ? "Processing..."
                             : "Invest Now"}
                         </button>
-                        {subscribeError && selectedPlan === plan.id && (
+                        {/* Enhanced insufficient balance warning and Add Funds button */}
+                        {Number(investmentAmount) > balance && (
+                          <div className="mt-3 bg-yellow-50 border border-yellow-200 rounded p-3 flex flex-col items-center">
+                            <div className="flex items-center gap-2 text-yellow-700 mb-2">
+                              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                              </svg>
+                              <span className="font-medium">Insufficient Balance</span>
+                            </div>
+                            <p className="text-sm text-yellow-600 mb-2 text-center">
+                              Your current balance (₹{balance.toLocaleString()}) is insufficient for this investment amount (₹{Number(investmentAmount).toLocaleString()}).
+                            </p>
+                            <button
+                              onClick={() => {
+                                setSelectedPlan(null);
+                                navigate('/funds/add');
+                              }}
+                              className="w-full py-2 px-4 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition-colors flex items-center justify-center gap-2"
+                            >
+                              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                              </svg>
+                              Add Funds
+                            </button>
+                          </div>
+                        )}
+                        {/* End enhanced warning */}
+                        {subscribeError && selectedPlan === plan.id && !Number(investmentAmount) > balance && (
                           <div className="text-red-500 mt-2">
                             {subscribeError}
                           </div>
