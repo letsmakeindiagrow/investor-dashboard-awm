@@ -89,6 +89,7 @@ const Investments: React.FC = () => {
   );
   const [withdrawalDetails, setWithdrawalDetails] =
     useState<WithdrawalDetails | null>(null);
+  const [balance, setBalance] = useState<number>(0);
 
   // Add useEffect to handle SIP message timeout
   useEffect(() => {
@@ -172,6 +173,24 @@ const Investments: React.FC = () => {
     };
 
     fetchInvestments();
+  }, []);
+
+  // Add balance fetch
+  const fetchBalance = async () => {
+    try {
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/v1/investor/getBalance`, {
+        withCredentials: true,
+      });
+      if (response.status === 200) {
+        setBalance(response.data.balance.availableBalance);
+      }
+    } catch (error) {
+      console.error("Error fetching balance:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchBalance();
   }, []);
 
   const handleLumpsumSubmit = async () => {
@@ -753,13 +772,13 @@ const Investments: React.FC = () => {
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Penalty Percentage:</span>
+                    <span className="text-gray-600">Pre-exit Percentage:</span>
                     <span className="font-medium text-red-500">
                       {withdrawalDetails.expensePercentageApplied}%
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Penalty Amount:</span>
+                    <span className="text-gray-600">Pre-exit Amount:</span>
                     <span className="font-medium text-red-500">
                       ₹
                       {withdrawalDetails.expenseAmountDeducted.toLocaleString()}
@@ -804,10 +823,30 @@ const Investments: React.FC = () => {
                 </div>
               </div>
 
-              <p className="text-sm text-gray-600">
-                Are you sure you want to proceed with the withdrawal? The
-                penalty amount will be deducted from your total value.
-              </p>
+              {balance < withdrawalDetails.netAmountPaid ? (
+                <div className="bg-yellow-50 p-4 rounded-lg">
+                  <div className="flex items-center gap-2 text-yellow-700 mb-2">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    <span className="font-medium">Insufficient Balance</span>
+                  </div>
+                  <p className="text-sm text-yellow-600 mb-3">
+                    Your current balance (₹{balance.toLocaleString()}) is insufficient for this withdrawal.
+                  </p>
+                  <button
+                    onClick={() => navigate('/funds/add')}
+                    className="w-full py-2 px-4 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition-colors"
+                  >
+                    Add Funds
+                  </button>
+                </div>
+              ) : (
+                <p className="text-sm text-gray-600">
+                  Are you sure you want to proceed with the withdrawal? The
+                  pre-exit % will be deducted from your total value.
+                </p>
+              )}
             </div>
 
             <div className="flex justify-end space-x-4">
@@ -820,12 +859,14 @@ const Investments: React.FC = () => {
               >
                 Cancel
               </button>
-              <button
-                className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-                onClick={() => handleWithdrawInvestment(showWithdrawConfirm)}
-              >
-                Confirm Withdrawal
-              </button>
+              {balance >= withdrawalDetails.netAmountPaid && (
+                <button
+                  className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                  onClick={() => handleWithdrawInvestment(showWithdrawConfirm)}
+                >
+                  Confirm Withdrawal
+                </button>
+              )}
             </div>
           </div>
         </div>
