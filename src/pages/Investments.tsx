@@ -824,7 +824,7 @@ const Investments: React.FC = () => {
               </div>
 
               {balance < withdrawalDetails.netAmountPaid ? (
-                <div className="bg-yellow-50 p-4 rounded-lg">
+                <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
                   <div className="flex items-center gap-2 text-yellow-700 mb-2">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
@@ -832,14 +832,32 @@ const Investments: React.FC = () => {
                     <span className="font-medium">Insufficient Balance</span>
                   </div>
                   <p className="text-sm text-yellow-600 mb-3">
-                    Your current balance (₹{balance.toLocaleString()}) is insufficient for this withdrawal.
+                    Your current balance (₹{balance.toLocaleString()}) is insufficient for this withdrawal of ₹{withdrawalDetails.netAmountPaid.toLocaleString()}.
                   </p>
-                  <button
-                    onClick={() => navigate('/funds/add')}
-                    className="w-full py-2 px-4 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition-colors"
-                  >
-                    Add Funds
-                  </button>
+                  <div className="flex flex-col gap-2">
+                    <button
+                      onClick={() => {
+                        setShowWithdrawConfirm(null);
+                        setWithdrawalDetails(null);
+                        navigate('/funds/add');
+                      }}
+                      className="w-full py-2 px-4 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition-colors flex items-center justify-center gap-2"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                      </svg>
+                      Add Funds
+                    </button>
+                    <button
+                      onClick={() => {
+                        setShowWithdrawConfirm(null);
+                        setWithdrawalDetails(null);
+                      }}
+                      className="w-full py-2 px-4 bg-gray-100 text-gray-600 rounded hover:bg-gray-200 transition-colors"
+                    >
+                      Cancel
+                    </button>
+                  </div>
                 </div>
               ) : (
                 <p className="text-sm text-gray-600">
