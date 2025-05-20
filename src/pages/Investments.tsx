@@ -653,7 +653,7 @@ const Investments: React.FC = () => {
                           </div>
                         )}
                         {/* End enhanced warning */}
-                        {subscribeError && selectedPlan === plan.id && !Number(investmentAmount) > balance && (
+                        {subscribeError && selectedPlan === plan.id && Number(investmentAmount) <= balance && (
                           <div className="text-red-500 mt-2">
                             {subscribeError}
                           </div>
