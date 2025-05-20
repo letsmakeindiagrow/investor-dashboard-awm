@@ -51,6 +51,7 @@ const Funds: React.FC = () => {
   const [withdrawMessage, setWithdrawMessage] = useState<string | null>(null);
   const [transactionHistory, setTransactionHistory] = useState<any[]>([]);
   const [balance, setBalance] = useState<number>(0);
+  const [withdrawableBalance, setWithdrawableBalance] = useState<number>(0);
   // Sample transaction history data
   // const transactionHistory = [
   //   {
@@ -161,6 +162,7 @@ const Funds: React.FC = () => {
       });
       if (response.status === 200) {
         setBalance(response.data.balance.availableBalance);
+        setWithdrawableBalance(response.data.balance.withdrawableBalance);
       }
     } catch (error) {
       console.error("Error fetching balance:", error);
@@ -216,7 +218,7 @@ const Funds: React.FC = () => {
               Total Balance
             </h3>
             <p className="text-3xl font-bold" style={{ color: "#08AFF1" }}>
-              ₹{balance}
+              ₹{balance.toLocaleString()}
             </p>
           </div>
           <div className="bg-white p-4 rounded-lg shadow-md">
@@ -227,7 +229,7 @@ const Funds: React.FC = () => {
               Withdrawable Balance
             </h3>
             <p className="text-3xl font-bold" style={{ color: "#AACF45" }}>
-              ₹1,00,000
+              ₹{withdrawableBalance.toLocaleString()}
             </p>
           </div>
         </div>
@@ -445,13 +447,13 @@ const Funds: React.FC = () => {
             <div>
               <label className="block mb-2">Available Balance</label>
               <p className="text-2xl font-bold" style={{ color: "#08AFF1" }}>
-                ₹1,25,000
+                ₹{balance.toLocaleString()}
               </p>
             </div>
             <div>
               <label className="block mb-2">Withdrawable Balance</label>
               <p className="text-2xl font-bold" style={{ color: "#AACF45" }}>
-                ₹1,00,000
+                ₹{withdrawableBalance.toLocaleString()}
               </p>
             </div>
             <div>
@@ -462,7 +464,7 @@ const Funds: React.FC = () => {
                 className="w-full p-2 border rounded"
                 value={withdrawAmount}
                 onChange={(e) => setWithdrawAmount(e.target.value)}
-                max={100000}
+                max={withdrawableBalance}
               />
             </div>
             <div>
@@ -497,7 +499,7 @@ const Funds: React.FC = () => {
               style={{ backgroundColor: "#08AFF1" }}
               disabled={
                 !withdrawAmount ||
-                Number(withdrawAmount) > 100000 ||
+                Number(withdrawAmount) > withdrawableBalance ||
                 withdrawLoading
               }
               onClick={handleWithdrawFunds}
