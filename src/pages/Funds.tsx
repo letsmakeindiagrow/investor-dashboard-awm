@@ -218,7 +218,7 @@ const Funds: React.FC = () => {
               Total Balance
             </h3>
             <p className="text-3xl font-bold" style={{ color: "#08AFF1" }}>
-              ₹{balance.toLocaleString()}
+              ₹{(balance ?? 0).toLocaleString()}
             </p>
           </div>
           <div className="bg-white p-4 rounded-lg shadow-md">
@@ -229,7 +229,7 @@ const Funds: React.FC = () => {
               Withdrawable Balance
             </h3>
             <p className="text-3xl font-bold" style={{ color: "#AACF45" }}>
-              ₹{withdrawableBalance.toLocaleString()}
+              ₹{(withdrawableBalance ?? 0).toLocaleString()}
             </p>
           </div>
         </div>
@@ -447,13 +447,13 @@ const Funds: React.FC = () => {
             <div>
               <label className="block mb-2">Available Balance</label>
               <p className="text-2xl font-bold" style={{ color: "#08AFF1" }}>
-                ₹{balance.toLocaleString()}
+                ₹{(balance ?? 0).toLocaleString()}
               </p>
             </div>
             <div>
               <label className="block mb-2">Withdrawable Balance</label>
               <p className="text-2xl font-bold" style={{ color: "#AACF45" }}>
-                ₹{withdrawableBalance.toLocaleString()}
+                ₹{(withdrawableBalance ?? 0).toLocaleString()}
               </p>
             </div>
             <div>
@@ -464,7 +464,7 @@ const Funds: React.FC = () => {
                 className="w-full p-2 border rounded"
                 value={withdrawAmount}
                 onChange={(e) => setWithdrawAmount(e.target.value)}
-                max={withdrawableBalance}
+                max={(withdrawableBalance ?? 0)}
               />
             </div>
             <div>
@@ -499,7 +499,7 @@ const Funds: React.FC = () => {
               style={{ backgroundColor: "#08AFF1" }}
               disabled={
                 !withdrawAmount ||
-                Number(withdrawAmount) > withdrawableBalance ||
+                Number(withdrawAmount) > (withdrawableBalance ?? 0) ||
                 withdrawLoading
               }
               onClick={handleWithdrawFunds}
