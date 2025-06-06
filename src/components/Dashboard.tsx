@@ -7,7 +7,6 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  ReferenceLine,
 } from "recharts";
 import axios from "axios";
 
@@ -16,11 +15,12 @@ const Dashboard: React.FC = () => {
   const [totalInvestedValue, setTotalInvestedValue] = useState<number>(0);
   const [totalInvestmentsCount, setTotalInvestmentsCount] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
+  const [investmentHistory, setInvestmentHistory] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchInvestmentData = async () => {
       try {
-        const [currentValueRes, investmentsRes, investmentsCountRes] = await Promise.all([
+        const [currentValueRes, investmentsRes, investmentsCountRes, historyRes] = await Promise.all([
           axios.get(`${import.meta.env.VITE_API_URL}/api/v1/investor/totalCurrentValue`, {
             withCredentials: true
           }),
@@ -29,18 +29,32 @@ const Dashboard: React.FC = () => {
           }),
           axios.get(`${import.meta.env.VITE_API_URL}/api/v1/investor/totalInvestments`, {
             withCredentials: true
+          }),
+          axios.get(`${import.meta.env.VITE_API_URL}/api/v1/investor/getInvestments`, {
+            withCredentials: true
           })
         ]);
 
         setTotalCurrentValue(Number(currentValueRes.data?.totalCurrentValue || 0));
         setTotalInvestedValue(Number(investmentsRes.data?.totalInvestment?._sum?.investedAmount || 0));
         setTotalInvestmentsCount(investmentsCountRes.data?.totalInvestmentGain?._count || 0);
+        
+        // Process investment history for the graph
+        const investments = historyRes.data?.investments || [];
+        const historyData = investments.map((inv: any) => ({
+          date: new Date(inv.investmentDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
+          invested: inv.investedAmount,
+          current: inv.investedAmount * (1 + (Number(inv.investmentPlan?.roiAAR || 0) / 100))
+        }));
+        setInvestmentHistory(historyData);
+        
         setLoading(false);
       } catch (error) {
         console.error('Error fetching investment data:', error);
         setTotalCurrentValue(0);
         setTotalInvestedValue(0);
         setTotalInvestmentsCount(0);
+        setInvestmentHistory([]);
         setLoading(false);
       }
     };
@@ -50,15 +64,23 @@ const Dashboard: React.FC = () => {
 
   const profitLoss = totalCurrentValue - totalInvestedValue;
 
-  // Sample investment data
-  const investmentData = [
-    { name: "Jan", invested: 50000, current: 52000 },
-    { name: "Feb", invested: 50000, current: 53500 },
-    { name: "Mar", invested: 50000, current: 55000 },
-    { name: "Apr", invested: 50000, current: 56500 },
-    { name: "May", invested: 50000, current: 58000 },
-    { name: "Jun", invested: 50000, current: 60000 },
-  ];
+  // Custom tooltip component
+  const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-white p-3 rounded-lg shadow-lg border border-gray-200">
+          <p className="text-sm font-semibold mb-1">{label}</p>
+          <p className="text-sm" style={{ color: "#08AFF1" }}>
+            Invested: ₹{payload[0].value.toLocaleString()}
+          </p>
+          <p className="text-sm" style={{ color: "#AACF45" }}>
+            Current: ₹{payload[1].value.toLocaleString()}
+          </p>
+        </div>
+      );
+    }
+    return null;
+  };
 
   return (
     <div className="space-y-6">
@@ -91,11 +113,11 @@ const Dashboard: React.FC = () => {
       </div>
 
       {/* Investment Value Graph */}
-      <div className="bg-white p-4 rounded-lg shadow-md">
+      <div className="bg-white p-6 rounded-lg shadow-md">
         <h3 className="text-lg font-semibold mb-4">Investment Value Trend</h3>
         <div className="h-80">
           <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={investmentData}>
+            <AreaChart data={investmentHistory}>
               <defs>
                 <linearGradient id="investedGradient" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#08AFF1" stopOpacity={0.8} />
@@ -106,15 +128,23 @@ const Dashboard: React.FC = () => {
                   <stop offset="95%" stopColor="#AACF45" stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
+              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+              <XAxis 
+                dataKey="date" 
+                tick={{ fill: '#666' }}
+                tickLine={{ stroke: '#666' }}
+              />
+              <YAxis 
+                tick={{ fill: '#666' }}
+                tickLine={{ stroke: '#666' }}
+                tickFormatter={(value) => `₹${(value/1000).toFixed(0)}k`}
+              />
+              <Tooltip content={<CustomTooltip />} />
               <Area
                 type="monotone"
                 dataKey="invested"
                 stroke="#08AFF1"
-                strokeWidth={3}
+                strokeWidth={2}
                 fillOpacity={1}
                 fill="url(#investedGradient)"
                 activeDot={{
@@ -128,7 +158,7 @@ const Dashboard: React.FC = () => {
                 type="monotone"
                 dataKey="current"
                 stroke="#AACF45"
-                strokeWidth={3}
+                strokeWidth={2}
                 fillOpacity={1}
                 fill="url(#currentGradient)"
                 activeDot={{
@@ -138,18 +168,17 @@ const Dashboard: React.FC = () => {
                   stroke: "#AACF45",
                 }}
               />
-              <ReferenceLine y={0} stroke="#e5e7eb" />
             </AreaChart>
           </ResponsiveContainer>
 
           <div className="flex justify-center mt-4 space-x-6">
             <div className="flex items-center">
-              <div className="w-3 h-3 rounded-full bg-blue-500 mr-2"></div>
-              <span className="text-sm text-gray-600">Invested Value</span>
+              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: "#08AFF1" }}></div>
+              <span className="text-sm text-gray-600 ml-2">Invested Value</span>
             </div>
             <div className="flex items-center">
-              <div className="w-3 h-3 rounded-full bg-green-500 mr-2"></div>
-              <span className="text-sm text-gray-600">Current Value</span>
+              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: "#AACF45" }}></div>
+              <span className="text-sm text-gray-600 ml-2">Current Value</span>
             </div>
           </div>
         </div>
