@@ -241,41 +241,16 @@ const Sidebar: React.FC = () => {
           {/* Referral */}
           <div>
             <div
-              onClick={() => toggleMenu("referral")}
+              onClick={() => navigateTo("/referral")}
               className={`flex items-center p-3 rounded-md cursor-pointer ${hoverEffect} transition-colors`}
             >
               <div className="mr-3">{menuIcons.referral}</div>
               {!isCollapsed && (
-                <>
-                  <span
-                    className={`flex-1 ${textColor} font-semibold text-base`}
-                  >
-                    Referral
-                  </span>
-                  {openMenus.referral ? (
-                    <ChevronDown className="h-5 w-5 text-gray-500" />
-                  ) : (
-                    <ChevronRight className="h-5 w-5 text-gray-500" />
-                  )}
-                </>
+                <span className={`flex-1 ${textColor} font-semibold text-base`}>
+                  Referral
+                </span>
               )}
             </div>
-            {!isCollapsed && openMenus.referral && (
-              <div className="pl-4 space-y-2 mt-1">
-                <div
-                  onClick={() => navigateTo("/referral/overview")}
-                  className={`block p-3 rounded-md text-base ${hoverEffect} ${textColor} cursor-pointer transition-colors font-medium`}
-                >
-                  Referral Overview
-                </div>
-                <div
-                  onClick={() => navigateTo("/referral/history")}
-                  className={`block p-3 rounded-md text-base ${hoverEffect} ${textColor} cursor-pointer transition-colors font-medium`}
-                >
-                  Referral History
-                </div>
-              </div>
-            )}
           </div>
         </div>
       </div>

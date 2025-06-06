@@ -33,8 +33,6 @@ export const appRouter = createBrowserRouter([
 
       // Referral Routes
       { path: "/referral", element: <Referral /> },
-      { path: "/referral/overview", element: <Referral /> },
-      { path: "/referral/history", element: <Referral /> },
     ],
   },
 ]);
