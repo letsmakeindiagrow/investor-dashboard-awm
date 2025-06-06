@@ -113,7 +113,7 @@ const Dashboard: React.FC = () => {
       </div>
 
       {/* Investment Value Graph */}
-      <div className="bg-white p-6 rounded-lg shadow-md">
+      <div className="bg-white p-4 rounded-lg shadow-md">
         <h3 className="text-lg font-semibold mb-4">Investment Value Trend</h3>
         <div className="h-80">
           <ResponsiveContainer width="100%" height="100%">
@@ -128,23 +128,15 @@ const Dashboard: React.FC = () => {
                   <stop offset="95%" stopColor="#AACF45" stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-              <XAxis 
-                dataKey="date" 
-                tick={{ fill: '#666' }}
-                tickLine={{ stroke: '#666' }}
-              />
-              <YAxis 
-                tick={{ fill: '#666' }}
-                tickLine={{ stroke: '#666' }}
-                tickFormatter={(value) => `₹${(value/1000).toFixed(0)}k`}
-              />
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="date" />
+              <YAxis />
               <Tooltip content={<CustomTooltip />} />
               <Area
                 type="monotone"
                 dataKey="invested"
                 stroke="#08AFF1"
-                strokeWidth={2}
+                strokeWidth={3}
                 fillOpacity={1}
                 fill="url(#investedGradient)"
                 activeDot={{
@@ -158,7 +150,7 @@ const Dashboard: React.FC = () => {
                 type="monotone"
                 dataKey="current"
                 stroke="#AACF45"
-                strokeWidth={2}
+                strokeWidth={3}
                 fillOpacity={1}
                 fill="url(#currentGradient)"
                 activeDot={{
@@ -170,17 +162,6 @@ const Dashboard: React.FC = () => {
               />
             </AreaChart>
           </ResponsiveContainer>
-
-          <div className="flex justify-center mt-4 space-x-6">
-            <div className="flex items-center">
-              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: "#08AFF1" }}></div>
-              <span className="text-sm text-gray-600 ml-2">Invested Value</span>
-            </div>
-            <div className="flex items-center">
-              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: "#AACF45" }}></div>
-              <span className="text-sm text-gray-600 ml-2">Current Value</span>
-            </div>
-          </div>
         </div>
       </div>
     </div>
