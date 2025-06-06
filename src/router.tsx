@@ -13,11 +13,7 @@ export const appRouter = createBrowserRouter([
     children: [
       {
         path: "/dashboard",
-        element: <Dashboard view="overview" />,
-      },
-      {
-        path: "/details",
-        element: <Dashboard view="details" />,
+        element: <Dashboard />,
       },
 
       // Investments Routes

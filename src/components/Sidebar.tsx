@@ -108,12 +108,6 @@ const Sidebar: React.FC = () => {
                 >
                   My Portfolio
                 </div>
-                <div
-                  onClick={() => navigateTo("/details")}
-                  className={`block p-3 rounded-md text-base ${hoverEffect} ${textColor} cursor-pointer transition-colors font-medium`}
-                >
-                  Investment Details
-                </div>
               </div>
             )}
           </div>
