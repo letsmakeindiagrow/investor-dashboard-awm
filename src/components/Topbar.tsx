@@ -1,32 +1,74 @@
-import React, { useState } from 'react';
-import { ChevronDown, User, LogOut, Bell, HelpCircle, X } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { ChevronDown, User, LogOut, Bell, HelpCircle, X, Mail, Phone, MapPin, Calendar, CreditCard, Shield } from 'lucide-react';
 import axios from 'axios';
+
+interface UserData {
+  firstName: string;
+  lastName: string;
+  email: string;
+  emailVerified: boolean;
+  mobileNumber: string;
+  mobileVerified: boolean;
+  dateOfBirth: string;
+  createdAt: string;
+  availableBalance: number;
+  verificationState: string;
+  address?: {
+    street: string;
+    city: string;
+    state: string;
+    pincode: string;
+  };
+  bankDetails?: {
+    accountNumber: string;
+    bankName: string;
+    ifscCode: string;
+  };
+}
 
 const Topbar: React.FC = () => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [userData, setUserData] = useState<UserData | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  // Static user data (to be replaced with API data later)
-  const userData = {
-    name: "John Doe",
-    email: "user@example.com",
-    phone: "+91 9876543210",
-    address: "123 Main Street, City, State - 123456",
-    accountType: "Individual",
-    kycStatus: "Verified",
-    joinDate: "01/01/2024"
+  const fetchUserData = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/v1/investor/userInfo`, {
+        withCredentials: true,
+      });
+      setUserData(response.data);
+    } catch (error) {
+      console.error('Failed to fetch user data:', error);
+    } finally {
+      setLoading(false);
+    }
   };
+
+  useEffect(() => {
+    if (isProfileModalOpen) {
+      fetchUserData();
+    }
+  }, [isProfileModalOpen]);
 
   const handleLogout = async () => {
     try {
       await axios.get(`${import.meta.env.VITE_API_URL}/api/v1/investor/logout`, {
         withCredentials: true
       });
-      // After successful logout, redirect to login page
       window.location.href = 'https://login.aadyanviwealth.com';
     } catch (error) {
       console.error('Logout failed:', error);
     }
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-IN', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
   };
 
   return (
@@ -53,7 +95,9 @@ const Topbar: React.FC = () => {
             <div className="h-8 w-8 rounded-full bg-[#00A7E1] flex items-center justify-center">
               <User className="h-5 w-5 text-white" />
             </div>
-            <span className="text-sm font-medium text-gray-700">User</span>
+            <span className="text-sm font-medium text-gray-700">
+              {userData ? `${userData.firstName} ${userData.lastName}` : 'User'}
+            </span>
             <ChevronDown className={`h-4 w-4 text-gray-500 transition-transform ${isProfileOpen ? 'transform rotate-180' : ''}`} />
           </button>
           
@@ -61,7 +105,7 @@ const Topbar: React.FC = () => {
           {isProfileOpen && (
             <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
               <div className="px-4 py-2 border-b border-gray-100">
-                <p className="text-sm font-medium text-gray-800">user@example.com</p>
+                <p className="text-sm font-medium text-gray-800">{userData?.email || 'user@example.com'}</p>
               </div>
               <button 
                 className="w-full flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
@@ -109,40 +153,94 @@ const Topbar: React.FC = () => {
               </button>
             </div>
             <div className="p-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-600">Full Name</label>
-                    <p className="mt-1 text-gray-900">{userData.name}</p>
+              {loading ? (
+                <div className="flex justify-center items-center h-40">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#00A7E1]"></div>
+                </div>
+              ) : userData ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-600">Full Name</label>
+                      <p className="mt-1 text-gray-900">{`${userData.firstName} ${userData.lastName}`}</p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-600">Email</label>
+                      <div className="mt-1 flex items-center">
+                        <Mail className="h-4 w-4 text-gray-500 mr-2" />
+                        <p className="text-gray-900">{userData.email}</p>
+                        {userData.emailVerified && (
+                          <span className="ml-2 px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">Verified</span>
+                        )}
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-600">Mobile Number</label>
+                      <div className="mt-1 flex items-center">
+                        <Phone className="h-4 w-4 text-gray-500 mr-2" />
+                        <p className="text-gray-900">{userData.mobileNumber}</p>
+                        {userData.mobileVerified && (
+                          <span className="ml-2 px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">Verified</span>
+                        )}
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-600">Date of Birth</label>
+                      <div className="mt-1 flex items-center">
+                        <Calendar className="h-4 w-4 text-gray-500 mr-2" />
+                        <p className="text-gray-900">{formatDate(userData.dateOfBirth)}</p>
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-600">Email</label>
-                    <p className="mt-1 text-gray-900">{userData.email}</p>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-600">Phone</label>
-                    <p className="mt-1 text-gray-900">{userData.phone}</p>
+                  <div className="space-y-4">
+                    {userData.address && (
+                      <div>
+                        <label className="block text-sm font-medium text-gray-600">Address</label>
+                        <div className="mt-1 flex items-start">
+                          <MapPin className="h-4 w-4 text-gray-500 mr-2 mt-1" />
+                          <p className="text-gray-900">
+                            {userData.address.street}<br />
+                            {userData.address.city}, {userData.address.state}<br />
+                            {userData.address.pincode}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                    {userData.bankDetails && (
+                      <div>
+                        <label className="block text-sm font-medium text-gray-600">Bank Details</label>
+                        <div className="mt-1 flex items-start">
+                          <CreditCard className="h-4 w-4 text-gray-500 mr-2 mt-1" />
+                          <div>
+                            <p className="text-gray-900">{userData.bankDetails.bankName}</p>
+                            <p className="text-gray-900">A/C: {userData.bankDetails.accountNumber}</p>
+                            <p className="text-gray-900">IFSC: {userData.bankDetails.ifscCode}</p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-600">Account Status</label>
+                      <div className="mt-1 flex items-center">
+                        <Shield className="h-4 w-4 text-gray-500 mr-2" />
+                        <p className="text-gray-900">{userData.verificationState}</p>
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-600">Available Balance</label>
+                      <p className="mt-1 text-gray-900">₹{userData.availableBalance.toLocaleString('en-IN')}</p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-600">Member Since</label>
+                      <p className="mt-1 text-gray-900">{formatDate(userData.createdAt)}</p>
+                    </div>
                   </div>
                 </div>
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-600">Address</label>
-                    <p className="mt-1 text-gray-900">{userData.address}</p>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-600">Account Type</label>
-                    <p className="mt-1 text-gray-900">{userData.accountType}</p>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-600">KYC Status</label>
-                    <p className="mt-1 text-gray-900">{userData.kycStatus}</p>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-600">Member Since</label>
-                    <p className="mt-1 text-gray-900">{userData.joinDate}</p>
-                  </div>
+              ) : (
+                <div className="text-center text-gray-500 py-8">
+                  Failed to load user data. Please try again.
                 </div>
-              </div>
+              )}
             </div>
             <div className="p-6 border-t flex justify-end">
               <button
