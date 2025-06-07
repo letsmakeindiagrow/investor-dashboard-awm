@@ -13,7 +13,7 @@ const Topbar: React.FC = () => {
         withCredentials: true
       });
       // After successful logout, redirect to login page
-      navigate('login.aadyanviwealth.com');
+      window.location.href = 'https://login.aadyanviwealth.com';
     } catch (error) {
       console.error('Logout failed:', error);
     }
