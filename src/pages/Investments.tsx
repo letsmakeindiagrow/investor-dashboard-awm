@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import BigNumber from "bignumber.js";
+import { toast } from "react-hot-toast";
 
 interface InvestmentPlan {
   id: string;
@@ -273,22 +274,23 @@ const Investments: React.FC = () => {
     }
   };
 
-  const handleWithdrawInvestment = async (investmentId: string) => {
+  const handleWithdrawInvestment = async (investmentPlanId: string) => {
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/api/getWithdrawalDetails/${investmentId}`
+        `${import.meta.env.VITE_API_URL}/api/v1/investor/getWithdrawalDetails/${investmentPlanId}`,
+        { withCredentials: true }
       );
 
       if (response.status === 200) {
         const data = response.data.withdrawalDetails;
 
-        const investment = myInvestments.find((inv) => inv.id === investmentId);
+        const investment = myInvestments.find((inv) => inv.investmentPlanId === investmentPlanId);
         const plan = investmentPlans.find(
-          (p) => p.id === investment?.investmentPlanId
+          (p) => p.id === investmentPlanId
         );
 
         if (!investment || !plan) {
-          console.error("Investment or plan not found");
+          toast.error("Investment or plan not found");
           return;
         }
 
@@ -306,7 +308,7 @@ const Investments: React.FC = () => {
         const netPayout = totalGain.minus(exitExpense);
 
         setWithdrawalDetails({
-          id: investmentId,
+          id: investment.id,
           netAmountPaid: netPayout.toNumber(),
           expensePercentageApplied: data.expensePercentageApplied,
           expenseAmountDeducted: exitExpense.toNumber(),
@@ -320,11 +322,11 @@ const Investments: React.FC = () => {
           },
         });
 
-        setShowWithdrawConfirm(investmentId);
+        setShowWithdrawConfirm(investment.id);
       }
     } catch (error) {
       console.error("Error fetching withdrawal details:", error);
-      console.error("Failed to fetch withdrawal details");
+      toast.error("Failed to fetch withdrawal details");
     }
   };
 
@@ -678,7 +680,7 @@ const Investments: React.FC = () => {
                           : "bg-red-500 hover:bg-red-600"
                       }`}
                       disabled={withdrawMessage?.id === item.id}
-                      onClick={() => handleWithdrawInvestment(item.id)}
+                      onClick={() => handleWithdrawInvestment(item.investmentPlanId)}
                     >
                       {withdrawMessage?.id === item.id
                         ? "Processing..."
