@@ -31,7 +31,7 @@ const Topbar: React.FC = () => {
   const fetchUserData = async () => {
     try {
       setLoading(true);
-      const response = await axios.get<ApiResponse>(`${import.meta.env.VITE_API_URL}/api/v1/investor/userInfo`, {
+      const response = await axios.get<ApiResponse>(`${import.meta.env.VITE_API_URL}/api/v1/investor/getUserInfo`, {
         withCredentials: true,
       });
       console.log('API userInfo response:', response.data);
