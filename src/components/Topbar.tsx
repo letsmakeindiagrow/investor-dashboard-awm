@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronDown, User, LogOut, Bell, HelpCircle, X, Mail, Phone, MapPin, Calendar, CreditCard, Shield } from 'lucide-react';
+import { ChevronDown, User, LogOut, Bell, HelpCircle, X, Mail, Phone, Calendar, Shield } from 'lucide-react';
 import axios from 'axios';
 
 interface UserData {
