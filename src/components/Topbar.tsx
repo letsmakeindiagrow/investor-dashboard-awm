@@ -34,6 +34,7 @@ const Topbar: React.FC = () => {
       const response = await axios.get<ApiResponse>(`${import.meta.env.VITE_API_URL}/api/v1/investor/userInfo`, {
         withCredentials: true,
       });
+      console.log('API userInfo response:', response.data);
       setUserData(response.data.user);
     } catch (error) {
       console.error('Failed to fetch user data:', error);
@@ -166,13 +167,13 @@ const Topbar: React.FC = () => {
                   <div className="space-y-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-600">Full Name</label>
-                      <p className="mt-1 text-gray-900">{`${userData.firstName} ${userData.lastName}`}</p>
+                      <p className="mt-1 text-gray-900">{`${userData.firstName || '-'} ${userData.lastName || '-'}`}</p>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-600">Email</label>
                       <div className="mt-1 flex items-center">
                         <Mail className="h-4 w-4 text-gray-500 mr-2" />
-                        <p className="text-gray-900">{userData.email}</p>
+                        <p className="text-gray-900">{userData.email || '-'}</p>
                         {userData.emailVerified && (
                           <span className="ml-2 px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">Verified</span>
                         )}
@@ -182,7 +183,7 @@ const Topbar: React.FC = () => {
                       <label className="block text-sm font-medium text-gray-600">Mobile Number</label>
                       <div className="mt-1 flex items-center">
                         <Phone className="h-4 w-4 text-gray-500 mr-2" />
-                        <p className="text-gray-900">{userData.mobileNumber}</p>
+                        <p className="text-gray-900">{userData.mobileNumber || '-'}</p>
                         {userData.mobileVerified && (
                           <span className="ml-2 px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">Verified</span>
                         )}
@@ -192,12 +193,12 @@ const Topbar: React.FC = () => {
                       <label className="block text-sm font-medium text-gray-600">Date of Birth</label>
                       <div className="mt-1 flex items-center">
                         <Calendar className="h-4 w-4 text-gray-500 mr-2" />
-                        <p className="text-gray-900">{formatDate(userData.dateOfBirth)}</p>
+                        <p className="text-gray-900">{userData.dateOfBirth ? formatDate(userData.dateOfBirth) : '-'}</p>
                       </div>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-600">Referral Code</label>
-                      <p className="mt-1 text-gray-900">{userData.referralCode}</p>
+                      <p className="mt-1 text-gray-900">{userData.referralCode || '-'}</p>
                     </div>
                   </div>
                   <div className="space-y-4">
@@ -205,20 +206,20 @@ const Topbar: React.FC = () => {
                       <label className="block text-sm font-medium text-gray-600">Account Status</label>
                       <div className="mt-1 flex items-center">
                         <Shield className="h-4 w-4 text-gray-500 mr-2" />
-                        <p className="text-gray-900">{userData.verificationState}</p>
+                        <p className="text-gray-900">{userData.verificationState || '-'}</p>
                       </div>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-600">Available Balance</label>
-                      <p className="mt-1 text-gray-900">₹{formatBalance(userData.availableBalance)}</p>
+                      <p className="mt-1 text-gray-900">₹{userData.availableBalance ? formatBalance(userData.availableBalance) : '0.00'}</p>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-600">Member Since</label>
-                      <p className="mt-1 text-gray-900">{formatDate(userData.createdAt)}</p>
+                      <p className="mt-1 text-gray-900">{userData.createdAt ? formatDate(userData.createdAt) : '-'}</p>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-600">Last Updated</label>
-                      <p className="mt-1 text-gray-900">{formatDate(userData.updatedAt)}</p>
+                      <p className="mt-1 text-gray-900">{userData.updatedAt ? formatDate(userData.updatedAt) : '-'}</p>
                     </div>
                   </div>
                 </div>
