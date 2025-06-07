@@ -65,8 +65,6 @@ interface WithdrawalDetails {
   };
 }
 
-
-
 const Investments: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -144,9 +142,12 @@ const Investments: React.FC = () => {
   useEffect(() => {
     const fetchPlans = async () => {
       try {
-        const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/v1/investor/getInvestmentPlans`, {
-          withCredentials: true,
-        });
+        const response = await axios.get(
+          `${import.meta.env.VITE_API_URL}/api/v1/investor/getInvestmentPlans`,
+          {
+            withCredentials: true,
+          }
+        );
         console.log(response.data.investmentPlans);
         setInvestmentPlans(response.data.investmentPlans);
       } catch (err) {
@@ -162,9 +163,12 @@ const Investments: React.FC = () => {
   useEffect(() => {
     const fetchInvestments = async () => {
       try {
-        const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/v1/investor/getInvestments`, {
-          withCredentials: true,
-        });
+        const response = await axios.get(
+          `${import.meta.env.VITE_API_URL}/api/v1/investor/getInvestments`,
+          {
+            withCredentials: true,
+          }
+        );
         console.log(response.data.investments);
         setMyInvestments(response.data.investments);
       } catch (err) {
@@ -181,9 +185,12 @@ const Investments: React.FC = () => {
   // Add balance fetch
   const fetchBalance = async () => {
     try {
-      const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/v1/investor/getBalance`, {
-        withCredentials: true,
-      });
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/api/v1/investor/getBalance`,
+        {
+          withCredentials: true,
+        }
+      );
       if (response.status === 200) {
         setBalance(response.data.balance.availableBalance);
       }
@@ -276,17 +283,19 @@ const Investments: React.FC = () => {
   const handleWithdrawInvestment = async (investmentPlanId: string) => {
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/api/v1/investor/getWithdrawalDetails/${investmentPlanId}`,
+        `${
+          import.meta.env.VITE_API_URL
+        }/api/v1/investor/getWithdrawalDetails/${investmentPlanId}`,
         { withCredentials: true }
       );
 
       if (response.status === 200) {
         const data = response.data.withdrawalDetails;
 
-        const investment = myInvestments.find((inv) => inv.investmentPlanId === investmentPlanId);
-        const plan = investmentPlans.find(
-          (p) => p.id === investmentPlanId
+        const investment = myInvestments.find(
+          (inv) => inv.investmentPlanId === investmentPlanId
         );
+        const plan = investmentPlans.find((p) => p.id === investmentPlanId);
 
         if (!investment || !plan) {
           console.error("Investment or plan not found");
@@ -569,34 +578,60 @@ const Investments: React.FC = () => {
                         {Number(investmentAmount) > balance && (
                           <div className="mt-3 bg-yellow-50 border border-yellow-200 rounded p-3 flex flex-col items-center">
                             <div className="flex items-center gap-2 text-yellow-700 mb-2">
-                              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                              <svg
+                                className="w-5 h-5"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth="2"
+                                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                                />
                               </svg>
-                              <span className="font-medium">Insufficient Balance</span>
+                              <span className="font-medium">
+                                Insufficient Balance
+                              </span>
                             </div>
                             <p className="text-sm text-yellow-600 mb-2 text-center">
-                              Your current balance (₹{balance.toLocaleString()}) is insufficient for this investment amount (₹{Number(investmentAmount).toLocaleString()}).
+                              Your current balance (₹{balance.toLocaleString()})
+                              is insufficient for this investment amount (₹
+                              {Number(investmentAmount).toLocaleString()}).
                             </p>
                             <button
                               onClick={() => {
                                 setSelectedPlan(null);
-                                navigate('/funds/add');
+                                navigate("/funds/add");
                               }}
                               className="w-full py-2 px-4 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition-colors flex items-center justify-center gap-2"
                             >
-                              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                              <svg
+                                className="w-5 h-5"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth="2"
+                                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                                />
                               </svg>
                               Add Funds
                             </button>
                           </div>
                         )}
                         {/* End enhanced warning */}
-                        {subscribeError && selectedPlan === plan.id && Number(investmentAmount) <= balance && (
-                          <div className="text-red-500 mt-2">
-                            {subscribeError}
-                          </div>
-                        )}
+                        {subscribeError &&
+                          selectedPlan === plan.id &&
+                          Number(investmentAmount) <= balance && (
+                            <div className="text-red-500 mt-2">
+                              {subscribeError}
+                            </div>
+                          )}
                         {subscribeSuccess && selectedPlan === plan.id && null}
                       </div>
                       <button
@@ -643,7 +678,9 @@ const Investments: React.FC = () => {
                 <tr key={item.id} className="border-b hover:bg-gray-50">
                   <td className="py-2 px-3 text-center">{index + 1}</td>
                   <td className="py-2 px-3 text-left">
-                    {item.investmentPlan?.type} ({item.investmentPlan?.investmentTerm} yr, {item.investmentPlan?.roiAAR}%)
+                    {item.investmentPlan?.type} (
+                    {item.investmentPlan?.investmentTerm} yr,{" "}
+                    {item.investmentPlan?.roiAAR}%)
                   </td>
                   <td className="py-2 px-3 text-right">
                     {item.investedAmount
@@ -679,7 +716,7 @@ const Investments: React.FC = () => {
                           : "bg-red-500 hover:bg-red-600"
                       }`}
                       disabled={withdrawMessage?.id === item.id}
-                      onClick={() => handleWithdrawInvestment(item.investmentPlanId)}
+                      onClick={() => handleWithdrawInvestment(item.id)}
                     >
                       {withdrawMessage?.id === item.id
                         ? "Processing..."
@@ -747,12 +784,15 @@ const Investments: React.FC = () => {
                   <div className="flex justify-between">
                     <span className="text-gray-600">Pre-exit Amount:</span>
                     <span className="font-medium text-red-500">
-                      ₹{withdrawalDetails.expenseAmountDeducted.toLocaleString()}
+                      ₹
+                      {withdrawalDetails.expenseAmountDeducted.toLocaleString()}
                     </span>
                   </div>
                   <div className="border-t pt-2 mt-2">
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Net Amount to Receive:</span>
+                      <span className="text-gray-600">
+                        Net Amount to Receive:
+                      </span>
                       <span className="font-medium text-green-600">
                         ₹{withdrawalDetails.netAmountPaid.toLocaleString()}
                       </span>
@@ -762,7 +802,9 @@ const Investments: React.FC = () => {
               </div>
 
               <div className="bg-blue-50 p-4 rounded-lg">
-                <h4 className="font-medium mb-2 text-blue-700">Transaction Details</h4>
+                <h4 className="font-medium mb-2 text-blue-700">
+                  Transaction Details
+                </h4>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span className="text-gray-600">Transaction Type:</span>
