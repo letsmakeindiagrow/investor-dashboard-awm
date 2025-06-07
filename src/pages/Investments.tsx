@@ -280,12 +280,12 @@ const Investments: React.FC = () => {
     }
   };
 
-  const handleWithdrawInvestment = async (investmentPlanId: string) => {
+  const handleWithdrawInvestment = async (userInvestmentId: string) => {
     try {
       const response = await axios.get(
         `${
           import.meta.env.VITE_API_URL
-        }/api/v1/investor/getWithdrawalDetails/${investmentPlanId}`,
+        }/api/v1/investor/getWithdrawalDetails/${userInvestmentId}`,
         { withCredentials: true }
       );
 
@@ -293,9 +293,11 @@ const Investments: React.FC = () => {
         const data = response.data.withdrawalDetails;
 
         const investment = myInvestments.find(
-          (inv) => inv.investmentPlanId === investmentPlanId
+          (inv) => inv.id === userInvestmentId
         );
-        const plan = investmentPlans.find((p) => p.id === investmentPlanId);
+        const plan = investmentPlans.find(
+          (p) => p.id === investment?.investmentPlanId
+        );
 
         if (!investment || !plan) {
           console.error("Investment or plan not found");
