@@ -52,13 +52,10 @@ interface SubscribeInvestmentResponse {
 
 interface WithdrawalDetails {
   id: string;
-  investmentPlan: {
-    name: string;
-  };
-  investedAmount: number;
-  currentValue: number;
-  preExit: number;
   netAmountPaid: number;
+  expensePercentageApplied: number;
+  expenseAmountDeducted: number;
+  lockInStageAchieved: number;
   transaction: {
     fundTransaction: {
       type: string;
@@ -302,13 +299,10 @@ const Investments: React.FC = () => {
 
         setWithdrawalDetails({
           id: investmentId,
-          investmentPlan: {
-            name: plan.name,
-          },
-          investedAmount: investment.investedAmount,
-          currentValue: totalGain.toNumber(),
-          preExit: data.expensePercentageApplied,
           netAmountPaid: NetPayout.toNumber(),
+          expensePercentageApplied: data.expensePercentageApplied,
+          expenseAmountDeducted: exitExpense.toNumber(),
+          lockInStageAchieved: data.lockInStageAchieved,
           transaction: {
             fundTransaction: {
               type: "WITHDRAWAL",
@@ -771,65 +765,71 @@ const Investments: React.FC = () => {
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30 z-50">
           <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
             <h3 className="text-lg font-semibold mb-4">Confirm Withdrawal</h3>
-            <div className="space-y-4">
-              <div>
-                <p className="text-sm text-gray-600">Investment Plan</p>
-                <p className="font-medium">
-                  {investmentPlans.find(p => p.id === myInvestments.find(inv => inv.id === withdrawalDetails.id)?.investmentPlanId)?.name || "—"}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Invested Amount</p>
-                <p className="font-medium">
-                  ₹{myInvestments.find(inv => inv.id === withdrawalDetails.id)?.investedAmount.toLocaleString() || "—"}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Current Value</p>
-                <p className="font-medium">
-                  ₹{withdrawalDetails.netAmountPaid.toLocaleString()}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Pre-exit %</p>
-                <p className="font-medium">{withdrawalDetails.preExit}%</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Net Amount Paid</p>
-                <p className="font-medium">
-                  ₹{withdrawalDetails.netAmountPaid.toLocaleString()}
-                </p>
-              </div>
-              {balance < withdrawalDetails.netAmountPaid ? (
-                <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
-                  <div className="flex items-center gap-2 text-yellow-700 mb-2">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                    </svg>
-                    <span className="font-medium">Insufficient Balance</span>
+
+            <div className="mb-4 space-y-3">
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <h4 className="font-medium mb-2">Withdrawal Details</h4>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Lock-in Stage:</span>
+                    <span className="font-medium">
+                      Stage {withdrawalDetails.lockInStageAchieved}
+                    </span>
                   </div>
-                  <p className="text-sm text-yellow-600 mb-3">
-                    Your current balance (₹{balance.toLocaleString()}) is insufficient for this withdrawal of ₹{withdrawalDetails.netAmountPaid.toLocaleString()}.
-                  </p>
-                  <button
-                    onClick={() => {
-                      setShowWithdrawConfirm(null);
-                      setWithdrawalDetails(null);
-                    }}
-                    className="w-full py-2 px-4 bg-gray-100 text-gray-600 rounded hover:bg-gray-200 transition-colors"
-                  >
-                    Cancel
-                  </button>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Pre-exit Percentage:</span>
+                    <span className="font-medium text-red-500">
+                      {withdrawalDetails.expensePercentageApplied}%
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Pre-exit Amount:</span>
+                    <span className="font-medium text-red-500">
+                      ₹{withdrawalDetails.expenseAmountDeducted.toLocaleString()}
+                    </span>
+                  </div>
+                  <div className="border-t pt-2 mt-2">
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Net Amount to Receive:</span>
+                      <span className="font-medium text-green-600">
+                        ₹{withdrawalDetails.netAmountPaid.toLocaleString()}
+                      </span>
+                    </div>
+                  </div>
                 </div>
-              ) : (
-                <p className="text-sm text-gray-600">
-                  Are you sure you want to proceed with the withdrawal? The
-                  pre-exit % will be deducted from your total value.
-                </p>
-              )}
+              </div>
+
+              <div className="bg-blue-50 p-4 rounded-lg">
+                <h4 className="font-medium mb-2 text-blue-700">Transaction Details</h4>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Transaction Type:</span>
+                    <span className="font-medium">
+                      {withdrawalDetails.transaction.fundTransaction.type}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Payment Method:</span>
+                    <span className="font-medium">
+                      {withdrawalDetails.transaction.fundTransaction.method}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Status:</span>
+                    <span className="font-medium text-yellow-600">
+                      {withdrawalDetails.transaction.fundTransaction.status}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <p className="text-sm text-gray-600">
+                Are you sure you want to proceed with the withdrawal? The
+                pre-exit % will be deducted from your total value.
+              </p>
             </div>
 
-            <div className="mt-6 flex justify-end space-x-3">
+            <div className="flex justify-end space-x-4">
               <button
                 className="px-4 py-2 text-gray-600 hover:text-gray-800"
                 onClick={() => {
@@ -839,14 +839,12 @@ const Investments: React.FC = () => {
               >
                 Cancel
               </button>
-              {balance >= withdrawalDetails.netAmountPaid && (
-                <button
-                  className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-                  onClick={() => handleWithdrawInvestment(showWithdrawConfirm)}
-                >
-                  Confirm Withdrawal
-                </button>
-              )}
+              <button
+                className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                onClick={() => handleWithdrawInvestment(showWithdrawConfirm)}
+              >
+                Confirm Withdrawal
+              </button>
             </div>
           </div>
         </div>
