@@ -228,7 +228,12 @@ const Topbar: React.FC = () => {
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-600">Available Balance</label>
-                      <p className="mt-1 text-gray-900">₹{userData.availableBalance.toLocaleString('en-IN')}</p>
+                      <p className="mt-1 text-gray-900">
+                        ₹{(userData.availableBalance || 0).toLocaleString('en-IN', {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2
+                        })}
+                      </p>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-600">Member Since</label>
