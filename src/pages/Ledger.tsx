@@ -9,9 +9,60 @@ interface LedgerEntry {
   debitAmount: number | null;
   creditAmount: number | null;
   balance: number | null;
+  details?: any;
 }
 
-
+// Function to generate narration based on transaction type and details
+const generateNarration = (entry: LedgerEntry): string => {
+  const { voucherType, details } = entry;
+  
+  switch (voucherType) {
+    case 'FUND_ADD':
+      return `Funds added via ${details?.paymentMethod || 'UPI/IMPS/NEFT'}`;
+    
+    case 'FUND_WITHDRAW':
+      return `Funds withdrawn to ${details?.accountNumber || 'XXXXX1234'}`;
+    
+    case 'DP_CHARGE':
+      return `DP charges for settlement`;
+    
+    case 'STT_DELIVERY':
+      return `STT - Equity delivery`;
+    
+    case 'BROKERAGE':
+      return `Brokerage charges for ${details?.segment || 'equity intraday'}`;
+    
+    case 'DIVIDEND':
+      return `Dividend received for ${details?.symbol || 'TCS'}`;
+    
+    case 'INVESTMENT':
+      return `Investment in ${details?.planName || 'Investment Plan'}`;
+    
+    case 'REDEMPTION':
+      return `Redemption from ${details?.planName || 'Investment Plan'}`;
+    
+    case 'INTEREST':
+      return `Interest earned on ${details?.planName || 'Investment'}`;
+    
+    case 'TAX_DEDUCTION':
+      return `Tax deduction (${details?.taxType || 'TDS'})`;
+    
+    case 'REFUND':
+      return `Refund processed for ${details?.reason || 'previous transaction'}`;
+    
+    case 'ADJUSTMENT':
+      return `Adjustment for ${details?.reason || 'account reconciliation'}`;
+    
+    case 'MAINTENANCE':
+      return `Account maintenance charges`;
+    
+    case 'PENALTY':
+      return `Penalty charges for ${details?.reason || 'late payment'}`;
+    
+    default:
+      return entry.Narration || `Transaction of type ${voucherType}`;
+  }
+};
 
 const Ledger: React.FC = () => {
   const [dateRange, setDateRange] = useState<'all' | 'custom'>('all');
@@ -145,7 +196,7 @@ const Ledger: React.FC = () => {
                 >
                   <td className="py-2 px-3">{new Date(entry.createdAt).toLocaleString()}</td>
                   <td className="py-2 px-3">{entry.voucherType}</td>
-                  <td className="py-2 px-3">{entry.Narration || '-'}</td>
+                  <td className="py-2 px-3">{generateNarration(entry)}</td>
                   <td className="py-2 px-3 text-blue-600">
                     {entry.debitAmount ? `₹${entry.debitAmount.toLocaleString()}` : '-'}
                   </td>
@@ -163,6 +214,6 @@ const Ledger: React.FC = () => {
       </div>
     </div>
   );
-}
+};
 
 export default Ledger;
