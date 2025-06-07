@@ -1,8 +1,23 @@
 import React, { useState } from 'react';
-import { ChevronDown, User, Settings, LogOut, Bell, HelpCircle } from 'lucide-react';
+import { ChevronDown, User, LogOut, Bell, HelpCircle } from 'lucide-react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const Topbar: React.FC = () => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    try {
+      await axios.get(`${import.meta.env.VITE_API_URL}/api/v1/investor/logout`, {
+        withCredentials: true
+      });
+      // After successful logout, redirect to login page
+      navigate('/login');
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  };
 
   return (
     <div className="bg-white shadow-md h-16 flex items-center justify-between px-6 relative">
@@ -39,15 +54,12 @@ const Topbar: React.FC = () => {
                 <p className="text-sm font-medium text-gray-800">user@example.com</p>
               </div>
               <a href="#" className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                <Settings className="mr-3 h-4 w-4 text-gray-500" />
-                Settings
-              </a>
-              <a href="#" className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                 <HelpCircle className="mr-3 h-4 w-4 text-gray-500" />
                 Help
               </a>
               <div className="border-t border-gray-100"></div>
               <button 
+                onClick={handleLogout}
                 className="w-full flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
               >
                 <LogOut className="mr-3 h-4 w-4 text-gray-500" />
