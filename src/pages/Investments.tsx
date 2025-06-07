@@ -83,7 +83,6 @@ const Investments: React.FC = () => {
   const [filterType, setFilterType] = useState<"ALL" | "SIP" | "LUMPSUM">(
     "ALL"
   );
-  const [withdrawLoading, setWithdrawLoading] = useState<string | null>(null);
   const [withdrawMessage, setWithdrawMessage] = useState<{
     id: string;
     message: string;
@@ -274,32 +273,41 @@ const Investments: React.FC = () => {
     }
   };
 
-  const fetchWithdrawalDetails = async (investmentId: string) => {
-    setWithdrawLoading(investmentId);
+  const handleWithdrawInvestment = async (investmentId: string) => {
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/api/v1/investor/getWithdrawalDetails/${investmentId}`,
-        { withCredentials: true }
+        `${import.meta.env.VITE_API_URL}/api/investments/${investmentId}/withdraw`
       );
+
       if (response.status === 200) {
-        const data = response.data;
+        const data = response.data.withdrawalDetails;
+
         const investment = myInvestments.find((inv) => inv.id === investmentId);
         const plan = investmentPlans.find(
           (p) => p.id === investment?.investmentPlanId
         );
+
         if (!investment || !plan) {
-          throw new Error("Investment or plan not found");
+          console.error("Investment or plan not found");
+          return;
         }
 
+        // Calculate total gain
         const totalGain = new BigNumber(investment.investedAmount)
           .multipliedBy(plan.roiAAR)
           .dividedBy(100);
-        const exitExpense = totalGain.multipliedBy(data.expensePercentageApplied).dividedBy(100);
-        const NetPayout = totalGain.minus(exitExpense);
+
+        // Calculate exit expense
+        const exitExpense = totalGain
+          .multipliedBy(data.expensePercentageApplied)
+          .dividedBy(100);
+
+        // Calculate net payout
+        const netPayout = totalGain.minus(exitExpense);
 
         setWithdrawalDetails({
           id: investmentId,
-          netAmountPaid: NetPayout.toNumber(),
+          netAmountPaid: netPayout.toNumber(),
           expensePercentageApplied: data.expensePercentageApplied,
           expenseAmountDeducted: exitExpense.toNumber(),
           lockInStageAchieved: data.lockInStageAchieved,
@@ -307,63 +315,16 @@ const Investments: React.FC = () => {
             fundTransaction: {
               type: "WITHDRAWAL",
               method: "BANK_TRANSFER",
-              status: "PENDING"
-            }
-          }
+              status: "PENDING",
+            },
+          },
         });
+
         setShowWithdrawConfirm(investmentId);
       }
     } catch (error) {
       console.error("Error fetching withdrawal details:", error);
-      setWithdrawMessage({
-        id: investmentId,
-        message: "Failed to fetch withdrawal details",
-      });
-    } finally {
-      setWithdrawLoading(null);
-    }
-  };
-
-  const handleWithdrawInvestment = async (investmentId: string) => {
-    console.log("Handling withdrawal for investment:", investmentId);
-    setWithdrawLoading(investmentId);
-    setWithdrawMessage(null);
-
-    try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/v1/investor/withdrawPreMaturity`,
-        { investmentPlanId: investmentId },
-        { withCredentials: true }
-      );
-
-      console.log("Withdrawal response:", response.data);
-
-      if (response.data.message) {
-        setWithdrawMessage({
-          id: investmentId,
-          message: response.data.message,
-        });
-        // Refresh investments list
-        const updatedInvestments = await axios.get(
-          `${import.meta.env.VITE_API_URL}/api/v1/investor/getInvestments`,
-          {
-            withCredentials: true,
-          }
-        );
-        console.log("Updated investments:", updatedInvestments.data);
-        setMyInvestments(updatedInvestments.data.investments);
-      }
-    } catch (error: any) {
-      console.error("Withdrawal error:", error.response?.data || error);
-      setWithdrawMessage({
-        id: investmentId,
-        message:
-          error.response?.data?.message || "Failed to withdraw investment",
-      });
-    } finally {
-      setWithdrawLoading(null);
-      setShowWithdrawConfirm(null);
-      setWithdrawalDetails(null);
+      console.error("Failed to fetch withdrawal details");
     }
   };
 
@@ -478,7 +439,7 @@ const Investments: React.FC = () => {
                     className="text-lg font-semibold mb-2"
                     style={{ color: "#08AFF1" }}
                   >
-                    {plan.name}
+                    {plan.type}
                   </h3>
                   <div className="space-y-2 text-sm">
                     <p>
@@ -520,7 +481,7 @@ const Investments: React.FC = () => {
                         className="text-lg font-semibold mb-2"
                         style={{ color: "#08AFF1" }}
                       >
-                        {plan.name}
+                        {plan.type}
                       </h3>
                       <div className="space-y-2 text-sm mb-4">
                         <p>
@@ -681,7 +642,7 @@ const Investments: React.FC = () => {
                 <tr key={item.id} className="border-b hover:bg-gray-50">
                   <td className="py-2 px-3 text-center">{index + 1}</td>
                   <td className="py-2 px-3 text-left">
-                    {item.investmentPlan?.type || "—"}
+                    {item.investmentPlan?.type} ({item.investmentPlan?.investmentTerm} yr, {item.investmentPlan?.roiAAR}%)
                   </td>
                   <td className="py-2 px-3 text-right">
                     {item.investedAmount
@@ -712,14 +673,14 @@ const Investments: React.FC = () => {
                   <td className="py-2 px-3">
                     <button
                       className={`px-4 py-2 rounded text-white ${
-                        withdrawLoading === item.id
+                        withdrawMessage?.id === item.id
                           ? "bg-gray-400"
                           : "bg-red-500 hover:bg-red-600"
                       }`}
-                      disabled={withdrawLoading === item.id}
-                      onClick={() => fetchWithdrawalDetails(item.id)}
+                      disabled={withdrawMessage?.id === item.id}
+                      onClick={() => handleWithdrawInvestment(item.id)}
                     >
-                      {withdrawLoading === item.id
+                      {withdrawMessage?.id === item.id
                         ? "Processing..."
                         : "Withdraw"}
                     </button>
