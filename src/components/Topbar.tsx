@@ -5,7 +5,6 @@ import { useNavigate } from 'react-router-dom';
 
 const Topbar: React.FC = () => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const navigate = useNavigate();
 
   const handleLogout = async () => {
     try {
