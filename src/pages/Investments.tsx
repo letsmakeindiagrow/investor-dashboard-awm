@@ -1,33 +1,27 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { differenceInDays } from "date-fns";
-import Decimal from "decimal.js";
+import BigNumber from "bignumber.js";
 
 interface InvestmentPlan {
   id: string;
   name: string;
+  type: "SIP" | "LUMPSUM";
   minInvestment: number;
   expectedReturn: string;
-  investmentTerm: string;
-  type: string;
-  status: string;
-  roiAAR: number;
+  investmentTerm: number;
+  roiAAR: string;
+  status: "ACTIVE" | "INACTIVE";
 }
 
 interface Investment {
   id: string;
+  investmentPlanId: string;
   investedAmount: number;
   investmentDate: string;
   maturityDate: string;
   withdrawalFrequency: string;
-  status: string;
-  investmentPlanId: string;
-  investmentPlan: {
-    investmentTerm: number;
-    roiAAR: string;
-    type: string;
-  };
+  investmentPlan?: InvestmentPlan;
 }
 
 interface SubscribeInvestmentRequest {
@@ -48,10 +42,14 @@ interface SubscribeInvestmentResponse {
 // }
 
 interface WithdrawalDetails {
+  id: string;
+  investmentPlan: {
+    name: string;
+  };
+  investedAmount: number;
+  currentValue: number;
+  preExit: number;
   netAmountPaid: number;
-  expensePercentageApplied: number;
-  expenseAmountDeducted: number;
-  lockInStageAchieved: number;
   transaction: {
     fundTransaction: {
       type: string;
@@ -271,79 +269,55 @@ const Investments: React.FC = () => {
   };
 
   const fetchWithdrawalDetails = async (investmentId: string) => {
+    setWithdrawLoading(investmentId);
     try {
-      console.log("Starting withdrawal details fetch for ID:", investmentId);
-      console.log("Current investments:", myInvestments);
-
-      const investment = myInvestments.find((inv) => inv.id === investmentId);
-      if (!investment) {
-        console.error("Investment not found for ID:", investmentId);
-        throw new Error("Investment not found");
-      }
-
-      const plan = investmentPlans.find(
-        (p) => p.id === investment.investmentPlanId
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/api/v1/investor/getWithdrawalDetails/${investmentId}`,
+        { withCredentials: true }
       );
-      if (!plan) {
-        console.error("Plan not found for investment:", investment);
-        throw new Error("Investment plan not found");
-      }
+      if (response.status === 200) {
+        const data = response.data;
+        const investment = myInvestments.find((inv) => inv.id === investmentId);
+        const plan = investmentPlans.find(
+          (p) => p.id === investment?.investmentPlanId
+        );
+        if (!investment || !plan) {
+          throw new Error("Investment or plan not found");
+        }
 
-      const T_elaspsed = differenceInDays(
-        new Date(),
-        new Date(investment.investmentDate)
-      );
-      const T_lockIn = Number(plan.investmentTerm) * 365;
-      const P_completed = (T_elaspsed / T_lockIn) * 100;
+        const totalGain = new BigNumber(investment.investedAmount)
+          .multipliedBy(plan.roiAAR)
+          .dividedBy(100);
+        const exitExpense = totalGain.multipliedBy(data.expensePercentageApplied).dividedBy(100);
+        const NetPayout = totalGain.minus(exitExpense);
 
-      let lockInStage = 0;
-      let expensePercentageApplied = 0;
-      if (0 < P_completed && P_completed <= 25) {
-        lockInStage = 1;
-        expensePercentageApplied = 5;
-      } else if (25 < P_completed && P_completed <= 50) {
-        lockInStage = 2;
-        expensePercentageApplied = 3.5;
-      } else if (50 < P_completed && P_completed <= 75) {
-        lockInStage = 3;
-        expensePercentageApplied = 2.5;
-      } else if (75 < P_completed && P_completed <= 100) {
-        lockInStage = 4;
-        expensePercentageApplied = 0;
-      }
-
-      const principalAsDecimal = new Decimal(investment.investedAmount);
-      const roiRate = new Decimal(plan.roiAAR);
-
-      const gainComponent = principalAsDecimal
-        .times(roiRate.div(100))
-        .times(new Decimal(T_elaspsed).div(365));
-
-      const totalGain = principalAsDecimal.plus(gainComponent);
-      const exitExpense = totalGain.times(expensePercentageApplied).div(100);
-      const NetPayout = totalGain.minus(exitExpense);
-
-      setWithdrawalDetails({
-        netAmountPaid: NetPayout.toNumber(),
-        expensePercentageApplied,
-        expenseAmountDeducted: exitExpense.toNumber(),
-        lockInStageAchieved: lockInStage,
-        transaction: {
-          fundTransaction: {
-            type: "Pre-Maturity Exit",
-            method: "NEFT",
-            status: "Processing",
+        setWithdrawalDetails({
+          id: investmentId,
+          investmentPlan: {
+            name: plan.name,
           },
-        },
-      });
-
-      setShowWithdrawConfirm(investmentId);
-    } catch (error: any) {
-      console.error("Error in fetchWithdrawalDetails:", error);
+          investedAmount: investment.investedAmount,
+          currentValue: totalGain.toNumber(),
+          preExit: data.expensePercentageApplied,
+          netAmountPaid: NetPayout.toNumber(),
+          transaction: {
+            fundTransaction: {
+              type: "WITHDRAWAL",
+              method: "BANK_TRANSFER",
+              status: "PENDING"
+            }
+          }
+        });
+        setShowWithdrawConfirm(investmentId);
+      }
+    } catch (error) {
+      console.error("Error fetching withdrawal details:", error);
       setWithdrawMessage({
         id: investmentId,
-        message: error.message || "Failed to calculate withdrawal details",
+        message: "Failed to fetch withdrawal details",
       });
+    } finally {
+      setWithdrawLoading(null);
     }
   };
 
@@ -516,7 +490,7 @@ const Investments: React.FC = () => {
                         {plan.expectedReturn}
                       </span>
                     </p>
-                    <p>Investment Period: {plan.investmentTerm}</p>
+                    <p>Investment Period: {plan.investmentTerm} yr</p>
                   </div>
                 </div>
               ))}
@@ -558,7 +532,7 @@ const Investments: React.FC = () => {
                             {plan.expectedReturn}
                           </span>
                         </p>
-                        <p>Investment Period: {plan.investmentTerm}</p>
+                        <p>Investment Period: {plan.investmentTerm} yr</p>
                       </div>
                       <div className="mt-4 space-y-3">
                         <div>
@@ -792,19 +766,19 @@ const Investments: React.FC = () => {
               <div>
                 <p className="text-sm text-gray-600">Investment Plan</p>
                 <p className="font-medium">
-                  {withdrawalDetails.investmentPlan?.name}
+                  {investmentPlans.find(p => p.id === myInvestments.find(inv => inv.id === withdrawalDetails.id)?.investmentPlanId)?.name || "—"}
                 </p>
               </div>
               <div>
                 <p className="text-sm text-gray-600">Invested Amount</p>
                 <p className="font-medium">
-                  ₹{withdrawalDetails.investedAmount.toLocaleString()}
+                  ₹{myInvestments.find(inv => inv.id === withdrawalDetails.id)?.investedAmount.toLocaleString() || "—"}
                 </p>
               </div>
               <div>
                 <p className="text-sm text-gray-600">Current Value</p>
                 <p className="font-medium">
-                  ₹{withdrawalDetails.currentValue.toLocaleString()}
+                  ₹{withdrawalDetails.netAmountPaid.toLocaleString()}
                 </p>
               </div>
               <div>
