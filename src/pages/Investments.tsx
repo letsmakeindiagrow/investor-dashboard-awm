@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import BigNumber from "bignumber.js";
-import { toast } from "react-hot-toast";
 
 interface InvestmentPlan {
   id: string;
@@ -290,7 +289,7 @@ const Investments: React.FC = () => {
         );
 
         if (!investment || !plan) {
-          toast.error("Investment or plan not found");
+          console.error("Investment or plan not found");
           return;
         }
 
@@ -326,7 +325,7 @@ const Investments: React.FC = () => {
       }
     } catch (error) {
       console.error("Error fetching withdrawal details:", error);
-      toast.error("Failed to fetch withdrawal details");
+      console.error("Failed to fetch withdrawal details");
     }
   };
 
