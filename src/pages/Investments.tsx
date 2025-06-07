@@ -615,7 +615,8 @@ const Investments: React.FC = () => {
                             plan.type === "SIP" ||
                             !investmentAmount ||
                             Number(investmentAmount) < plan.minInvestment ||
-                            subscribeLoading
+                            subscribeLoading ||
+                            Number(investmentAmount) > balance
                           }
                           onClick={handleLumpsumSubmit}
                         >
@@ -625,7 +626,34 @@ const Investments: React.FC = () => {
                             ? "Processing..."
                             : "Invest Now"}
                         </button>
-                        {subscribeError && selectedPlan === plan.id && (
+                        {/* Enhanced insufficient balance warning and Add Funds button */}
+                        {Number(investmentAmount) > balance && (
+                          <div className="mt-3 bg-yellow-50 border border-yellow-200 rounded p-3 flex flex-col items-center">
+                            <div className="flex items-center gap-2 text-yellow-700 mb-2">
+                              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                              </svg>
+                              <span className="font-medium">Insufficient Balance</span>
+                            </div>
+                            <p className="text-sm text-yellow-600 mb-2 text-center">
+                              Your current balance (₹{balance.toLocaleString()}) is insufficient for this investment amount (₹{Number(investmentAmount).toLocaleString()}).
+                            </p>
+                            <button
+                              onClick={() => {
+                                setSelectedPlan(null);
+                                navigate('/funds/add');
+                              }}
+                              className="w-full py-2 px-4 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition-colors flex items-center justify-center gap-2"
+                            >
+                              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                              </svg>
+                              Add Funds
+                            </button>
+                          </div>
+                        )}
+                        {/* End enhanced warning */}
+                        {subscribeError && selectedPlan === plan.id && Number(investmentAmount) <= balance && (
                           <div className="text-red-500 mt-2">
                             {subscribeError}
                           </div>
@@ -704,7 +732,7 @@ const Investments: React.FC = () => {
                       ? new Date(item.maturityDate).toLocaleDateString()
                       : "—"}
                   </td>
-                  <td className="py-2 px-3 text-center">
+                  <td className="py-2 px-3">
                     <button
                       className={`px-4 py-2 rounded text-white ${
                         withdrawLoading === item.id
@@ -760,69 +788,35 @@ const Investments: React.FC = () => {
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30 z-50">
           <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
             <h3 className="text-lg font-semibold mb-4">Confirm Withdrawal</h3>
-
-            <div className="mb-4 space-y-3">
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <h4 className="font-medium mb-2">Withdrawal Details</h4>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Lock-in Stage:</span>
-                    <span className="font-medium">
-                      Stage {withdrawalDetails.lockInStageAchieved}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Pre-exit Percentage:</span>
-                    <span className="font-medium text-red-500">
-                      {withdrawalDetails.expensePercentageApplied}%
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Pre-exit Amount:</span>
-                    <span className="font-medium text-red-500">
-                      ₹
-                      {withdrawalDetails.expenseAmountDeducted.toLocaleString()}
-                    </span>
-                  </div>
-                  <div className="border-t pt-2 mt-2">
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">
-                        Net Amount to Receive:
-                      </span>
-                      <span className="font-medium text-green-600">
-                        ₹{withdrawalDetails.netAmountPaid.toLocaleString()}
-                      </span>
-                    </div>
-                  </div>
-                </div>
+            <div className="space-y-4">
+              <div>
+                <p className="text-sm text-gray-600">Investment Plan</p>
+                <p className="font-medium">
+                  {withdrawalDetails.investmentPlan?.name}
+                </p>
               </div>
-
-              <div className="bg-blue-50 p-4 rounded-lg">
-                <h4 className="font-medium mb-2 text-blue-700">
-                  Transaction Details
-                </h4>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Transaction Type:</span>
-                    <span className="font-medium">
-                      {withdrawalDetails.transaction.fundTransaction.type}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Payment Method:</span>
-                    <span className="font-medium">
-                      {withdrawalDetails.transaction.fundTransaction.method}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Status:</span>
-                    <span className="font-medium text-yellow-600">
-                      {withdrawalDetails.transaction.fundTransaction.status}
-                    </span>
-                  </div>
-                </div>
+              <div>
+                <p className="text-sm text-gray-600">Invested Amount</p>
+                <p className="font-medium">
+                  ₹{withdrawalDetails.investedAmount.toLocaleString()}
+                </p>
               </div>
-
+              <div>
+                <p className="text-sm text-gray-600">Current Value</p>
+                <p className="font-medium">
+                  ₹{withdrawalDetails.currentValue.toLocaleString()}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-600">Pre-exit %</p>
+                <p className="font-medium">{withdrawalDetails.preExit}%</p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-600">Net Amount Paid</p>
+                <p className="font-medium">
+                  ₹{withdrawalDetails.netAmountPaid.toLocaleString()}
+                </p>
+              </div>
               {balance < withdrawalDetails.netAmountPaid ? (
                 <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
                   <div className="flex items-center gap-2 text-yellow-700 mb-2">
@@ -834,30 +828,15 @@ const Investments: React.FC = () => {
                   <p className="text-sm text-yellow-600 mb-3">
                     Your current balance (₹{balance.toLocaleString()}) is insufficient for this withdrawal of ₹{withdrawalDetails.netAmountPaid.toLocaleString()}.
                   </p>
-                  <div className="flex flex-col gap-2">
-                    <button
-                      onClick={() => {
-                        setShowWithdrawConfirm(null);
-                        setWithdrawalDetails(null);
-                        navigate('/funds/add');
-                      }}
-                      className="w-full py-2 px-4 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition-colors flex items-center justify-center gap-2"
-                    >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                      </svg>
-                      Add Funds
-                    </button>
-                    <button
-                      onClick={() => {
-                        setShowWithdrawConfirm(null);
-                        setWithdrawalDetails(null);
-                      }}
-                      className="w-full py-2 px-4 bg-gray-100 text-gray-600 rounded hover:bg-gray-200 transition-colors"
-                    >
-                      Cancel
-                    </button>
-                  </div>
+                  <button
+                    onClick={() => {
+                      setShowWithdrawConfirm(null);
+                      setWithdrawalDetails(null);
+                    }}
+                    className="w-full py-2 px-4 bg-gray-100 text-gray-600 rounded hover:bg-gray-200 transition-colors"
+                  >
+                    Cancel
+                  </button>
                 </div>
               ) : (
                 <p className="text-sm text-gray-600">
@@ -867,7 +846,7 @@ const Investments: React.FC = () => {
               )}
             </div>
 
-            <div className="flex justify-end space-x-4">
+            <div className="mt-6 flex justify-end space-x-3">
               <button
                 className="px-4 py-2 text-gray-600 hover:text-gray-800"
                 onClick={() => {
