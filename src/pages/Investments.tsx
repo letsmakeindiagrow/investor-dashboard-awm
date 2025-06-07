@@ -16,12 +16,21 @@ interface InvestmentPlan {
 
 interface Investment {
   id: string;
-  investmentPlanId: string;
   investedAmount: number;
   investmentDate: string;
   maturityDate: string;
+  totalMaturedValue: number | null;
   withdrawalFrequency: string;
-  investmentPlan?: InvestmentPlan;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+  userId: string;
+  investmentPlanId: string;
+  investmentPlan: {
+    investmentTerm: number;
+    roiAAR: string;
+    type: string;
+  };
 }
 
 interface SubscribeInvestmentRequest {
