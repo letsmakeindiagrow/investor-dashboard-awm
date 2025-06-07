@@ -276,7 +276,7 @@ const Investments: React.FC = () => {
   const handleWithdrawInvestment = async (investmentId: string) => {
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/api/investments/${investmentId}`
+        `${import.meta.env.VITE_API_URL}/api/getWithdrawalDetails/${investmentId}`
       );
 
       if (response.status === 200) {
