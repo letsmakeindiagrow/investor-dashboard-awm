@@ -1,10 +1,21 @@
 import React, { useState } from 'react';
-import { ChevronDown, User, LogOut, Bell, HelpCircle } from 'lucide-react';
+import { ChevronDown, User, LogOut, Bell, HelpCircle, X } from 'lucide-react';
 import axios from 'axios';
-
 
 const Topbar: React.FC = () => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+
+  // Static user data (to be replaced with API data later)
+  const userData = {
+    name: "John Doe",
+    email: "user@example.com",
+    phone: "+91 9876543210",
+    address: "123 Main Street, City, State - 123456",
+    accountType: "Individual",
+    kycStatus: "Verified",
+    joinDate: "01/01/2024"
+  };
 
   const handleLogout = async () => {
     try {
@@ -54,6 +65,10 @@ const Topbar: React.FC = () => {
               </div>
               <button 
                 className="w-full flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                onClick={() => {
+                  setIsProfileModalOpen(true);
+                  setIsProfileOpen(false);
+                }}
               >
                 <User className="mr-3 h-4 w-4 text-gray-500" />
                 Profile
@@ -79,6 +94,67 @@ const Topbar: React.FC = () => {
           )}
         </div>
       </div>
+
+      {/* Profile Modal */}
+      {isProfileModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg w-full max-w-2xl mx-4">
+            <div className="flex justify-between items-center p-6 border-b">
+              <h2 className="text-xl font-semibold text-gray-800">Profile Information</h2>
+              <button 
+                onClick={() => setIsProfileModalOpen(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <X className="h-6 w-6" />
+              </button>
+            </div>
+            <div className="p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600">Full Name</label>
+                    <p className="mt-1 text-gray-900">{userData.name}</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600">Email</label>
+                    <p className="mt-1 text-gray-900">{userData.email}</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600">Phone</label>
+                    <p className="mt-1 text-gray-900">{userData.phone}</p>
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600">Address</label>
+                    <p className="mt-1 text-gray-900">{userData.address}</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600">Account Type</label>
+                    <p className="mt-1 text-gray-900">{userData.accountType}</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600">KYC Status</label>
+                    <p className="mt-1 text-gray-900">{userData.kycStatus}</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600">Member Since</label>
+                    <p className="mt-1 text-gray-900">{userData.joinDate}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="p-6 border-t flex justify-end">
+              <button
+                onClick={() => setIsProfileModalOpen(false)}
+                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
