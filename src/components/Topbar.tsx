@@ -52,7 +52,18 @@ const Topbar: React.FC = () => {
               <div className="px-4 py-2 border-b border-gray-100">
                 <p className="text-sm font-medium text-gray-800">user@example.com</p>
               </div>
-              <a href="#" className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+              <button 
+                className="w-full flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              >
+                <User className="mr-3 h-4 w-4 text-gray-500" />
+                Profile
+              </button>
+              <a 
+                href="https://www.aadyanviwealth.com/contact" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              >
                 <HelpCircle className="mr-3 h-4 w-4 text-gray-500" />
                 Help
               </a>
