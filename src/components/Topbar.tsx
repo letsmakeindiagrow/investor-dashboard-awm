@@ -3,27 +3,23 @@ import { ChevronDown, User, LogOut, Bell, HelpCircle, X, Mail, Phone, MapPin, Ca
 import axios from 'axios';
 
 interface UserData {
-  firstName: string;
-  lastName: string;
-  email: string;
-  emailVerified: boolean;
+  id: string;
+  referralCode: string;
   mobileNumber: string;
   mobileVerified: boolean;
+  email: string;
+  emailVerified: boolean;
+  firstName: string;
+  lastName: string;
   dateOfBirth: string;
   createdAt: string;
-  availableBalance: number;
+  updatedAt: string;
   verificationState: string;
-  address?: {
-    street: string;
-    city: string;
-    state: string;
-    pincode: string;
-  };
-  bankDetails?: {
-    accountNumber: string;
-    bankName: string;
-    ifscCode: string;
-  };
+  availableBalance: string;
+}
+
+interface ApiResponse {
+  user: UserData;
 }
 
 const Topbar: React.FC = () => {
@@ -35,10 +31,10 @@ const Topbar: React.FC = () => {
   const fetchUserData = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/v1/investor/getUserInfo`, {
+      const response = await axios.get<ApiResponse>(`${import.meta.env.VITE_API_URL}/api/v1/investor/userInfo`, {
         withCredentials: true,
       });
-      setUserData(response.data);
+      setUserData(response.data.user);
     } catch (error) {
       console.error('Failed to fetch user data:', error);
     } finally {
@@ -68,6 +64,14 @@ const Topbar: React.FC = () => {
       year: 'numeric',
       month: 'long',
       day: 'numeric'
+    });
+  };
+
+  const formatBalance = (balance: string) => {
+    const numBalance = parseFloat(balance);
+    return numBalance.toLocaleString('en-IN', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
     });
   };
 
@@ -191,34 +195,12 @@ const Topbar: React.FC = () => {
                         <p className="text-gray-900">{formatDate(userData.dateOfBirth)}</p>
                       </div>
                     </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-600">Referral Code</label>
+                      <p className="mt-1 text-gray-900">{userData.referralCode}</p>
+                    </div>
                   </div>
                   <div className="space-y-4">
-                    {userData.address && (
-                      <div>
-                        <label className="block text-sm font-medium text-gray-600">Address</label>
-                        <div className="mt-1 flex items-start">
-                          <MapPin className="h-4 w-4 text-gray-500 mr-2 mt-1" />
-                          <p className="text-gray-900">
-                            {userData.address.street}<br />
-                            {userData.address.city}, {userData.address.state}<br />
-                            {userData.address.pincode}
-                          </p>
-                        </div>
-                      </div>
-                    )}
-                    {userData.bankDetails && (
-                      <div>
-                        <label className="block text-sm font-medium text-gray-600">Bank Details</label>
-                        <div className="mt-1 flex items-start">
-                          <CreditCard className="h-4 w-4 text-gray-500 mr-2 mt-1" />
-                          <div>
-                            <p className="text-gray-900">{userData.bankDetails.bankName}</p>
-                            <p className="text-gray-900">A/C: {userData.bankDetails.accountNumber}</p>
-                            <p className="text-gray-900">IFSC: {userData.bankDetails.ifscCode}</p>
-                          </div>
-                        </div>
-                      </div>
-                    )}
                     <div>
                       <label className="block text-sm font-medium text-gray-600">Account Status</label>
                       <div className="mt-1 flex items-center">
@@ -228,16 +210,15 @@ const Topbar: React.FC = () => {
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-600">Available Balance</label>
-                      <p className="mt-1 text-gray-900">
-                        ₹{(userData.availableBalance || 0).toLocaleString('en-IN', {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2
-                        })}
-                      </p>
+                      <p className="mt-1 text-gray-900">₹{formatBalance(userData.availableBalance)}</p>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-600">Member Since</label>
                       <p className="mt-1 text-gray-900">{formatDate(userData.createdAt)}</p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-600">Last Updated</label>
+                      <p className="mt-1 text-gray-900">{formatDate(userData.updatedAt)}</p>
                     </div>
                   </div>
                 </div>
