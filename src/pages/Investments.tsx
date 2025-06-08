@@ -80,9 +80,9 @@ const Investments: React.FC = () => {
   const [subscribeLoading, setSubscribeLoading] = useState(false);
   const [subscribeError, setSubscribeError] = useState<string | null>(null);
   const [subscribeSuccess, setSubscribeSuccess] = useState<string | null>(null);
-  const [filterType, setFilterType] = useState<"ALL" | "SIP" | "LUMPSUM">(
-    "ALL"
-  );
+  const [filterType, setFilterType] = useState<"ALL" | "SIP" | "LUMPSUM">("ALL");
+  const [sortBy, setSortBy] = useState<"name" | "return" | "minInvestment">("name");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [withdrawMessage, setWithdrawMessage] = useState<{
     id: string;
     message: string;
@@ -373,6 +373,24 @@ const Investments: React.FC = () => {
     }
   };
 
+  const sortInvestmentPlans = (plans: InvestmentPlan[]) => {
+    return [...plans].sort((a, b) => {
+      if (sortBy === "name") {
+        return sortOrder === "asc" 
+          ? a.name.localeCompare(b.name)
+          : b.name.localeCompare(a.name);
+      } else if (sortBy === "return") {
+        return sortOrder === "asc"
+          ? parseFloat(a.roiAAR) - parseFloat(b.roiAAR)
+          : parseFloat(b.roiAAR) - parseFloat(a.roiAAR);
+      } else {
+        return sortOrder === "asc"
+          ? a.minInvestment - b.minInvestment
+          : b.minInvestment - a.minInvestment;
+      }
+    });
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">Loading...</div>
@@ -426,7 +444,7 @@ const Investments: React.FC = () => {
           </h2>
 
           {/* Filter Tabs */}
-          <div className="flex space-x-4 mb-6">
+          <div className="flex space-x-4 mb-4">
             <button
               className={`px-4 py-2 rounded-full ${
                 filterType === "ALL"
@@ -459,61 +477,117 @@ const Investments: React.FC = () => {
             </button>
           </div>
 
+          {/* Sort Buttons */}
+          <div className="flex space-x-4 mb-4">
+            <button
+              className={`px-4 py-2 rounded-full ${
+                sortBy === "name"
+                  ? "bg-blue-100 text-blue-600"
+                  : "bg-gray-100 text-gray-600"
+              }`}
+              onClick={() => {
+                if (sortBy === "name") {
+                  setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+                } else {
+                  setSortBy("name");
+                  setSortOrder("asc");
+                }
+              }}
+            >
+              A-Z {sortBy === "name" && (sortOrder === "asc" ? "↑" : "↓")}
+            </button>
+            <button
+              className={`px-4 py-2 rounded-full ${
+                sortBy === "return"
+                  ? "bg-blue-100 text-blue-600"
+                  : "bg-gray-100 text-gray-600"
+              }`}
+              onClick={() => {
+                if (sortBy === "return") {
+                  setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+                } else {
+                  setSortBy("return");
+                  setSortOrder("asc");
+                }
+              }}
+            >
+              Return % {sortBy === "return" && (sortOrder === "asc" ? "↑" : "↓")}
+            </button>
+            <button
+              className={`px-4 py-2 rounded-full ${
+                sortBy === "minInvestment"
+                  ? "bg-blue-100 text-blue-600"
+                  : "bg-gray-100 text-gray-600"
+              }`}
+              onClick={() => {
+                if (sortBy === "minInvestment") {
+                  setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+                } else {
+                  setSortBy("minInvestment");
+                  setSortOrder("asc");
+                }
+              }}
+            >
+              Min. Investment {sortBy === "minInvestment" && (sortOrder === "asc" ? "↑" : "↓")}
+            </button>
+          </div>
+
+          {/* Investment Plans Grid */}
           <div className="grid md:grid-cols-3 gap-4">
-            {investmentPlans
-              .filter(
+            {sortInvestmentPlans(
+              investmentPlans.filter(
                 (plan) => filterType === "ALL" || plan.type === filterType
               )
-              .map((plan) => (
-                <div
-                  key={plan.id}
-                  className={`bg-white p-4 rounded-lg shadow-md cursor-pointer transition-all 
-                  ${
-                    selectedPlan === plan.id
-                      ? "border-2 border-blue-400"
-                      : "hover:shadow-xl"
-                  }`}
-                  onClick={() => setSelectedPlan(plan.id)}
-                  style={{
-                    borderColor:
-                      selectedPlan === plan.id ? "#08AFF1" : "transparent",
-                    zIndex: selectedPlan === plan.id ? 1 : 0,
-                  }}
+            ).map((plan) => (
+              <div
+                key={plan.id}
+                className={`bg-white p-4 rounded-lg shadow-md cursor-pointer transition-all 
+                ${
+                  selectedPlan === plan.id
+                    ? "border-2 border-blue-400"
+                    : "hover:shadow-xl"
+                }`}
+                onClick={() => setSelectedPlan(plan.id)}
+                style={{
+                  borderColor:
+                    selectedPlan === plan.id ? "#08AFF1" : "transparent",
+                  zIndex: selectedPlan === plan.id ? 1 : 0,
+                }}
+              >
+                <h3
+                  className="text-lg font-semibold mb-2"
+                  style={{ color: "#08AFF1" }}
                 >
-                  <h3
-                    className="text-lg font-semibold mb-2"
-                    style={{ color: "#08AFF1" }}
-                  >
-                    {plan.name}
-                  </h3>
-                  <div className="space-y-2 text-sm">
-                    <p>
-                      Min. Investment:{" "}
-                      <span style={{ color: "#AACF45" }}>
-                        {'₹' + Number(plan.minInvestment).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                      </span>
-                    </p>
-                    <p>
-                      Expected Return:{" "}
-                      <span style={{ color: "#AACF45" }}>
-                        {(() => {
-                          let principal = new Decimal(plan.minInvestment);
-                          const inputAmount = Number(investmentAmount);
-                          if (!isNaN(inputAmount) && inputAmount >= plan.minInvestment) {
-                            principal = new Decimal(inputAmount);
-                          }
-                          const roi = new Decimal(plan.roiAAR);
-                          const T_elapsed = plan.investmentTerm * 365;
-                          const gainComponent = principal.times(roi.div(100)).times(new Decimal(T_elapsed).div(365));
-                          const expectedReturn = principal.plus(gainComponent);
-                          return '₹' + expectedReturn.toFixed(2);
-                        })()}
-                      </span>
-                    </p>
-                    <p>Investment Period: {plan.investmentTerm} yr</p>
-                  </div>
+                  {plan.name}
+                </h3>
+                <div>
+                  <p>
+                    Min. Investment:{" "}
+                    <span style={{ color: "#AACF45" }}>
+                      {'₹' + Number(plan.minInvestment).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </span>
+                  </p>
+                  <p>
+                    Expected Return:{" "}
+                    <span style={{ color: "#AACF45" }}>
+                      {(() => {
+                        let principal = new Decimal(plan.minInvestment);
+                        const inputAmount = Number(investmentAmount);
+                        if (!isNaN(inputAmount) && inputAmount >= plan.minInvestment) {
+                          principal = new Decimal(inputAmount);
+                        }
+                        const roi = new Decimal(plan.roiAAR);
+                        const T_elapsed = plan.investmentTerm * 365;
+                        const gainComponent = principal.times(roi.div(100)).times(new Decimal(T_elapsed).div(365));
+                        const expectedReturn = principal.plus(gainComponent);
+                        return '₹' + expectedReturn.toFixed(2);
+                      })()}
+                    </span>
+                  </p>
+                  <p>Investment Period: {plan.investmentTerm} yr</p>
                 </div>
-              ))}
+              </div>
+            ))}
           </div>
 
           {/* Modal overlay for expanded card */}
