@@ -802,15 +802,7 @@ const Investments: React.FC = () => {
             </thead>
             <tbody>
               {myInvestments.map((item, index) => {
-                // Calculate days since investment
-                const dateOfInvestment = new Date(item.investmentDate);
-                const today = new Date();
-                const days = Math.floor((today.getTime() - dateOfInvestment.getTime()) / (1000 * 60 * 60 * 24));
                 const investedAmount = Number(item.investedAmount);
-                const roi = Number(item.investmentPlan?.roiAAR) / 100;
-                const dailyReturn = (investedAmount * roi) / 365;
-                const returnAmountTillDate = days * dailyReturn;
-                const returnPercentTillDate = investedAmount > 0 ? (returnAmountTillDate / investedAmount) * 100 : 0;
                 return (
                   <tr key={item.id} className="border-b hover:bg-gray-50">
                     <td className="py-2 px-3 text-center align-middle">{index + 1}</td>
@@ -835,84 +827,97 @@ const Investments: React.FC = () => {
       )}
 
       {/* Investment Details Modal */}
-      {selectedInvestment && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30 z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg relative">
-            <button
-              className="absolute top-2 right-2 text-gray-400 hover:text-gray-600"
-              onClick={() => setSelectedInvestment(null)}
-              aria-label="Close"
-            >
-              &times;
-            </button>
-            <h3 className="text-lg font-semibold mb-4" style={{ color: '#08AFF1' }}>
-              Investment Details
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-              <div>
-                <div className="text-gray-600 text-sm">Plan Name</div>
-                <div className="font-medium">{selectedInvestment.investmentPlan?.name}</div>
+      {selectedInvestment && (() => {
+        const dateOfInvestment = new Date(selectedInvestment.investmentDate);
+        const today = new Date();
+        const investedAmount = Number(selectedInvestment.investedAmount);
+        const roi = Number(selectedInvestment.investmentPlan?.roiAAR) / 100;
+        const days = Math.floor((today.getTime() - dateOfInvestment.getTime()) / (1000 * 60 * 60 * 24));
+        const returnAmountTillDate = days * ((investedAmount * roi) / 365);
+        const returnPercentTillDate = investedAmount > 0 ? (returnAmountTillDate / investedAmount) * 100 : 0;
+        return (
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30 z-50">
+            <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg relative">
+              <button
+                className="absolute top-2 right-2 text-gray-400 hover:text-gray-600"
+                onClick={() => setSelectedInvestment(null)}
+                aria-label="Close"
+              >
+                &times;
+              </button>
+              <h3 className="text-lg font-semibold mb-4" style={{ color: '#08AFF1' }}>
+                Investment Details
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                  <div className="text-gray-600 text-sm">Plan Name</div>
+                  <div className="font-medium">{selectedInvestment.investmentPlan?.name}</div>
+                </div>
+                <div>
+                  <div className="text-gray-600 text-sm">Invested Value</div>
+                  <div className="font-medium">{'₹' + Number(selectedInvestment.investedAmount).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                </div>
+                <div>
+                  <div className="text-gray-600 text-sm">Date of Investment</div>
+                  <div className="font-medium">{selectedInvestment.investmentDate ? new Date(selectedInvestment.investmentDate).toLocaleDateString('en-IN', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric'
+                  }) : '—'}</div>
+                </div>
+                <div>
+                  <div className="text-gray-600 text-sm">Investment Period</div>
+                  <div className="font-medium">{selectedInvestment.investmentPlan?.investmentTerm} yr</div>
+                </div>
+                <div>
+                  <div className="text-gray-600 text-sm">RoI(%)</div>
+                  <div className="font-medium">{selectedInvestment.investmentPlan?.roiAAR}</div>
+                </div>
+                <div>
+                  <div className="text-gray-600 text-sm">Withdrawal Frequency</div>
+                  <div className="font-medium">{selectedInvestment.withdrawalFrequency}</div>
+                </div>
+                <div>
+                  <div className="text-gray-600 text-sm">Date of Maturity</div>
+                  <div className="font-medium">{selectedInvestment.maturityDate ? new Date(selectedInvestment.maturityDate).toLocaleDateString('en-IN', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric'
+                  }) : '—'}</div>
+                </div>
+                <div>
+                  <div className="text-gray-600 text-sm">Status</div>
+                  <div className="font-medium">{selectedInvestment.status}</div>
+                </div>
+                <div>
+                  <div className="text-gray-600 text-sm">Return (Rs.)</div>
+                  <div className="font-medium" style={{ color: '#AACF45' }}>
+                    {'₹' + Number(returnAmountTillDate).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </div>
+                </div>
+                <div>
+                  <div className="text-gray-600 text-sm">Return (%)</div>
+                  <div className="font-medium" style={{ color: '#AACF45' }}>
+                    {returnPercentTillDate.toFixed(2)}%
+                  </div>
+                </div>
               </div>
-              <div>
-                <div className="text-gray-600 text-sm">Invested Value</div>
-                <div className="font-medium">{'₹' + Number(selectedInvestment.investedAmount).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
-              </div>
-              <div>
-                <div className="text-gray-600 text-sm">Date of Investment</div>
-                <div className="font-medium">{selectedInvestment.investmentDate ? new Date(selectedInvestment.investmentDate).toLocaleDateString('en-IN', {
-                  day: '2-digit',
-                  month: '2-digit',
-                  year: 'numeric'
-                }) : '—'}</div>
-              </div>
-              <div>
-                <div className="text-gray-600 text-sm">Investment Period</div>
-                <div className="font-medium">{selectedInvestment.investmentPlan?.investmentTerm} yr</div>
-              </div>
-              <div>
-                <div className="text-gray-600 text-sm">RoI(%)</div>
-                <div className="font-medium">{selectedInvestment.investmentPlan?.roiAAR}</div>
-              </div>
-              <div>
-                <div className="text-gray-600 text-sm">Withdrawal Frequency</div>
-                <div className="font-medium">{selectedInvestment.withdrawalFrequency}</div>
-              </div>
-              <div>
-                <div className="text-gray-600 text-sm">Date of Maturity</div>
-                <div className="font-medium">{selectedInvestment.maturityDate ? new Date(selectedInvestment.maturityDate).toLocaleDateString('en-IN', {
-                  day: '2-digit',
-                  month: '2-digit',
-                  year: 'numeric'
-                }) : '—'}</div>
-              </div>
-              <div>
-                <div className="text-gray-600 text-sm">Status</div>
-                <div className="font-medium">{selectedInvestment.status}</div>
-              </div>
-              <div>
-                <div className="text-gray-600 text-sm">Return Amount till date</div>
-                <div className="font-medium">{'₹' + returnAmountTillDate.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
-              </div>
-              <div>
-                <div className="text-gray-600 text-sm">Return % till date</div>
-                <div className="font-medium">{returnPercentTillDate.toFixed(2)}%</div>
-              </div>
+              <button
+                className={`w-full py-2 rounded text-white ${withdrawMessage?.id === selectedInvestment.id ? 'bg-gray-400' : 'bg-red-500 hover:bg-red-600'}`}
+                disabled={withdrawMessage?.id === selectedInvestment.id}
+                onClick={() => handleWithdrawInvestment(selectedInvestment.id)}
+              >
+                {withdrawMessage?.id === selectedInvestment.id ? 'Processing...' : 'Withdraw'}
+              </button>
+              {withdrawMessage?.id === selectedInvestment.id && (
+                <div className={`mt-2 text-sm ${withdrawMessage.message.includes('success') ? 'text-green-600' : 'text-red-600'}`}>
+                  {withdrawMessage.message}
+                </div>
+              )}
             </div>
-            <button
-              className={`w-full py-2 rounded text-white ${withdrawMessage?.id === selectedInvestment.id ? 'bg-gray-400' : 'bg-red-500 hover:bg-red-600'}`}
-              disabled={withdrawMessage?.id === selectedInvestment.id}
-              onClick={() => handleWithdrawInvestment(selectedInvestment.id)}
-            >
-              {withdrawMessage?.id === selectedInvestment.id ? 'Processing...' : 'Withdraw'}
-            </button>
-            {withdrawMessage?.id === selectedInvestment.id && (
-              <div className={`mt-2 text-sm ${withdrawMessage.message.includes('success') ? 'text-green-600' : 'text-red-600'}`}>
-                {withdrawMessage.message}
-              </div>
-            )}
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       {/* Success Modal Overlay */}
       {subscribeSuccess && (
