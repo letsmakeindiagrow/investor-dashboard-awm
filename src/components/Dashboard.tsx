@@ -133,7 +133,8 @@ const Dashboard: React.FC = () => {
         <div className="bg-white p-4 rounded-lg shadow-md">
           <h3 className="text-sm text-gray-500">Total Return</h3>
           <p className={`text-2xl font-bold ${profitLoss >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-            {loading ? 'Loading...' : `₹${profitLoss.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (${totalReturnPercent.toFixed(2)}%)`}
+            {loading ? 'Loading...' : `₹${profitLoss.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} `}
+            <span className="text-lg">({totalReturnPercent.toFixed(2)}%)</span>
           </p>
         </div>
         <div className="bg-white p-4 rounded-lg shadow-md">
