@@ -145,7 +145,7 @@ const Ledger: React.FC = () => {
                   <td className="py-2 px-3">{entry.voucherType}</td>
                   <td className="py-2 px-3 text-blue-600">{entry.debitAmount !== null && entry.debitAmount !== undefined ? `₹${entry.debitAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '-'}</td>
                   <td className="py-2 px-3 text-blue-600">{entry.creditAmount !== null && entry.creditAmount !== undefined ? `₹${entry.creditAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '-'}</td>
-                  <td className="py-2 px-3 font-semibold">{entry.balance !== null && entry.balance !== undefined ? `₹${entry.balance.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '-'}</td>
+                  <td className="py-2 px-3 font-semibold">{entry.balance !== null && entry.balance !== undefined ? `₹${Number(entry.balance).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '-'}</td>
                 </tr>
               ))}
             </tbody>
