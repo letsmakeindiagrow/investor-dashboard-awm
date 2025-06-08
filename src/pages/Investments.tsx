@@ -891,13 +891,13 @@ const Investments: React.FC = () => {
                 </div>
                 <div>
                   <div className="text-gray-600 text-sm">Return (Rs.)</div>
-                  <div className="font-medium" style={{ color: '#AACF45' }}>
+                  <div className="font-medium">
                     {'₹' + Number(returnAmountTillDate).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </div>
                 </div>
                 <div>
                   <div className="text-gray-600 text-sm">Return (%)</div>
-                  <div className="font-medium" style={{ color: '#AACF45' }}>
+                  <div className="font-medium">
                     {returnPercentTillDate.toFixed(2)}%
                   </div>
                 </div>
