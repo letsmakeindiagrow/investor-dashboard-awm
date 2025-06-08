@@ -343,6 +343,36 @@ const Investments: React.FC = () => {
     }
   };
 
+  const handleConfirmWithdrawal = async () => {
+    if (!showWithdrawConfirm || !withdrawalDetails) return;
+    try {
+      const investment = myInvestments.find(inv => inv.id === showWithdrawConfirm);
+      if (!investment) throw new Error('Investment not found');
+      const payload = {
+        investmentPlanId: investment.investmentPlanId,
+        userInvestmentId: investment.id,
+      };
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/v1/investor/withdrawPreMaturity`,
+        payload,
+        { withCredentials: true }
+      );
+      setWithdrawMessage({ id: investment.id, message: response.data.message || 'Withdrawal successful!' });
+      setShowWithdrawConfirm(null);
+      setWithdrawalDetails(null);
+      // Optionally refresh investments list
+      const updatedInvestments = await axios.get(
+        `${import.meta.env.VITE_API_URL}/api/v1/investor/getInvestments`,
+        { withCredentials: true }
+      );
+      setMyInvestments(updatedInvestments.data.investments);
+    } catch (error: any) {
+      setWithdrawMessage({ id: showWithdrawConfirm, message: error?.response?.data?.message || 'Withdrawal failed.' });
+      setShowWithdrawConfirm(null);
+      setWithdrawalDetails(null);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">Loading...</div>
@@ -887,7 +917,7 @@ const Investments: React.FC = () => {
               </button>
               <button
                 className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-                onClick={() => handleWithdrawInvestment(showWithdrawConfirm)}
+                onClick={handleConfirmWithdrawal}
               >
                 Confirm Withdrawal
               </button>
