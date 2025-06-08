@@ -233,7 +233,7 @@ const Investments: React.FC = () => {
 
     const amount = Number(investmentAmount);
     if (amount < plan.minInvestment) {
-      setSubscribeError(`Amount must be at least ₹${plan.minInvestment.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`);
+      setSubscribeError(`Amount must be at least ₹${'₹' + Number(plan.minInvestment).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`);
       return;
     }
 
@@ -490,7 +490,7 @@ const Investments: React.FC = () => {
                     <p>
                       Min. Investment:{" "}
                       <span style={{ color: "#AACF45" }}>
-                        ₹{plan.minInvestment.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        {'₹' + Number(plan.minInvestment).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </span>
                     </p>
                     <p>
@@ -506,7 +506,7 @@ const Investments: React.FC = () => {
                           const T_elapsed = plan.investmentTerm * 365;
                           const gainComponent = principal.times(roi.div(100)).times(new Decimal(T_elapsed).div(365));
                           const expectedReturn = principal.plus(gainComponent);
-                          return `₹${expectedReturn.toFixed(2)}`;
+                          return '₹' + expectedReturn.toFixed(2);
                         })()}
                       </span>
                     </p>
@@ -543,7 +543,7 @@ const Investments: React.FC = () => {
                         <p>
                           Min. Investment:{" "}
                           <span style={{ color: "#AACF45" }}>
-                            ₹{plan.minInvestment.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            {'₹' + Number(plan.minInvestment).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                           </span>
                         </p>
                         <p>
@@ -559,7 +559,7 @@ const Investments: React.FC = () => {
                               const T_elapsed = plan.investmentTerm * 365;
                               const gainComponent = principal.times(roi.div(100)).times(new Decimal(T_elapsed).div(365));
                               const expectedReturn = principal.plus(gainComponent);
-                              return `₹${expectedReturn.toFixed(2)}`;
+                              return '₹' + expectedReturn.toFixed(2);
                             })()}
                           </span>
                         </p>
@@ -653,9 +653,8 @@ const Investments: React.FC = () => {
                               </span>
                             </div>
                             <p className="text-sm text-yellow-600 mb-2 text-center">
-                              Your current balance (₹{balance.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })})
-                              is insufficient for this investment amount (₹
-                              {Number(investmentAmount).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}).
+                              Your current balance ({'₹' + Number(balance).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })})
+                              is insufficient for this investment amount ({'₹' + Number(investmentAmount).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}).
                             </p>
                             <button
                               onClick={() => {
@@ -732,7 +731,7 @@ const Investments: React.FC = () => {
                 <tr key={item.id} className="border-b hover:bg-gray-50">
                   <td className="py-2 px-3 text-center align-middle">{index + 1}</td>
                   <td className="py-2 px-3 text-left align-middle">{item.investmentPlan?.name}</td>
-                  <td className="py-2 px-3 text-center align-middle">{item.investedAmount ? `₹${item.investedAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '—'}</td>
+                  <td className="py-2 px-3 text-center align-middle">{item.investedAmount ? '₹' + Number(item.investedAmount).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '—'}</td>
                   <td className="py-2 px-3 text-center align-middle">{item.investmentDate ? new Date(item.investmentDate).toLocaleDateString() : '—'}</td>
                   <td className="py-2 px-3 text-center align-middle">{item.maturityDate ? new Date(item.maturityDate).toLocaleDateString() : '—'}</td>
                   <td className="py-2 px-3 text-center align-middle">
@@ -771,7 +770,7 @@ const Investments: React.FC = () => {
               </div>
               <div>
                 <div className="text-gray-600 text-sm">Invested Value</div>
-                <div className="font-medium">₹{selectedInvestment.investedAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                <div className="font-medium">{'₹' + Number(selectedInvestment.investedAmount).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
               </div>
               <div>
                 <div className="text-gray-600 text-sm">Date of Investment</div>
@@ -857,7 +856,7 @@ const Investments: React.FC = () => {
                   <div className="flex justify-between">
                     <span className="text-gray-600">Pre-exit Amount:</span>
                     <span className="font-medium text-red-500">
-                      ₹{withdrawalDetails.expenseAmountDeducted.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      {'₹' + Number(withdrawalDetails.expenseAmountDeducted).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </span>
                   </div>
                   <div className="border-t pt-2 mt-2">
@@ -866,7 +865,7 @@ const Investments: React.FC = () => {
                         Net Amount to Receive:
                       </span>
                       <span className="font-medium text-green-600">
-                        ₹{withdrawalDetails.netAmountPaid.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        {'₹' + Number(withdrawalDetails.netAmountPaid).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </span>
                     </div>
                   </div>

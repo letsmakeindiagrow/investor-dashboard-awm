@@ -10,12 +10,32 @@ import {
 } from "recharts";
 import axios from "axios";
 
+interface UserData {
+  firstName: string;
+  lastName: string;
+}
+
 const Dashboard: React.FC = () => {
   const [totalCurrentValue, setTotalCurrentValue] = useState<number>(0);
   const [totalInvestedValue, setTotalInvestedValue] = useState<number>(0);
   const [totalInvestmentsCount, setTotalInvestmentsCount] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
   const [investmentHistory, setInvestmentHistory] = useState<any[]>([]);
+  const [userData, setUserData] = useState<UserData | null>(null);
+
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      try {
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/v1/investor/getUserInfo`, {
+          withCredentials: true,
+        });
+        setUserData(response.data.user);
+      } catch (error) {
+        setUserData(null);
+      }
+    };
+    fetchUserInfo();
+  }, []);
 
   useEffect(() => {
     const fetchInvestmentData = async () => {
@@ -84,6 +104,13 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="space-y-6">
+      {/* User Welcome */}
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold text-gray-800">
+          {userData ? `Welcome, ${userData.firstName} ${userData.lastName}` : 'Welcome'}
+        </h2>
+      </div>
+
       {/* Investment Overview Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="bg-white p-4 rounded-lg shadow-md">
