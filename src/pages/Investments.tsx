@@ -30,6 +30,7 @@ interface Investment {
     investmentTerm: number;
     roiAAR: string;
     type: string;
+    name: string;
   };
 }
 
@@ -452,7 +453,7 @@ const Investments: React.FC = () => {
                     className="text-lg font-semibold mb-2"
                     style={{ color: "#08AFF1" }}
                   >
-                    {plan.type}
+                    {plan.name}
                   </h3>
                   <div className="space-y-2 text-sm">
                     <p>
@@ -494,7 +495,7 @@ const Investments: React.FC = () => {
                         className="text-lg font-semibold mb-2"
                         style={{ color: "#08AFF1" }}
                       >
-                        {plan.type}
+                        {plan.name}
                       </h3>
                       <div className="space-y-2 text-sm mb-4">
                         <p>
@@ -666,7 +667,7 @@ const Investments: React.FC = () => {
             <thead>
               <tr className="bg-gray-50">
                 <th className="py-2 px-3 border-b text-center align-middle">No.</th>
-                <th className="py-2 px-3 border-b text-left align-middle">Plan Type</th>
+                <th className="py-2 px-3 border-b text-left align-middle">Plan Name</th>
                 <th className="py-2 px-3 border-b text-center align-middle">Invested Value</th>
                 <th className="py-2 px-3 border-b text-center align-middle">Date of Investment</th>
                 <th className="py-2 px-3 border-b text-center align-middle">Date of Maturity</th>
@@ -677,7 +678,7 @@ const Investments: React.FC = () => {
               {myInvestments.map((item, index) => (
                 <tr key={item.id} className="border-b hover:bg-gray-50">
                   <td className="py-2 px-3 text-center align-middle">{index + 1}</td>
-                  <td className="py-2 px-3 text-left align-middle">{item.investmentPlan?.type}</td>
+                  <td className="py-2 px-3 text-left align-middle">{item.investmentPlan?.name}</td>
                   <td className="py-2 px-3 text-center align-middle">{item.investedAmount ? `₹${item.investedAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '—'}</td>
                   <td className="py-2 px-3 text-center align-middle">{item.investmentDate ? new Date(item.investmentDate).toLocaleDateString() : '—'}</td>
                   <td className="py-2 px-3 text-center align-middle">{item.maturityDate ? new Date(item.maturityDate).toLocaleDateString() : '—'}</td>
@@ -712,8 +713,8 @@ const Investments: React.FC = () => {
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <div>
-                <div className="text-gray-600 text-sm">Plan Type</div>
-                <div className="font-medium">{selectedInvestment.investmentPlan?.type}</div>
+                <div className="text-gray-600 text-sm">Plan Name</div>
+                <div className="font-medium">{selectedInvestment.investmentPlan?.name}</div>
               </div>
               <div>
                 <div className="text-gray-600 text-sm">Invested Value</div>
