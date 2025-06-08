@@ -797,8 +797,6 @@ const Investments: React.FC = () => {
                 <th className="py-2 px-3 border-b text-center align-middle">Invested Value</th>
                 <th className="py-2 px-3 border-b text-center align-middle">Date of Investment</th>
                 <th className="py-2 px-3 border-b text-center align-middle">Date of Maturity</th>
-                <th className="py-2 px-3 border-b text-center align-middle">Return Amount till date</th>
-                <th className="py-2 px-3 border-b text-center align-middle">Return % till date</th>
                 <th className="py-2 px-3 border-b text-center align-middle">More Info</th>
               </tr>
             </thead>
@@ -820,8 +818,6 @@ const Investments: React.FC = () => {
                     <td className="py-2 px-3 text-center align-middle">{item.investedAmount ? '₹' + investedAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '—'}</td>
                     <td className="py-2 px-3 text-center align-middle">{item.investmentDate ? new Date(item.investmentDate).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '—'}</td>
                     <td className="py-2 px-3 text-center align-middle">{item.maturityDate ? new Date(item.maturityDate).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '—'}</td>
-                    <td className="py-2 px-3 text-center align-middle">{'₹' + returnAmountTillDate.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-                    <td className="py-2 px-3 text-center align-middle">{returnPercentTillDate.toFixed(2)}%</td>
                     <td className="py-2 px-3 text-center align-middle">
                       <button
                         className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
@@ -892,6 +888,14 @@ const Investments: React.FC = () => {
               <div>
                 <div className="text-gray-600 text-sm">Status</div>
                 <div className="font-medium">{selectedInvestment.status}</div>
+              </div>
+              <div>
+                <div className="text-gray-600 text-sm">Return Amount till date</div>
+                <div className="font-medium">{'₹' + returnAmountTillDate.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+              </div>
+              <div>
+                <div className="text-gray-600 text-sm">Return % till date</div>
+                <div className="font-medium">{returnPercentTillDate.toFixed(2)}%</div>
               </div>
             </div>
             <button
