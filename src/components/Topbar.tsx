@@ -1,6 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import { ChevronDown, User, LogOut, Bell, HelpCircle, X, Mail, Phone, Calendar, Shield } from 'lucide-react';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import {
+  ChevronDown,
+  User,
+  LogOut,
+  Bell,
+  HelpCircle,
+  X,
+  Mail,
+  Phone,
+  Calendar,
+  Shield,
+} from "lucide-react";
+import axios from "axios";
 
 interface UserData {
   id: string;
@@ -31,13 +42,16 @@ const Topbar: React.FC = () => {
   const fetchUserData = async () => {
     try {
       setLoading(true);
-      const response = await axios.get<ApiResponse>(`${import.meta.env.VITE_API_URL}/api/v1/investor/getUserInfo`, {
-        withCredentials: true,
-      });
-      console.log('API userInfo response:', response.data);
+      const response = await axios.get<ApiResponse>(
+        `${import.meta.env.VITE_API_URL}/api/v1/investor/getUserInfo`,
+        {
+          withCredentials: true,
+        }
+      );
+      console.log("API userInfo response:", response.data);
       setUserData(response.data.user);
     } catch (error) {
-      console.error('Failed to fetch user data:', error);
+      console.error("Failed to fetch user data:", error);
     } finally {
       setLoading(false);
     }
@@ -56,28 +70,31 @@ const Topbar: React.FC = () => {
 
   const handleLogout = async () => {
     try {
-      await axios.get(`${import.meta.env.VITE_API_URL}/api/v1/investor/logout`, {
-        withCredentials: true
-      });
-      window.location.href = 'https://login.aadyanviwealth.com';
+      await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/v1/investor/logout`,
+        {
+          withCredentials: true,
+        }
+      );
+      window.location.href = "https://login.aadyanviwealth.com";
     } catch (error) {
-      console.error('Logout failed:', error);
+      console.error("Logout failed:", error);
     }
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-IN', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
+    return new Date(dateString).toLocaleDateString("en-IN", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
     });
   };
 
   const formatBalance = (balance: string) => {
     const numBalance = parseFloat(balance);
-    return numBalance.toLocaleString('en-IN', {
+    return numBalance.toLocaleString("en-IN", {
       minimumFractionDigits: 2,
-      maximumFractionDigits: 2
+      maximumFractionDigits: 2,
     });
   };
 
@@ -85,9 +102,13 @@ const Topbar: React.FC = () => {
     <div className="bg-white shadow-md h-16 flex items-center justify-between px-6 relative">
       {/* Company Logo Space */}
       <div className="pointer-events-none flex items-center justify-center h-16">
-        <img src="/straight_logo.png" alt="Company Logo" className="h-100 w-48" />
+        <img
+          src="/straight_logo.png"
+          alt="Company Logo"
+          className="h-100 w-48"
+        />
       </div>
-      
+
       {/* User Info and Notifications */}
       <div className="flex items-center space-x-6">
         {/* Notifications */}
@@ -95,10 +116,10 @@ const Topbar: React.FC = () => {
           <Bell className="h-6 w-6 text-gray-600" />
           <span className="absolute top-0 right-0 h-2 w-2 bg-red-500 rounded-full"></span>
         </div>
-        
+
         {/* Profile Dropdown */}
         <div className="relative">
-          <button 
+          <button
             className="flex items-center space-x-2 focus:outline-none"
             onClick={() => setIsProfileOpen(!isProfileOpen)}
           >
@@ -106,18 +127,24 @@ const Topbar: React.FC = () => {
               <User className="h-5 w-5 text-white" />
             </div>
             <span className="text-sm font-medium text-gray-700">
-              {userData ? `${userData.firstName} ${userData.lastName}` : 'User'}
+              {userData ? `${userData.firstName} ${userData.lastName}` : "User"}
             </span>
-            <ChevronDown className={`h-4 w-4 text-gray-500 transition-transform ${isProfileOpen ? 'transform rotate-180' : ''}`} />
+            <ChevronDown
+              className={`h-4 w-4 text-gray-500 transition-transform ${
+                isProfileOpen ? "transform rotate-180" : ""
+              }`}
+            />
           </button>
-          
+
           {/* Dropdown Menu */}
           {isProfileOpen && (
             <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
               <div className="px-4 py-2 border-b border-gray-100">
-                <p className="text-sm font-medium text-gray-800">{userData?.email || '-'}</p>
+                <p className="text-sm font-medium text-gray-800">
+                  {userData?.email || "-"}
+                </p>
               </div>
-              <button 
+              <button
                 className="w-full flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                 onClick={() => {
                   setIsProfileModalOpen(true);
@@ -127,9 +154,9 @@ const Topbar: React.FC = () => {
                 <User className="mr-3 h-4 w-4 text-gray-500" />
                 Profile
               </button>
-              <a 
-                href="https://www.aadyanviwealth.com/contact" 
-                target="_blank" 
+              <a
+                href="https://www.aadyanviwealth.com/contact"
+                target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
               >
@@ -137,7 +164,7 @@ const Topbar: React.FC = () => {
                 Help
               </a>
               <div className="border-t border-gray-100"></div>
-              <button 
+              <button
                 onClick={handleLogout}
                 className="w-full flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
               >
@@ -154,8 +181,10 @@ const Topbar: React.FC = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg w-full max-w-2xl mx-4">
             <div className="flex justify-between items-center p-6 border-b">
-              <h2 className="text-xl font-semibold text-gray-800">Profile Information</h2>
-              <button 
+              <h2 className="text-xl font-semibold text-gray-800">
+                Profile Information
+              </h2>
+              <button
                 onClick={() => setIsProfileModalOpen(false)}
                 className="text-gray-500 hover:text-gray-700"
               >
@@ -171,60 +200,107 @@ const Topbar: React.FC = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-600">Full Name</label>
-                      <p className="mt-1 text-gray-900">{`${userData.firstName || '-'} ${userData.lastName || '-'}`}</p>
+                      <label className="block text-sm font-medium text-gray-600">
+                        Full Name
+                      </label>
+                      <p className="mt-1 text-gray-900">{`${
+                        userData.firstName || "-"
+                      } ${userData.lastName || "-"}`}</p>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-600">Email</label>
+                      <label className="block text-sm font-medium text-gray-600">
+                        Email
+                      </label>
                       <div className="mt-1 flex items-center">
                         <Mail className="h-4 w-4 text-gray-500 mr-2" />
-                        <p className="text-gray-900">{userData.email || '-'}</p>
+                        <p className="text-gray-900">{userData.email || "-"}</p>
                         {userData.emailVerified && (
-                          <span className="ml-2 px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">Verified</span>
+                          <span className="ml-2 px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">
+                            Verified
+                          </span>
                         )}
                       </div>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-600">Mobile Number</label>
+                      <label className="block text-sm font-medium text-gray-600">
+                        Mobile Number
+                      </label>
                       <div className="mt-1 flex items-center">
                         <Phone className="h-4 w-4 text-gray-500 mr-2" />
-                        <p className="text-gray-900">{userData.mobileNumber || '-'}</p>
+                        <p className="text-gray-900">
+                          {userData.mobileNumber || "-"}
+                        </p>
                         {userData.mobileVerified && (
-                          <span className="ml-2 px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">Verified</span>
+                          <span className="ml-2 px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">
+                            Verified
+                          </span>
                         )}
                       </div>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-600">Date of Birth</label>
+                      <label className="block text-sm font-medium text-gray-600">
+                        Date of Birth
+                      </label>
                       <div className="mt-1 flex items-center">
                         <Calendar className="h-4 w-4 text-gray-500 mr-2" />
-                        <p className="text-gray-900">{userData.dateOfBirth ? formatDate(userData.dateOfBirth) : '-'}</p>
+                        <p className="text-gray-900">
+                          {userData.dateOfBirth
+                            ? formatDate(userData.dateOfBirth)
+                            : "-"}
+                        </p>
                       </div>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-600">Referral Code</label>
-                      <p className="mt-1 text-gray-900">{userData.referralCode || '-'}</p>
+                      <label className="block text-sm font-medium text-gray-600">
+                        Referral Code
+                      </label>
+                      <p className="mt-1 text-gray-900">
+                        {userData.referralCode || "-"}
+                      </p>
                     </div>
                   </div>
                   <div className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-600">Account Status</label>
+                      <label className="block text-sm font-medium text-gray-600">
+                        Account Status
+                      </label>
                       <div className="mt-1 flex items-center">
                         <Shield className="h-4 w-4 text-gray-500 mr-2" />
-                        <p className="text-gray-900">{userData.verificationState || '-'}</p>
+                        <p className="text-gray-900">
+                          {userData.verificationState || "-"}
+                        </p>
                       </div>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-600">Available Balance</label>
-                      <p className="mt-1 text-gray-900">₹{userData.availableBalance ? formatBalance(userData.availableBalance) : '0.00'}</p>
+                      <label className="block text-sm font-medium text-gray-600">
+                        Available Balance
+                      </label>
+                      <p className="mt-1 text-gray-900">
+                        ₹
+                        {userData.availableBalance
+                          ? formatBalance(userData.availableBalance)
+                          : "0.00"}
+                      </p>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-600">Member Since</label>
-                      <p className="mt-1 text-gray-900">{userData.createdAt ? formatDate(userData.createdAt) : '-'}</p>
+                      <label className="block text-sm font-medium text-gray-600">
+                        Member Since
+                      </label>
+                      <p className="mt-1 text-gray-900">
+                        {userData.createdAt
+                          ? formatDate(userData.createdAt)
+                          : "-"}
+                      </p>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-600">Last Updated</label>
-                      <p className="mt-1 text-gray-900">{userData.updatedAt ? formatDate(userData.updatedAt) : '-'}</p>
+                      <label className="block text-sm font-medium text-gray-600">
+                        Last Updated
+                      </label>
+                      <p className="mt-1 text-gray-900">
+                        {userData.updatedAt
+                          ? formatDate(userData.updatedAt)
+                          : "-"}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -247,6 +323,6 @@ const Topbar: React.FC = () => {
       )}
     </div>
   );
-}
+};
 
 export default Topbar;
