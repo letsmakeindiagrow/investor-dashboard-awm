@@ -182,7 +182,6 @@ const Ledger: React.FC = () => {
               <tr className="border-b bg-gray-50">
                 <th className="py-2 px-3">Date (TimeStamp)</th>
                 <th className="py-2 px-3">Voucher</th>
-                <th className="py-2 px-3">Narration</th>
                 <th className="py-2 px-3">Dr. Amt (Rs.)</th>
                 <th className="py-2 px-3">Cr. Amt (Rs.)</th>
                 <th className="py-2 px-3">Rn Balance (Rs.)</th>
@@ -196,16 +195,9 @@ const Ledger: React.FC = () => {
                 >
                   <td className="py-2 px-3">{new Date(entry.createdAt).toLocaleString()}</td>
                   <td className="py-2 px-3">{entry.voucherType}</td>
-                  <td className="py-2 px-3">{generateNarration(entry)}</td>
-                  <td className="py-2 px-3 text-blue-600">
-                    {entry.debitAmount ? `₹${entry.debitAmount.toLocaleString()}` : '-'}
-                  </td>
-                  <td className="py-2 px-3 text-blue-600">
-                    {entry.creditAmount ? `₹${entry.creditAmount.toLocaleString()}` : '-'}
-                  </td>
-                  <td className="py-2 px-3 font-semibold">
-                    {entry.balance ? `₹${entry.balance.toLocaleString()}` : '-'}
-                  </td>
+                  <td className="py-2 px-3 text-blue-600">{entry.debitAmount ? `₹${entry.debitAmount.toLocaleString()}` : '-'}</td>
+                  <td className="py-2 px-3 text-blue-600">{entry.creditAmount ? `₹${entry.creditAmount.toLocaleString()}` : '-'}</td>
+                  <td className="py-2 px-3 font-semibold">{entry.balance ? `₹${entry.balance.toLocaleString()}` : '-'}</td>
                 </tr>
               ))}
             </tbody>
