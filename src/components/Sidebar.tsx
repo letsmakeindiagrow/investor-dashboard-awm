@@ -14,13 +14,7 @@ import {
 
 const Sidebar: React.FC = () => {
   const navigate = useNavigate();
-  const [openMenus, setOpenMenus] = useState<{ [key: string]: boolean }>({
-    dashboard: true,
-    investments: false,
-    funds: false,
-    ledger: false,
-    referral: false,
-  });
+  const [openSection, setOpenSection] = useState<string | null>("dashboard");
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   // Color configuration
@@ -29,11 +23,8 @@ const Sidebar: React.FC = () => {
   const textColor = "text-gray-800";
   const hoverEffect = "hover:bg-gray-100 hover:bg-opacity-50";
 
-  const toggleMenu = (menu: string) => {
-    setOpenMenus((prev) => ({
-      ...prev,
-      [menu]: !prev[menu],
-    }));
+  const handleSectionClick = (section: string) => {
+    setOpenSection((prev) => (prev === section ? null : section));
   };
 
   const navigateTo = (path: string) => {
@@ -81,7 +72,7 @@ const Sidebar: React.FC = () => {
           {/* Dashboard */}
           <div>
             <div
-              onClick={() => toggleMenu("dashboard")}
+              onClick={() => handleSectionClick("dashboard")}
               className={`flex items-center p-3 rounded-md cursor-pointer ${hoverEffect} transition-colors`}
             >
               <div className="mr-3">{menuIcons.dashboard}</div>
@@ -92,7 +83,7 @@ const Sidebar: React.FC = () => {
                   >
                     Dashboard
                   </span>
-                  {openMenus.dashboard ? (
+                  {openSection === "dashboard" ? (
                     <ChevronDown className="h-5 w-5 text-gray-500" />
                   ) : (
                     <ChevronRight className="h-5 w-5 text-gray-500" />
@@ -100,7 +91,7 @@ const Sidebar: React.FC = () => {
                 </>
               )}
             </div>
-            {!isCollapsed && openMenus.dashboard && (
+            {!isCollapsed && openSection === "dashboard" && (
               <div className="pl-4 space-y-2 mt-1">
                 <div
                   onClick={() => navigateTo("/dashboard")}
@@ -115,7 +106,7 @@ const Sidebar: React.FC = () => {
           {/* Investments */}
           <div>
             <div
-              onClick={() => toggleMenu("investments")}
+              onClick={() => handleSectionClick("investments")}
               className={`flex items-center p-3 rounded-md cursor-pointer ${hoverEffect} transition-colors`}
             >
               <div className="mr-3">{menuIcons.investments}</div>
@@ -126,7 +117,7 @@ const Sidebar: React.FC = () => {
                   >
                     Investments
                   </span>
-                  {openMenus.investments ? (
+                  {openSection === "investments" ? (
                     <ChevronDown className="h-5 w-5 text-gray-500" />
                   ) : (
                     <ChevronRight className="h-5 w-5 text-gray-500" />
@@ -134,7 +125,7 @@ const Sidebar: React.FC = () => {
                 </>
               )}
             </div>
-            {!isCollapsed && openMenus.investments && (
+            {!isCollapsed && openSection === "investments" && (
               <div className="pl-4 space-y-2 mt-1">
                 <div
                   onClick={() => navigateTo("/investments/make")}
@@ -155,7 +146,7 @@ const Sidebar: React.FC = () => {
           {/* Funds */}
           <div>
             <div
-              onClick={() => toggleMenu("funds")}
+              onClick={() => handleSectionClick("funds")}
               className={`flex items-center p-3 rounded-md cursor-pointer ${hoverEffect} transition-colors`}
             >
               <div className="mr-3">{menuIcons.funds}</div>
@@ -166,7 +157,7 @@ const Sidebar: React.FC = () => {
                   >
                     Funds
                   </span>
-                  {openMenus.funds ? (
+                  {openSection === "funds" ? (
                     <ChevronDown className="h-5 w-5 text-gray-500" />
                   ) : (
                     <ChevronRight className="h-5 w-5 text-gray-500" />
@@ -174,7 +165,7 @@ const Sidebar: React.FC = () => {
                 </>
               )}
             </div>
-            {!isCollapsed && openMenus.funds && (
+            {!isCollapsed && openSection === "funds" && (
               <div className="pl-4 space-y-2 mt-1">
                 <div
                   onClick={() => navigateTo("/funds/available")}
@@ -207,7 +198,7 @@ const Sidebar: React.FC = () => {
           {/* Ledger */}
           <div>
             <div
-              onClick={() => toggleMenu("ledger")}
+              onClick={() => handleSectionClick("ledger")}
               className={`flex items-center p-3 rounded-md cursor-pointer ${hoverEffect} transition-colors`}
             >
               <div className="mr-3">{menuIcons.ledger}</div>
@@ -218,7 +209,7 @@ const Sidebar: React.FC = () => {
                   >
                     Ledger
                   </span>
-                  {openMenus.ledger ? (
+                  {openSection === "ledger" ? (
                     <ChevronDown className="h-5 w-5 text-gray-500" />
                   ) : (
                     <ChevronRight className="h-5 w-5 text-gray-500" />
@@ -226,7 +217,7 @@ const Sidebar: React.FC = () => {
                 </>
               )}
             </div>
-            {!isCollapsed && openMenus.ledger && (
+            {!isCollapsed && openSection === "ledger" && (
               <div className="pl-4 space-y-2 mt-1">
                 <div
                   onClick={() => navigateTo("/ledger")}
