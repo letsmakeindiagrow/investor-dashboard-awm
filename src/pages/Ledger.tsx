@@ -141,7 +141,14 @@ const Ledger: React.FC = () => {
                   key={entry.id} 
                   className="border-b hover:bg-gray-50 transition-colors"
                 >
-                  <td className="py-2 px-3">{new Date(entry.createdAt).toLocaleString()}</td>
+                  <td className="py-2 px-3">{new Date(entry.createdAt).toLocaleString('en-IN', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: true
+                  })}</td>
                   <td className="py-2 px-3">{entry.voucherType}</td>
                   <td className="py-2 px-3 text-blue-600">{entry.debitAmount !== null && entry.debitAmount !== undefined ? `₹${entry.debitAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '-'}</td>
                   <td className="py-2 px-3 text-blue-600">{entry.creditAmount !== null && entry.creditAmount !== undefined ? `₹${entry.creditAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '-'}</td>

@@ -600,7 +600,14 @@ const Funds: React.FC = () => {
                     className="border-b hover:bg-gray-50"
                   >
                     <td className="py-2 px-3">{transaction.transactionsId}</td>
-                    <td className="py-2 px-3">{transaction.datetime}</td>
+                    <td className="py-2 px-3">{new Date(transaction.datetime).toLocaleString('en-IN', {
+                      day: '2-digit',
+                      month: '2-digit',
+                      year: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      hour12: true
+                    })}</td>
                     <td className="py-2 px-3">{transaction.method}</td>
                     <td className="py-2 px-3">{transaction.type}</td>
                     <td

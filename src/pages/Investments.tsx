@@ -806,8 +806,16 @@ const Investments: React.FC = () => {
                   <td className="py-2 px-3 text-center align-middle">{index + 1}</td>
                   <td className="py-2 px-3 text-left align-middle">{item.investmentPlan?.name}</td>
                   <td className="py-2 px-3 text-center align-middle">{item.investedAmount ? '₹' + Number(item.investedAmount).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '—'}</td>
-                  <td className="py-2 px-3 text-center align-middle">{item.investmentDate ? new Date(item.investmentDate).toLocaleDateString() : '—'}</td>
-                  <td className="py-2 px-3 text-center align-middle">{item.maturityDate ? new Date(item.maturityDate).toLocaleDateString() : '—'}</td>
+                  <td className="py-2 px-3 text-center align-middle">{item.investmentDate ? new Date(item.investmentDate).toLocaleDateString('en-IN', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric'
+                  }) : '—'}</td>
+                  <td className="py-2 px-3 text-center align-middle">{item.maturityDate ? new Date(item.maturityDate).toLocaleDateString('en-IN', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric'
+                  }) : '—'}</td>
                   <td className="py-2 px-3 text-center align-middle">
                     <button
                       className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
@@ -848,7 +856,11 @@ const Investments: React.FC = () => {
               </div>
               <div>
                 <div className="text-gray-600 text-sm">Date of Investment</div>
-                <div className="font-medium">{selectedInvestment.investmentDate ? new Date(selectedInvestment.investmentDate).toLocaleDateString() : '—'}</div>
+                <div className="font-medium">{selectedInvestment.investmentDate ? new Date(selectedInvestment.investmentDate).toLocaleDateString('en-IN', {
+                  day: '2-digit',
+                  month: '2-digit',
+                  year: 'numeric'
+                }) : '—'}</div>
               </div>
               <div>
                 <div className="text-gray-600 text-sm">Investment Period</div>
@@ -864,7 +876,11 @@ const Investments: React.FC = () => {
               </div>
               <div>
                 <div className="text-gray-600 text-sm">Date of Maturity</div>
-                <div className="font-medium">{selectedInvestment.maturityDate ? new Date(selectedInvestment.maturityDate).toLocaleDateString() : '—'}</div>
+                <div className="font-medium">{selectedInvestment.maturityDate ? new Date(selectedInvestment.maturityDate).toLocaleDateString('en-IN', {
+                  day: '2-digit',
+                  month: '2-digit',
+                  year: 'numeric'
+                }) : '—'}</div>
               </div>
               <div>
                 <div className="text-gray-600 text-sm">Status</div>

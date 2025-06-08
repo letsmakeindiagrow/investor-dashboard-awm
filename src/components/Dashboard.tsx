@@ -62,7 +62,11 @@ const Dashboard: React.FC = () => {
         // Process investment history for the graph
         const investments = historyRes.data?.investments || [];
         const historyData = investments.map((inv: any) => ({
-          date: new Date(inv.investmentDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
+          date: new Date(inv.investmentDate).toLocaleDateString('en-IN', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+          }),
           invested: inv.investedAmount,
           current: inv.investedAmount * (1 + (Number(inv.investmentPlan?.roiAAR || 0) / 100))
         }));
