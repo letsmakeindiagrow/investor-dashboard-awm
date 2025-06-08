@@ -223,7 +223,7 @@ const Funds: React.FC = () => {
               Total Balance
             </h3>
             <p className="text-3xl font-bold" style={{ color: "#08AFF1" }}>
-              ₹{(balance ?? 0).toLocaleString()}
+              ₹{(balance ?? 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </p>
           </div>
           <div className="bg-white p-4 rounded-lg shadow-md">
@@ -234,7 +234,7 @@ const Funds: React.FC = () => {
               Withdrawable Balance
             </h3>
             <p className="text-3xl font-bold" style={{ color: "#AACF45" }}>
-              ₹{(withdrawableBalance ?? 0).toLocaleString()}
+              ₹{(withdrawableBalance ?? 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </p>
           </div>
         </div>
@@ -452,13 +452,13 @@ const Funds: React.FC = () => {
             <div>
               <label className="block mb-2">Available Balance</label>
               <p className="text-2xl font-bold" style={{ color: "#08AFF1" }}>
-                ₹{(balance ?? 0).toLocaleString()}
+                ₹{(balance ?? 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </p>
             </div>
             <div>
               <label className="block mb-2">Withdrawable Balance</label>
               <p className="text-2xl font-bold" style={{ color: "#AACF45" }}>
-                ₹{(withdrawableBalance ?? 0).toLocaleString()}
+                ₹{(withdrawableBalance ?? 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </p>
             </div>
             <div>
@@ -613,11 +613,11 @@ const Funds: React.FC = () => {
                       }}
                     >
                       {transaction.type === "Deposit" ? "+" : "-"}₹
-                      {transaction.amount.toLocaleString()}/-
+                      {transaction.amount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/-
                     </td>
                     <td className="py-2 px-3">{transaction.refNumber}</td>
                     <td className="py-2 px-3">
-                      ₹{transaction?.balance?.toLocaleString()}/-
+                      ₹{transaction?.balance?.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}/-
                     </td>
                     <td className="py-2 px-3">{transaction.remark}</td>
                   </tr>
