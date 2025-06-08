@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import BigNumber from "bignumber.js";
+import Decimal from 'decimal.js';
 
 interface InvestmentPlan {
   id: string;
@@ -465,7 +466,18 @@ const Investments: React.FC = () => {
                     <p>
                       Expected Return:{" "}
                       <span style={{ color: "#AACF45" }}>
-                        {plan.expectedReturn}
+                        {(() => {
+                          let principal = new Decimal(plan.minInvestment);
+                          const inputAmount = Number(investmentAmount);
+                          if (!isNaN(inputAmount) && inputAmount >= plan.minInvestment) {
+                            principal = new Decimal(inputAmount);
+                          }
+                          const roi = new Decimal(plan.roiAAR);
+                          const T_elapsed = plan.investmentTerm * 365;
+                          const gainComponent = principal.times(roi.div(100)).times(new Decimal(T_elapsed).div(365));
+                          const expectedReturn = principal.plus(gainComponent);
+                          return `₹${expectedReturn.toFixed(2)}`;
+                        })()}
                       </span>
                     </p>
                     <p>Investment Period: {plan.investmentTerm} yr</p>
@@ -507,7 +519,18 @@ const Investments: React.FC = () => {
                         <p>
                           Expected Return:{" "}
                           <span style={{ color: "#AACF45" }}>
-                            {plan.expectedReturn}
+                            {(() => {
+                              let principal = new Decimal(plan.minInvestment);
+                              const inputAmount = Number(investmentAmount);
+                              if (!isNaN(inputAmount) && inputAmount >= plan.minInvestment) {
+                                principal = new Decimal(inputAmount);
+                              }
+                              const roi = new Decimal(plan.roiAAR);
+                              const T_elapsed = plan.investmentTerm * 365;
+                              const gainComponent = principal.times(roi.div(100)).times(new Decimal(T_elapsed).div(365));
+                              const expectedReturn = principal.plus(gainComponent);
+                              return `₹${expectedReturn.toFixed(2)}`;
+                            })()}
                           </span>
                         </p>
                         <p>Investment Period: {plan.investmentTerm} yr</p>
