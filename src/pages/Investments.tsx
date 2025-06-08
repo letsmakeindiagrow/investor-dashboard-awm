@@ -669,21 +669,16 @@ const Investments: React.FC = () => {
                 <th className="py-2 px-3 border-b">Plan Type</th>
                 <th className="py-2 px-3 border-b">Invested Value</th>
                 <th className="py-2 px-3 border-b">Date of Investment</th>
-                <th className="py-2 px-3 border-b">Investment Period</th>
-                <th className="py-2 px-3 border-b">RoI(%)</th>
-                <th className="py-2 px-3 border-b">Withdrawal Frequency</th>
                 <th className="py-2 px-3 border-b">Date of Maturity</th>
-                <th className="py-2 px-3 border-b">Actions</th>
+                <th className="py-2 px-3 border-b">More Info</th>
               </tr>
             </thead>
             <tbody>
               {myInvestments.map((item, index) => (
-                <tr key={item.id} className="border-b hover:bg-gray-50 cursor-pointer" onClick={() => setSelectedInvestment(item)}>
+                <tr key={item.id} className="border-b hover:bg-gray-50">
                   <td className="py-2 px-3 text-center">{index + 1}</td>
                   <td className="py-2 px-3 text-left">
-                    {item.investmentPlan?.type} (
-                    {item.investmentPlan?.investmentTerm} yr,{' '}
-                    {item.investmentPlan?.roiAAR}%)
+                    {item.investmentPlan?.type}
                   </td>
                   <td className="py-2 px-3 text-right">
                     {item.investedAmount
@@ -696,23 +691,17 @@ const Investments: React.FC = () => {
                       : '—'}
                   </td>
                   <td className="py-2 px-3 text-center">
-                    {item.investmentPlan?.investmentTerm
-                      ? `${item.investmentPlan.investmentTerm} yr`
-                      : '—'}
-                  </td>
-                  <td className="py-2 px-3 text-right">
-                    {item.investmentPlan?.roiAAR ?? '—'}
-                  </td>
-                  <td className="py-2 px-3 text-center">
-                    {item.withdrawalFrequency || '—'}
-                  </td>
-                  <td className="py-2 px-3 text-center">
                     {item.maturityDate
                       ? new Date(item.maturityDate).toLocaleDateString()
                       : '—'}
                   </td>
                   <td className="py-2 px-3 text-center">
-                    {/* Remove Withdraw button from here */}
+                    <button
+                      className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                      onClick={() => setSelectedInvestment(item)}
+                    >
+                      More Info
+                    </button>
                   </td>
                 </tr>
               ))}
