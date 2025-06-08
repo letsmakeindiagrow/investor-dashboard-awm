@@ -797,35 +797,42 @@ const Investments: React.FC = () => {
                 <th className="py-2 px-3 border-b text-center align-middle">Invested Value</th>
                 <th className="py-2 px-3 border-b text-center align-middle">Date of Investment</th>
                 <th className="py-2 px-3 border-b text-center align-middle">Date of Maturity</th>
+                <th className="py-2 px-3 border-b text-center align-middle">Return Amount till date</th>
+                <th className="py-2 px-3 border-b text-center align-middle">Return % till date</th>
                 <th className="py-2 px-3 border-b text-center align-middle">More Info</th>
               </tr>
             </thead>
             <tbody>
-              {myInvestments.map((item, index) => (
-                <tr key={item.id} className="border-b hover:bg-gray-50">
-                  <td className="py-2 px-3 text-center align-middle">{index + 1}</td>
-                  <td className="py-2 px-3 text-left align-middle">{item.investmentPlan?.name}</td>
-                  <td className="py-2 px-3 text-center align-middle">{item.investedAmount ? '₹' + Number(item.investedAmount).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '—'}</td>
-                  <td className="py-2 px-3 text-center align-middle">{item.investmentDate ? new Date(item.investmentDate).toLocaleDateString('en-IN', {
-                    day: '2-digit',
-                    month: '2-digit',
-                    year: 'numeric'
-                  }) : '—'}</td>
-                  <td className="py-2 px-3 text-center align-middle">{item.maturityDate ? new Date(item.maturityDate).toLocaleDateString('en-IN', {
-                    day: '2-digit',
-                    month: '2-digit',
-                    year: 'numeric'
-                  }) : '—'}</td>
-                  <td className="py-2 px-3 text-center align-middle">
-                    <button
-                      className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-                      onClick={() => setSelectedInvestment(item)}
-                    >
-                      View Fund
-                    </button>
-                  </td>
-                </tr>
-              ))}
+              {myInvestments.map((item, index) => {
+                // Calculate days since investment
+                const dateOfInvestment = new Date(item.investmentDate);
+                const today = new Date();
+                const days = Math.floor((today.getTime() - dateOfInvestment.getTime()) / (1000 * 60 * 60 * 24));
+                const investedAmount = Number(item.investedAmount);
+                const roi = Number(item.investmentPlan?.roiAAR) / 100;
+                const dailyReturn = (investedAmount * roi) / 365;
+                const returnAmountTillDate = days * dailyReturn;
+                const returnPercentTillDate = investedAmount > 0 ? (returnAmountTillDate / investedAmount) * 100 : 0;
+                return (
+                  <tr key={item.id} className="border-b hover:bg-gray-50">
+                    <td className="py-2 px-3 text-center align-middle">{index + 1}</td>
+                    <td className="py-2 px-3 text-left align-middle">{item.investmentPlan?.name}</td>
+                    <td className="py-2 px-3 text-center align-middle">{item.investedAmount ? '₹' + investedAmount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '—'}</td>
+                    <td className="py-2 px-3 text-center align-middle">{item.investmentDate ? new Date(item.investmentDate).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '—'}</td>
+                    <td className="py-2 px-3 text-center align-middle">{item.maturityDate ? new Date(item.maturityDate).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '—'}</td>
+                    <td className="py-2 px-3 text-center align-middle">{'₹' + returnAmountTillDate.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                    <td className="py-2 px-3 text-center align-middle">{returnPercentTillDate.toFixed(2)}%</td>
+                    <td className="py-2 px-3 text-center align-middle">
+                      <button
+                        className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                        onClick={() => setSelectedInvestment(item)}
+                      >
+                        View Fund
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>

@@ -87,6 +87,7 @@ const Dashboard: React.FC = () => {
   }, []);
 
   const profitLoss = totalCurrentValue - totalInvestedValue;
+  const totalReturnPercent = totalInvestedValue > 0 ? (profitLoss / totalInvestedValue) * 100 : 0;
 
   // Custom tooltip component
   const CustomTooltip = ({ active, payload, label }: any) => {
@@ -130,9 +131,9 @@ const Dashboard: React.FC = () => {
           </p>
         </div>
         <div className="bg-white p-4 rounded-lg shadow-md">
-          <h3 className="text-sm text-gray-500">Profit & Loss</h3>
+          <h3 className="text-sm text-gray-500">Total Return</h3>
           <p className={`text-2xl font-bold ${profitLoss >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-            {loading ? 'Loading...' : `₹${profitLoss.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+            {loading ? 'Loading...' : `₹${profitLoss.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} (${totalReturnPercent.toFixed(2)}%)`}
           </p>
         </div>
         <div className="bg-white p-4 rounded-lg shadow-md">
