@@ -568,6 +568,12 @@ const Investments: React.FC = () => {
                     </span>
                   </p>
                   <p>
+                    ROI:{" "}
+                    <span style={{ color: "#AACF45" }}>
+                      {plan.roiAAR}% per annum
+                    </span>
+                  </p>
+                  <p>
                     Expected Return:{" "}
                     <span style={{ color: "#AACF45" }}>
                       {(() => {
@@ -618,6 +624,12 @@ const Investments: React.FC = () => {
                           Min. Investment:{" "}
                           <span style={{ color: "#AACF45" }}>
                             {'₹' + Number(plan.minInvestment).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          </span>
+                        </p>
+                        <p>
+                          ROI:{" "}
+                          <span style={{ color: "#AACF45" }}>
+                            {plan.roiAAR}% per annum
                           </span>
                         </p>
                         <p>
