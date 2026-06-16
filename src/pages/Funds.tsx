@@ -343,7 +343,7 @@ const Funds: React.FC = () => {
                     <p className="font-medium mb-1">OR</p>
                     <p className="text-sm text-gray-600">Send to UPI ID:</p>
                     <p className="font-mono bg-gray-100 px-3 py-1 rounded-md mt-1">
-                      bharatpe09910698294@yesbankltd
+                      8178757794@sbi
                     </p>
                   </div>
                 </>
